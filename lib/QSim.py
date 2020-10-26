@@ -71,7 +71,9 @@ Gates = {
     'Y': np.array([[0, -1j], [1j, 0]]),
     'Z': np.array([[1, 0], [0, -1]]),
     'H': np.array([[1 / np.sqrt(2), 1 / np.sqrt(2)], [1 / np.sqrt(2), -1 / np.sqrt(2)]]),
-    'CNOT': np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
+    'CNOT2_01': np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]]), #控制位在第一个
+    'CNOT2_10': np.array([[1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0]]), #控制位在第二个
+    'SWAP2_01': np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
 }
 
 class QuantumRegister:
@@ -104,15 +106,15 @@ class QuantumRegister:
     # 暂时只考虑相邻的门
     def generateMatrix(self, gate, q1, q2=-1):
         res = np.array([[1]])
-        if q2 == -1:
+        if q2 == -1:    # 单比特门
             for i in range(self.numQubits):
-                if(i == q1):
+                if i == q1:
                     res = kron(res, Gates[gate])
                 else:
                     res = kron(res, Gates['I'])
-        else:
+        else:           # 双比特门
             for i in range(self.numQubits-1):
-                if (i == q1):
+                if i == q1:
                     res = kron(res, Gates[gate])
                     i = i+1
                 else:

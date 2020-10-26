@@ -15,7 +15,7 @@ def test_constructor_1():
     qubit = QuantumRegister(3)
     print(qubit.getAmplitudes())
     qubit.addGate('X', 0)
-    qubit.addGate('CNOT', 0, 1)
+    qubit.addGate('CNOT2_01', 0, 1)
     measured = qubit.measure()
     assert measured == '110'
 
@@ -32,8 +32,16 @@ def test_constructor_3():
     wf = qubit.getAmplitudes()
     assert (wf == coef).all()
 
+# 测试 addGate方法
+def test_addGate():
+    qubit = QuantumRegister(basis='1000')
+    qubit.addGate('CNOT2_01', 0, 1)
+    qubit.addGate('CNOT2_10', 0, 1)
+    measured = qubit.measure()
+    assert measured == '0100'
+
 #############################################
-#                 测试 Tools             #
+#                 测试 Tools                #
 #############################################
 # test basis
 def test_basis():
