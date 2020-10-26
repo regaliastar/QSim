@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.linalg import kron
-from IPython.display import Markdown as md
+import sys
 
 class Tools:
     def basis(self, string='00010'):
@@ -50,12 +50,12 @@ class Tools:
 
     def print_wf(self, wf):
         coef, seqs = self.decompose(wf)
-        latex = ""
+        str = ''
         for i, seq in enumerate(seqs):
-            latex += r"%s$|%s\rangle$" % (coef[i], seq)
+            str += '{}|{}>'.format(coef[i], seq)
             if i != len(seqs) - 1:
-                latex += "+"
-        return md(latex)
+                str += '+'
+        return str
 
 # Define the one-qubit and 2-qubit operation gates
 Gates = {
@@ -69,14 +69,34 @@ Gates = {
 }
 
 class QuantumRegister:
-    def __init__(self, numQubits):
-        self.numQubits = numQubits
-        self.amplitudes = np.zeros(2**numQubits)
-        self.amplitudes[0] = 1
-        self.value = False
+    def __init__(self, numQubits=-1, coef = '-1', basis='-1'):
+        tools = Tools()
+        if type(numQubits)==type(int(numQubits)) and numQubits>0 :  #判断 numQubits 是否为正整数
+            self.numQubits = numQubits
+            self.amplitudes = np.zeros(2**numQubits)
+            self.amplitudes[0] = 1  #因为默认的输入是 '00000...0'
+            self.value = False
+        elif basis is not '-1' and isinstance(basis,str): #生成初态如 '0110...'
+            self.amplitudes = tools.basis(basis).A1
+            self.numQubits = len(basis)
+            self.value = False
+        elif coef is not '-1':  #生成初态如 '1/2|00>+1/2|01>+1/2|10>+1/2|11>'
+            # 验证输入
+            if not isinstance(coef,list) or not isinstance(basis,list):
+                raise Exception('Failed to excuse coef {}, basis {}'.format(coef, basis))
+            self.amplitudes = tools.wave_func(coef, basis).A1
+            self.numQubits = len(basis[0])
+            self.value = False
+        else:
+            raise ValueError('Failed to import arguments: {}'.format(sys.argv))
+
+    # get current amplitudes
+    def getAmplitudes(self):
+        return self.amplitudes
 
     # generate Matrix by given gates
-    def generateMatrix(self, gate, numQubits, q1, q2=-1):
+    # 暂时只考虑相邻的门
+    def generateMatrix(self, gate, q1, q2=-1):
         res = np.array([[1]])
         if q2 == -1:
             for i in range(self.numQubits):
@@ -93,13 +113,12 @@ class QuantumRegister:
                     res = kron(res, Gates['I'])
         return res
 
-    def add(self, gate, q1, q2=-1):
+    def addGate(self, gate, q1, q2=-1):
         if self.value:
             raise ValueError('Cannot add Gate to Measured Register')
         if gate not in Gates:
             raise Exception('Gate {} is not defined in Gates'.format(gate))
-        # 暂时只考虑相邻的门
-        gateMatrix = self.generateMatrix(gate, self.numQubits, q1, q2)
+        gateMatrix = self.generateMatrix(gate, q1, q2)
         self.amplitudes = np.dot(self.amplitudes, gateMatrix)
 
     def measure(self):
