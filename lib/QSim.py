@@ -59,13 +59,19 @@ class Tools:
 
 # Define the one-qubit and 2-qubit operation gates
 Gates = {
-    'I': np.matrix("1 0; 0 1"),
-    'X': np.matrix("0 1; 1 0"),
-    'Y': np.matrix("0 -1j; 1j 0"),
-    'Z': np.matrix("1 0; 0 -1"),
-    'H': np.matrix("1 1; 1 -1") / np.sqrt(2),
-    'CNOT': np.matrix("1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0"),
-    'SWAP': np.matrix("1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1")
+    # 'I': np.matrix("1 0; 0 1"),
+    # 'X': np.matrix("0 1; 1 0"),
+    # 'Y': np.matrix("0 -1j; 1j 0"),
+    # 'Z': np.matrix("1 0; 0 -1"),
+    # 'H': np.matrix("1 1; 1 -1") / np.sqrt(2),
+    # 'CNOT': np.matrix("1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0"),
+    # 'SWAP': np.matrix("1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1")
+    'I': np.array([[1, 0], [0, 1]]),
+    'X': np.array([[0, 1], [1, 0]]),
+    'Y': np.array([[0, -1j], [1j, 0]]),
+    'Z': np.array([[1, 0], [0, -1]]),
+    'H': np.array([[1 / np.sqrt(2), 1 / np.sqrt(2)], [1 / np.sqrt(2), -1 / np.sqrt(2)]]),
+    'CNOT': np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
 }
 
 class QuantumRegister:

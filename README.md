@@ -1,5 +1,5 @@
 # QSim
-
+## Introduction
 ```
 #############################################
 #                 Introduction              #
@@ -16,4 +16,10 @@ qubit.addGate('CNOT',0,1)
 
 result = qubit.measure()
 print(result)
+```
+
+## Options
+```
+测试
+pytest --disable-warnings  
 ```
