@@ -31,10 +31,12 @@ class Tools:
             res += a * self.basis(seqs[i])
         return np.matrix(res)
 
+    # @param wave_func: np.martix
     def project(self, wave_func, direction):
         '''<Psi | phi_i> to get the amplitude '''
         return wave_func.H * direction
 
+    # @param wave_func: np.martix
     def decompose(self, wave_func):
         '''将叠加态波函数分解'''
         nbit = int(np.log2(len(wave_func)))
@@ -48,6 +50,7 @@ class Tools:
                 direct_str.append(seq)
         return amplitudes, direct_str
 
+    # @param wf: np.martix
     def print_wf(self, wf):
         coef, seqs = self.decompose(wf)
         str = ''
@@ -64,8 +67,9 @@ Gates = {
     # 'Y': np.matrix("0 -1j; 1j 0"),
     # 'Z': np.matrix("1 0; 0 -1"),
     # 'H': np.matrix("1 1; 1 -1") / np.sqrt(2),
-    # 'CNOT': np.matrix("1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0"),
-    # 'SWAP': np.matrix("1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1")
+    # 'CNOT2_01': np.matrix("1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0"),
+    # 'CNOT2_10': np.matrix("1 0 0 0; 0 0 0 1; 0 0 1 0; 0 1 0 0"),
+    # 'SWAP2_01': np.matrix("1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1")
     'I': np.array([[1, 0], [0, 1]]),
     'X': np.array([[0, 1], [1, 0]]),
     'Y': np.array([[0, -1j], [1j, 0]]),
@@ -81,8 +85,11 @@ class QuantumRegister:
         tools = Tools()
         if type(numQubits)==type(int(numQubits)) and numQubits>0 :  #判断 numQubits 是否为正整数
             self.numQubits = numQubits
-            self.amplitudes = np.zeros(2**numQubits)
-            self.amplitudes[0] = 1  #因为默认的输入是 '00000...0'
+            # self.amplitudes = np.zeros(2**numQubits)
+            dim_1 = ['0' for index in range(numQubits)]
+            basisStr = ''.join(dim_1)
+            self.amplitudes = tools.basis(basisStr).A1
+            self.amplitudes[0] = '1'                    # 因为默认的输入是 '00000...0'
             self.value = False
         elif basis is not '-1' and isinstance(basis,str): #生成初态如 '0110...'
             self.amplitudes = tools.basis(basis).A1
@@ -99,11 +106,20 @@ class QuantumRegister:
             raise ValueError('Failed to import arguments: {}'.format(sys.argv))
 
     # get current amplitudes
+    # @return np.ndarray
     def getAmplitudes(self):
         return self.amplitudes
 
+    # 将 self.amplitudes 转为能被 print_wf 函数解析的 wave_func 格式
+    # ndarray 转为 matrix，
+    # 一维 转为 二维
+    # @return np.matrix
+    def a2wf(self):
+        return np.mat(self.amplitudes.reshape(2 ** self.numQubits, 1))
+
     # generate Matrix by given gates
     # 暂时只考虑相邻的门
+    # @return np.ndarray
     def generateMatrix(self, gate, q1, q2=-1):
         res = np.array([[1]])
         if q2 == -1:    # 单比特门
@@ -121,11 +137,31 @@ class QuantumRegister:
                     res = kron(res, Gates['I'])
         return res
 
-    def addGate(self, gate, q1, q2=-1):
+    # 将gate转化成矩阵
+    # 适用于跨线路门
+    # 控制位在上
+    # CNOT, C-Z, C-U
+    # @return np.ndarray
+    def gate2Matrix(self, gate, q1, q2=-1):
+        if gate not in Gates:
+            raise ValueError('Gate {} is not defined in Gates'.format(gate))
+        if q2 == -1:
+            return Gates[gate]
+        if q2 > q1:
+            m_size = 2 ** (q2 - q1 + 1)
+            base = np.identity(m_size)
+            for i in range(int(m_size/4)):
+                # base[m_size/2+1+i*2][m_size/2+1+i*2]
+                for j in range(2):
+                    for k in range(2):
+                        base[int(m_size / 2 + i * 2 + j)][int(m_size / 2  + i * 2 + k)] = Gates[gate][j][k]
+            return base
+
+    def applyGate(self, gate, q1, q2=-1):
         if self.value:
             raise ValueError('Cannot add Gate to Measured Register')
         if gate not in Gates:
-            raise Exception('Gate {} is not defined in Gates'.format(gate))
+            raise ValueError('Gate {} is not defined in Gates'.format(gate))
         gateMatrix = self.generateMatrix(gate, q1, q2)
         self.amplitudes = np.dot(self.amplitudes, gateMatrix)
 

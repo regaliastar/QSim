@@ -6,39 +6,54 @@ sys.path.append(BASE_DIR) #添加环境变量
 from lib.QSim import QuantumRegister
 from lib.QSim import Tools
 import numpy as np
+import logging
+
+logging.basicConfig(filename='test.log', level=logging.DEBUG)
 
 #############################################
-#          测试 QuantumRegister             #
+#          单元测试 QuantumRegister         #
+#           测试接口函数是否符合预期           #
 #############################################
 # 构造函数
 def test_constructor_1():
     qubit = QuantumRegister(3)
-    print(qubit.getAmplitudes())
-    qubit.addGate('X', 0)
-    qubit.addGate('CNOT2_01', 0, 1)
+    qubit.applyGate('X', 0)
+    qubit.applyGate('CNOT2_01', 0, 1)
     measured = qubit.measure()
     assert measured == '110'
 
 def test_constructor_2():
     qubit = QuantumRegister(basis='00001')
-    qubit.addGate('X', 0)
+    qubit.applyGate('X', 0)
     measured = qubit.measure()
     assert measured == '10001'
 
 def test_constructor_3():
     coef = [1/2, 1/2, 1/2, 1/2]
     qubit = QuantumRegister(coef=coef, basis=['00','01','10','11'])
-    qubit.addGate('X', 0)
-    wf = qubit.getAmplitudes()
-    assert (wf == coef).all()
+    qubit.applyGate('X', 0)
+    a = qubit.getAmplitudes()
+    assert (a == coef).all()
 
 # 测试 addGate方法
 def test_addGate():
     qubit = QuantumRegister(basis='1000')
-    qubit.addGate('CNOT2_01', 0, 1)
-    qubit.addGate('CNOT2_10', 0, 1)
+    qubit.applyGate('CNOT2_01', 0, 1)
+    qubit.applyGate('CNOT2_10', 0, 1)
     measured = qubit.measure()
     assert measured == '0100'
+
+# 测试 gate2matrix
+def test_gate2Matrix():
+    qubit = QuantumRegister(2)
+    Matrix1 = qubit.gate2Matrix('X', 0, 2)
+    Matrix2 = qubit.gate2Matrix('X', 2, 4)
+    Matrix3 = qubit.gate2Matrix('X', 0, 1)
+    CNOT3_02 = np.matrix('1 0 0 0 0 0 0 0; 0 1 0 0 0 0 0 0; 0 0 1 0 0 0 0 0; 0 0 0 1 0 0 0 0; 0 0 0 0 0 1 0 0; 0 0 0 0 1 0 0 0; 0 0 0 0 0 0 0 1; 0 0 0 0 0 0 1 0')
+    CNOT = np.matrix("1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0")
+    assert (CNOT3_02 == np.mat(Matrix1)).all()
+    assert (CNOT3_02 == np.mat(Matrix2)).all()
+    assert (CNOT == np.mat(Matrix3)).all()
 
 #############################################
 #                 测试 Tools                #
@@ -50,7 +65,7 @@ def test_basis():
     b = tools.basis('001')
     assert (b.A1 == arr).all()
 
-#test wave_func
+# test wave_func
 def test_wave_func():
     tools = Tools()
     coef1 = [1 / np.sqrt(2), np.sqrt(1 / 2)]
@@ -58,3 +73,24 @@ def test_wave_func():
     wf1 = tools.wave_func(coef1, seqs1)
     answer = np.array([np.sqrt(1/2), 0, 0, 0, np.sqrt(1/2), 0, 0, 0])
     assert (np.isclose(wf1.A1, answer)).all()
+
+# test print_wf, a2wf
+def test_print_wf():
+    tools = Tools()
+    answer = '{}|{}>+{}|{}>'.format(1/np.sqrt(2),'00',1/np.sqrt(2),'11')
+    q1 = QuantumRegister(2)
+    q1.applyGate('H', 0)
+    q1.applyGate('CNOT2_01', 0, 1)
+    wf1 = tools.print_wf(q1.a2wf())
+    assert answer == wf1
+    q2 = QuantumRegister(basis='00')
+    q2.applyGate('H', 0)
+    q2.applyGate('CNOT2_01', 0, 1)
+    wf2 = tools.print_wf(q2.a2wf())
+    assert answer == wf2
+    coef = [1/np.sqrt(2), 1/np.sqrt(2)]
+    basis = ['00', '11']
+    q3 = QuantumRegister(coef=coef, basis=basis)
+    wf3 = tools.print_wf(q3.a2wf())
+    assert answer == wf3
+
