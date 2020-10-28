@@ -24,8 +24,10 @@ class Tools:
             yield '0' * nzeros + binary
 
     def wave_func(self, coef=[], seqs=[]):
-        '''返回由振幅和几个Qubit序列表示的叠加态波函数，
-           sum_i coef_i |psi_i> '''
+        '''
+        返回由振幅和几个Qubit序列表示的叠加态波函数，
+        sum_i coef_i |psi_i>
+        '''
         res = 0
         for i, a in enumerate(coef):
             res += a * self.basis(seqs[i])
@@ -33,12 +35,16 @@ class Tools:
 
     # @param wave_func: np.martix
     def project(self, wave_func, direction):
-        '''<Psi | phi_i> to get the amplitude '''
+        '''
+        <Psi | phi_i> to get the amplitude
+        '''
         return wave_func.H * direction
 
-    # @param wave_func: np.martix
     def decompose(self, wave_func):
-        '''将叠加态波函数分解'''
+        '''
+        将叠加态波函数分解
+        :param wave_func: np.martix
+        '''
         nbit = int(np.log2(len(wave_func)))
         amplitudes = []
         direct_str = []
@@ -50,8 +56,11 @@ class Tools:
                 direct_str.append(seq)
         return amplitudes, direct_str
 
-    # @param wf: np.martix
     def print_wf(self, wf):
+        '''
+        :param wf: np.martix
+        :return: sr
+        '''
         coef, seqs = self.decompose(wf)
         str = ''
         for i, seq in enumerate(seqs):
@@ -62,26 +71,22 @@ class Tools:
 
 # Define the one-qubit and 2-qubit operation gates
 Gates = {
-    # 'I': np.matrix("1 0; 0 1"),
-    # 'X': np.matrix("0 1; 1 0"),
-    # 'Y': np.matrix("0 -1j; 1j 0"),
-    # 'Z': np.matrix("1 0; 0 -1"),
-    # 'H': np.matrix("1 1; 1 -1") / np.sqrt(2),
-    # 'CNOT2_01': np.matrix("1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0"),
-    # 'CNOT2_10': np.matrix("1 0 0 0; 0 0 0 1; 0 0 1 0; 0 1 0 0"),
-    # 'SWAP2_01': np.matrix("1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1")
     'I': np.array([[1, 0], [0, 1]]),
     'X': np.array([[0, 1], [1, 0]]),
     'Y': np.array([[0, -1j], [1j, 0]]),
     'Z': np.array([[1, 0], [0, -1]]),
     'H': np.array([[1 / np.sqrt(2), 1 / np.sqrt(2)], [1 / np.sqrt(2), -1 / np.sqrt(2)]]),
-    'CNOT2_01': np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]]), #控制位在第一个
-    'CNOT2_10': np.array([[1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0]]), #控制位在第二个
     'SWAP2_01': np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
 }
 
 class QuantumRegister:
     def __init__(self, numQubits=-1, coef = '-1', basis='-1'):
+        '''
+        定义了3种构造方法：QuantumRegister()
+        :param numQubits: number
+        :param coef: list
+        :param basis: str or list
+        '''
         tools = Tools()
         if type(numQubits)==type(int(numQubits)) and numQubits>0 :  #判断 numQubits 是否为正整数
             self.numQubits = numQubits
@@ -105,22 +110,27 @@ class QuantumRegister:
         else:
             raise ValueError('Failed to import arguments: {}'.format(sys.argv))
 
-    # get current amplitudes
-    # @return np.ndarray
     def getAmplitudes(self):
+        '''
+        get current amplitudes
+        :return np.ndarray
+        '''
         return self.amplitudes
 
-    # 将 self.amplitudes 转为能被 print_wf 函数解析的 wave_func 格式
-    # ndarray 转为 matrix，
-    # 一维 转为 二维
-    # @return np.matrix
     def a2wf(self):
+        '''
+        将 self.amplitudes 转为能被 print_wf 函数解析的 wave_func 格式
+        ndarray 转为 matrix，一维 转为 二维
+        :return np.matrix
+        '''
         return np.mat(self.amplitudes.reshape(2 ** self.numQubits, 1))
 
-    # generate Matrix by given gates
-    # 暂时只考虑相邻的门
-    # @return np.ndarray
     def generateMatrix(self, gate, q1, q2=-1):
+        '''
+        generate Matrix by given gates
+        暂时不考虑并行，每添加一个门就进行一次波函数的运算
+        :return np.ndarray
+        '''
         res = np.array([[1]])
         if q2 == -1:    # 单比特门
             for i in range(self.numQubits):
@@ -129,20 +139,24 @@ class QuantumRegister:
                 else:
                     res = kron(res, Gates['I'])
         else:           # 双比特门
-            for i in range(self.numQubits-1):
-                if i == q1:
-                    res = kron(res, Gates[gate])
-                    i = i+1
+            length = q1-q2 if q1>q2 else q2-q1
+            min = q1 if q1<q2 else q2
+            matrix = self.gate2Matrix(gate, q1, q2)
+            for i in range(self.numQubits-length):
+                if i == min:
+                    res = kron(res, matrix)
                 else:
                     res = kron(res, Gates['I'])
         return res
 
-    # 将gate转化成矩阵
-    # 适用于跨线路门
-    # 控制位在上
-    # CNOT, C-Z, C-U
-    # @return np.ndarray
     def gate2Matrix(self, gate, q1, q2=-1):
+        '''
+        将gate转化成矩阵
+        适用于跨线路门
+        控制位在上
+        CNOT, C-Z, C-U
+        :return np.ndarray
+        '''
         if gate not in Gates:
             raise ValueError('Gate {} is not defined in Gates'.format(gate))
         if q2 == -1:
@@ -151,11 +165,22 @@ class QuantumRegister:
             m_size = 2 ** (q2 - q1 + 1)
             base = np.identity(m_size)
             for i in range(int(m_size/4)):
-                # base[m_size/2+1+i*2][m_size/2+1+i*2]
+                # base[m_size/2+i*2][m_size/2+i*2]
                 for j in range(2):
                     for k in range(2):
                         base[int(m_size / 2 + i * 2 + j)][int(m_size / 2  + i * 2 + k)] = Gates[gate][j][k]
             return base
+        elif q2 < q1:
+            m_size = 2 ** (q1 - q2 + 1)
+            base = np.identity(m_size)
+            for i in range(int(m_size/4)):
+                # 1+2*i, 1+2*i+m_size/2
+                for j in range(2):
+                    for k in range(2):
+                        base[int(1 + 2 * i + j * m_size / 2)][int(1 + 2 * i + k * m_size / 2)] = Gates[gate][j][k]
+            return base
+        else:
+            raise ValueError('Failed to input args!')
 
     def applyGate(self, gate, q1, q2=-1):
         if self.value:

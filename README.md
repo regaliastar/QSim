@@ -11,8 +11,8 @@ from QSim import QuantumRegister
 from QSim import Tools
 
 qubit = new QuantumRegister(3)
-qubit.addGate('H',0)
-qubit.addGate('CNOT',0,1)
+qubit.applyGate('H',0)
+qubit.applyGate('X',0,1)
 
 result = qubit.measure()
 print(result)

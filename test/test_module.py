@@ -18,7 +18,7 @@ def test_entangled():
     qubit = QuantumRegister(2)
     tools = Tools()
     qubit.applyGate('H', 0)
-    qubit.applyGate('CNOT2_01', 0, 1)
+    qubit.applyGate('X', 0, 1)
     wf = qubit.a2wf()
     log.debug(tools.print_wf(wf))
     measured = qubit.measure()

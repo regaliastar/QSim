@@ -18,7 +18,7 @@ logging.basicConfig(filename='test.log', level=logging.DEBUG)
 def test_constructor_1():
     qubit = QuantumRegister(3)
     qubit.applyGate('X', 0)
-    qubit.applyGate('CNOT2_01', 0, 1)
+    qubit.applyGate('X', 0, 1)
     measured = qubit.measure()
     assert measured == '110'
 
@@ -38,14 +38,15 @@ def test_constructor_3():
 # 测试 addGate方法
 def test_addGate():
     qubit = QuantumRegister(basis='1000')
-    qubit.applyGate('CNOT2_01', 0, 1)
-    qubit.applyGate('CNOT2_10', 0, 1)
+    qubit.applyGate('X', 0, 1)
+    qubit.applyGate('X', 1, 0)
     measured = qubit.measure()
     assert measured == '0100'
 
 # 测试 gate2matrix
 def test_gate2Matrix():
-    qubit = QuantumRegister(2)
+    qubit = QuantumRegister(basis='1000')
+    # 控制位在上
     Matrix1 = qubit.gate2Matrix('X', 0, 2)
     Matrix2 = qubit.gate2Matrix('X', 2, 4)
     Matrix3 = qubit.gate2Matrix('X', 0, 1)
@@ -54,6 +55,16 @@ def test_gate2Matrix():
     assert (CNOT3_02 == np.mat(Matrix1)).all()
     assert (CNOT3_02 == np.mat(Matrix2)).all()
     assert (CNOT == np.mat(Matrix3)).all()
+    # 控制位在下
+    CNOT4_30 = np.eye(16, 16)
+    CNOT4_30[np.array([1, 9])] = CNOT4_30[np.array([9, 1])]
+    CNOT4_30[np.array([3, 11])] = CNOT4_30[np.array([11, 3])]
+    CNOT4_30[np.array([5, 13])] = CNOT4_30[np.array([13, 5])]
+    CNOT4_30[np.array([7, 15])] = CNOT4_30[np.array([15, 7])]
+    Matrix4 = qubit.gate2Matrix('X', 3, 0)
+    assert (CNOT4_30 == np.mat(Matrix4)).all()
+    # 测试其他门是否满足
+
 
 #############################################
 #                 测试 Tools                #
@@ -80,12 +91,12 @@ def test_print_wf():
     answer = '{}|{}>+{}|{}>'.format(1/np.sqrt(2),'00',1/np.sqrt(2),'11')
     q1 = QuantumRegister(2)
     q1.applyGate('H', 0)
-    q1.applyGate('CNOT2_01', 0, 1)
+    q1.applyGate('X', 0, 1)
     wf1 = tools.print_wf(q1.a2wf())
     assert answer == wf1
     q2 = QuantumRegister(basis='00')
     q2.applyGate('H', 0)
-    q2.applyGate('CNOT2_01', 0, 1)
+    q2.applyGate('X', 0, 1)
     wf2 = tools.print_wf(q2.a2wf())
     assert answer == wf2
     coef = [1/np.sqrt(2), 1/np.sqrt(2)]
