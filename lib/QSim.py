@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.linalg import kron
+from sklearn.preprocessing import normalize
 import sys
 
 class Tools:
@@ -62,12 +63,20 @@ class Tools:
         :return: sr
         '''
         coef, seqs = self.decompose(wf)
-        str = ''
+        str = '|psi> = '
         for i, seq in enumerate(seqs):
             str += '{}|{}>'.format(coef[i], seq)
             if i != len(seqs) - 1:
                 str += '+'
         return str
+
+    def normalization(self, coef):
+        '''
+        将输入参数归一化，如：[0.1, 0.4] => [0.2, 0.8]
+        :param coef:
+        :return:
+        '''
+        return coef / np.linalg.norm(coef)
 
 # Define the one-qubit and 2-qubit operation gates
 Gates = {
@@ -76,6 +85,10 @@ Gates = {
     'Y': np.array([[0, -1j], [1j, 0]]),
     'Z': np.array([[1, 0], [0, -1]]),
     'H': np.array([[1 / np.sqrt(2), 1 / np.sqrt(2)], [1 / np.sqrt(2), -1 / np.sqrt(2)]]),
+    'S': np.array([[1, 0], [0, 1j]]),
+    'T': np.array([[1, 0], [0, np.exp(1j*np.pi/4)]]),
+    'V': np.array([[(1+1j)/2, -1j*(1+1j)/2], [-1j*(1+1j)/2, (1+1j)/2]]),
+    'V+': np.array([[(1-1j)/2, 1j*(1-1j)/2], [1j*(1-1j)/2, (1-1j)/2]]),
     'SWAP2_01': np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
 }
 
@@ -90,16 +103,17 @@ class QuantumRegister:
         tools = Tools()
         if type(numQubits)==type(int(numQubits)) and numQubits>0 :  #判断 numQubits 是否为正整数
             self.numQubits = numQubits
-            # self.amplitudes = np.zeros(2**numQubits)
             dim_1 = ['0' for index in range(numQubits)]
             basisStr = ''.join(dim_1)
             self.amplitudes = tools.basis(basisStr).A1
             self.amplitudes[0] = '1'                    # 因为默认的输入是 '00000...0'
             self.value = False
+            self.measured = np.zeros(self.numQubits)
         elif basis is not '-1' and isinstance(basis,str): #生成初态如 '0110...'
             self.amplitudes = tools.basis(basis).A1
             self.numQubits = len(basis)
             self.value = False
+            self.measured = np.zeros(self.numQubits)
         elif coef is not '-1':  #生成初态如 '1/2|00>+1/2|01>+1/2|10>+1/2|11>'
             # 验证输入
             if not isinstance(coef,list) or not isinstance(basis,list):
@@ -107,6 +121,7 @@ class QuantumRegister:
             self.amplitudes = tools.wave_func(coef, basis).A1
             self.numQubits = len(basis[0])
             self.value = False
+            self.measured = np.zeros(self.numQubits)
         else:
             raise ValueError('Failed to import arguments: {}'.format(sys.argv))
 
@@ -190,16 +205,56 @@ class QuantumRegister:
         gateMatrix = self.generateMatrix(gate, q1, q2)
         self.amplitudes = np.dot(self.amplitudes, gateMatrix)
 
-    def measure(self):
+    def measure(self, place=-1, count=-1):
+        '''
+        若 place 为空，则测量全局
+        否则测量第place个比特
+        :param: place 测量第place个比特
+        :param: count 全局测试的次数
+        :return: str
+        '''
         if(self.value):
             return print_wf(self.value)
-        self.probabilities = []
-        for amp in np.nditer(self.amplitudes):
-            probability = np.absolute(amp) ** 2
-            self.probabilities.append(probability)
-        results = list(range(len(self.probabilities)))
-        self.value = np.binary_repr(
-            np.random.choice(results, p=self.probabilities),
-            self.numQubits
-        )
-        return self.value
+        if place == -1:
+            self.probabilities = []
+            for amp in np.nditer(self.amplitudes):
+                probability = np.absolute(amp) ** 2
+                self.probabilities.append(probability)
+            results = list(range(len(self.probabilities)))
+            self.value = np.binary_repr(
+                np.random.choice(results, p=self.probabilities),
+                self.numQubits
+            )
+            return self.value
+        elif type(place)==type(int(place)) and place>=0:
+            if self.measured[place] == 1:
+                raise ValueError('{} is measured already!'.format(place))
+            index = 0
+            for i in range(place):
+                if self.measured[i] == 1:
+                    index += 1
+            index = place - index
+            tools = Tools()
+            coef, seqs = tools.decompose(self.a2wf())
+            [prob_0, prob_1] = [0, 0]
+            probabilities = np.zeros(2)
+            for i, seq in enumerate(seqs):
+                prob_0 += np.square(coef[i]) if seq[index] == '0' else 0
+            probabilities[0] = prob_0
+            probabilities[1] = 1 - prob_0
+            ls = [0, 1]
+            selected = np.random.choice(ls, p=probabilities)
+            self.measured[place] = 1
+            # 重新生成状态
+            co = []
+            ba = []
+            for i, seq in enumerate(seqs):
+                if seq[index] == str(selected):
+                    co.append(coef[i])
+                    ba.append(seq[0:index] + seq[index+1:len(seq)])
+            co = tools.normalization(co)
+            self.amplitudes = tools.wave_func(co, ba).A1
+            self.numQubits = len(ba[0])
+            return selected
+        else:
+            raise ValueError('Failed to import arguments: {}'.format(sys.argv))

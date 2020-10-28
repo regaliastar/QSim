@@ -8,7 +8,8 @@ from lib.QSim import Tools
 import numpy as np
 import logging
 
-logging.basicConfig(filename='test.log', level=logging.DEBUG)
+logging.basicConfig(filename='test.log', level=logging.DEBUG,
+                    format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
 #############################################
 #          单元测试 QuantumRegister         #
@@ -65,6 +66,21 @@ def test_gate2Matrix():
     assert (CNOT4_30 == np.mat(Matrix4)).all()
     # 测试其他门是否满足
 
+def test_measure():
+    tools = Tools()
+    log = logging.getLogger('test_measure')
+    qubit = QuantumRegister(3)
+    qubit.applyGate('H', 0)
+    qubit.applyGate('X', 0, 1)
+    log.debug(tools.print_wf(qubit.a2wf()))
+    m2 = qubit.measure(place=2)
+    # log.debug(qubit.getAmplitudes())
+    log.debug(tools.print_wf(qubit.a2wf()))
+    assert m2 == 0
+    m0 = qubit.measure(place=0)
+    # log.debug(tools.print_wf(qubit.a2wf()))
+    assert m0 == qubit.measure(place=1)
+
 
 #############################################
 #                 测试 Tools                #
@@ -88,7 +104,7 @@ def test_wave_func():
 # test print_wf, a2wf
 def test_print_wf():
     tools = Tools()
-    answer = '{}|{}>+{}|{}>'.format(1/np.sqrt(2),'00',1/np.sqrt(2),'11')
+    answer = '|psi> = {}|{}>+{}|{}>'.format(1/np.sqrt(2),'00',1/np.sqrt(2),'11')
     q1 = QuantumRegister(2)
     q1.applyGate('H', 0)
     q1.applyGate('X', 0, 1)

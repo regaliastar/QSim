@@ -12,8 +12,14 @@ import logging
 #                 模块化测试                 #
 #             验证制备各种模型的能力           #
 #############################################
-# 制备纠缠态
-def test_entangled():
+
+def test_Bell():
+    '''
+    制备Bell态
+    ---H---*---
+           |
+    -------X---
+    '''
     log = logging.getLogger('test_entangled')
     qubit = QuantumRegister(2)
     tools = Tools()
@@ -23,3 +29,16 @@ def test_entangled():
     log.debug(tools.print_wf(wf))
     measured = qubit.measure()
     assert measured[0] == measured[1]
+
+def test_Deutsch():
+    '''
+    因为 f = CNOT 是平衡函数，因此测量q[0]必为0
+    :return:
+    '''
+    qubit = QuantumRegister(basis='01')
+    qubit.applyGate('H',0)
+    qubit.applyGate('H',1)
+    qubit.applyGate('X',0,1)
+    qubit.applyGate('H',0)
+    m = qubit.measure(place=0)
+    assert m == 1
