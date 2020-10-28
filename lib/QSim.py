@@ -205,7 +205,7 @@ class QuantumRegister:
         gateMatrix = self.generateMatrix(gate, q1, q2)
         self.amplitudes = np.dot(self.amplitudes, gateMatrix)
 
-    def measure(self, place=-1, count=-1):
+    def measure(self, place=-1, count=1):
         '''
         若 place 为空，则测量全局
         否则测量第place个比特
@@ -216,16 +216,24 @@ class QuantumRegister:
         if(self.value):
             return print_wf(self.value)
         if place == -1:
-            self.probabilities = []
-            for amp in np.nditer(self.amplitudes):
-                probability = np.absolute(amp) ** 2
-                self.probabilities.append(probability)
-            results = list(range(len(self.probabilities)))
-            self.value = np.binary_repr(
-                np.random.choice(results, p=self.probabilities),
-                self.numQubits
-            )
-            return self.value
+            _v = {'value':{}}
+            _v['count'] = count
+            for i in range(count):
+                self.probabilities = []
+                for amp in np.nditer(self.amplitudes):
+                    probability = np.absolute(amp) ** 2
+                    self.probabilities.append(probability)
+                results = list(range(len(self.probabilities)))
+                v = np.binary_repr(
+                    np.random.choice(results, p=self.probabilities),
+                    self.numQubits
+                )
+                if v in _v['value']:
+                    _v['value'][v] += 1
+                else:
+                    _v['value'][v] = 1
+            self.value = _v
+            return _v
         elif type(place)==type(int(place)) and place>=0:
             if self.measured[place] == 1:
                 raise ValueError('{} is measured already!'.format(place))

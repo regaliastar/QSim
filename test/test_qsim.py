@@ -21,13 +21,15 @@ def test_constructor_1():
     qubit.applyGate('X', 0)
     qubit.applyGate('X', 0, 1)
     measured = qubit.measure()
-    assert measured == '110'
+    for i in measured['value']:
+        assert i == '110'
 
 def test_constructor_2():
     qubit = QuantumRegister(basis='00001')
     qubit.applyGate('X', 0)
     measured = qubit.measure()
-    assert measured == '10001'
+    for i in measured['value']:
+        assert i == '10001'
 
 def test_constructor_3():
     coef = [1/2, 1/2, 1/2, 1/2]
@@ -42,7 +44,8 @@ def test_addGate():
     qubit.applyGate('X', 0, 1)
     qubit.applyGate('X', 1, 0)
     measured = qubit.measure()
-    assert measured == '0100'
+    for i in measured['value']:
+        assert i == '0100'
 
 # 测试 gate2matrix
 def test_gate2Matrix():

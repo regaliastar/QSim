@@ -27,8 +27,10 @@ def test_Bell():
     qubit.applyGate('X', 0, 1)
     wf = qubit.a2wf()
     log.debug(tools.print_wf(wf))
-    measured = qubit.measure()
-    assert measured[0] == measured[1]
+    measured = qubit.measure(count=100)
+    for m in measured['value']:
+        assert m[0] == m[1]
+    log.debug(measured)
 
 def test_Deutsch():
     '''
