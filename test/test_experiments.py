@@ -34,6 +34,7 @@ def test_Bell():
 
 def test_Deutsch():
     '''
+    Deutsch算法：常数函数 => 0，平衡函数 => 1
     因为 f = CNOT 是平衡函数，因此测量q[0]必为0
     :return:
     '''
@@ -44,3 +45,31 @@ def test_Deutsch():
     qubit.applyGate('H',0)
     m = qubit.measure(place=0)
     assert m == 1
+
+def test_teleport():
+    '''
+    量子隐态传输实验：量子通信网络的基础，Alice:q[0,1], Bob:q[2], 要传输的 phi=q[0]
+    假设 phi = sqrt(1/2)|0> + sqrt(1/2)|1>
+    '''
+    log = logging.getLogger('test_teleport')
+    tools = Tools()
+    qubit = QuantumRegister(basis='000')
+    # 先制备Bell态
+    qubit.applyGate('H',1)
+    qubit.applyGate('X',1,2)
+    # 假设 phi = sqrt(1/2)|0> + sqrt(1/2)|1>
+    qubit.applyGate('H',0)
+    phi = '|psi> = {}|{}>+{}|{}>'.format(1/np.sqrt(2),'0',1/np.sqrt(2),'1')
+    # 开始隐态传输
+    qubit.applyGate('X',0,1)
+    qubit.applyGate('H',0)
+    m1 = qubit.measure(place=0)
+    m2 = qubit.measure(place=1)
+    if m2 == 1:
+        qubit.applyGate('X', 2)
+    if m1 == 1:
+        qubit.applyGate('Z',2)
+    Bob_wf = tools.print_wf(qubit.a2wf())
+    log.debug('m1: {},m2: {}'.format(m1, m2))
+    log.debug(Bob_wf)
+    assert phi == Bob_wf
