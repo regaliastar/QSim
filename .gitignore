@@ -103,3 +103,4 @@ public
 .ipynb_checkpoints
 .idea
 .pytest_cache
+__pycache__
