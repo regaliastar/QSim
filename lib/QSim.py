@@ -1,7 +1,11 @@
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
+sys.path.append(BASE_DIR) #添加环境变量
+from lib.GateManager import GateManager
 import numpy as np
 from scipy.linalg import kron
 from sklearn.preprocessing import normalize
-import sys
 
 class Tools:
     def basis(self, string='00010'):
@@ -78,20 +82,6 @@ class Tools:
         '''
         return coef / np.linalg.norm(coef)
 
-# Define the one-qubit and 2-qubit operation gates
-Gates = {
-    'I': np.array([[1, 0], [0, 1]]),
-    'X': np.array([[0, 1], [1, 0]]),
-    'Y': np.array([[0, -1j], [1j, 0]]),
-    'Z': np.array([[1, 0], [0, -1]]),
-    'H': np.array([[1 / np.sqrt(2), 1 / np.sqrt(2)], [1 / np.sqrt(2), -1 / np.sqrt(2)]]),
-    'S': np.array([[1, 0], [0, 1j]]),
-    'T': np.array([[1, 0], [0, np.exp(1j*np.pi/4)]]),
-    'V': np.array([[(1+1j)/2, -1j*(1+1j)/2], [-1j*(1+1j)/2, (1+1j)/2]]),
-    'V+': np.array([[(1-1j)/2, 1j*(1-1j)/2], [1j*(1-1j)/2, (1-1j)/2]]),
-    'SWAP2_01': np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
-}
-
 class QuantumRegister:
     def __init__(self, numQubits=-1, coef = '-1', basis='-1'):
         '''
@@ -132,6 +122,15 @@ class QuantumRegister:
         '''
         return self.amplitudes
 
+    def getBasicInfo(self):
+        info = {
+            'numQubits': self.numQubits,
+            'measured': self.measured,
+            'value': self.value,
+            'amplitudes': self.getAmplitudes()
+        }
+        return info
+
     def a2wf(self):
         '''
         将 self.amplitudes 转为能被 print_wf 函数解析的 wave_func 格式
@@ -139,6 +138,38 @@ class QuantumRegister:
         :return np.matrix
         '''
         return np.mat(self.amplitudes.reshape(2 ** self.numQubits, 1))
+
+    def getCurrentIndex(self, q1, q2=-1):
+        '''
+        由于测试单个比特，导致Index和线路模型中的Index不同
+        根据self.measured表来生成符合波函数的index，如对于3比特系统:
+        q0 ---H---*---M    此时波函数有q1,q2，因此若输入位置1，需转换为当前Index = 0
+                  |
+        q1 -------C------M 此时波函数只有q2，因此若输入位置2，需转换为当前Index = 0
+
+        q2 ----------------
+        :param q1:
+        :param q2:
+        :return:
+        '''
+        [index_1, index_2] = [0, 0]
+        if q2 == -1:
+            for i in range(q1):
+                if self.measured[i] == 1:
+                    index_1 += 1
+            index_1 = q1 - index_1
+            return index_1
+        else:
+            [index_1, index_2] = [0, 0]
+            for i in range(q1):
+                if self.measured[i] == 1:
+                    index_1 += 1
+            index_1 = q1 - index_1
+            for i in range(q2):
+                if self.measured[i] == 1:
+                    index_2 += 1
+            index_2 = q2 - index_2
+            return [index_1, index_2]
 
     def generateMatrix(self, gate, q1, q2=-1):
         '''
@@ -148,59 +179,28 @@ class QuantumRegister:
         '''
         res = np.array([[1]])
         if q2 == -1:    # 单比特门
+            index_1 = self.getCurrentIndex(q1, q2)
             for i in range(self.numQubits):
-                if i == q1:
-                    res = kron(res, Gates[gate])
+                if i == index_1:
+                    res = kron(res, GateManager.Gates[gate])
                 else:
-                    res = kron(res, Gates['I'])
+                    res = kron(res, GateManager.Gates['I'])
         else:           # 双比特门
-            length = q1-q2 if q1>q2 else q2-q1
-            min = q1 if q1<q2 else q2
-            matrix = self.gate2Matrix(gate, q1, q2)
+            [index_1, index_2] = self.getCurrentIndex(q1, q2)
+            length = index_1-index_2 if index_1>index_2 else index_2-index_1
+            min = index_1 if index_1<index_2 else index_2
+            matrix = GateManager.gate2Matrix(gate, index_1, index_2)
             for i in range(self.numQubits-length):
                 if i == min:
                     res = kron(res, matrix)
                 else:
-                    res = kron(res, Gates['I'])
+                    res = kron(res, GateManager.Gates['I'])
         return res
-
-    def gate2Matrix(self, gate, q1, q2=-1):
-        '''
-        将gate转化成矩阵
-        适用于跨线路门
-        控制位在上
-        CNOT, C-Z, C-U
-        :return np.ndarray
-        '''
-        if gate not in Gates:
-            raise ValueError('Gate {} is not defined in Gates'.format(gate))
-        if q2 == -1:
-            return Gates[gate]
-        if q2 > q1:
-            m_size = 2 ** (q2 - q1 + 1)
-            base = np.identity(m_size)
-            for i in range(int(m_size/4)):
-                # base[m_size/2+i*2][m_size/2+i*2]
-                for j in range(2):
-                    for k in range(2):
-                        base[int(m_size / 2 + i * 2 + j)][int(m_size / 2  + i * 2 + k)] = Gates[gate][j][k]
-            return base
-        elif q2 < q1:
-            m_size = 2 ** (q1 - q2 + 1)
-            base = np.identity(m_size)
-            for i in range(int(m_size/4)):
-                # 1+2*i, 1+2*i+m_size/2
-                for j in range(2):
-                    for k in range(2):
-                        base[int(1 + 2 * i + j * m_size / 2)][int(1 + 2 * i + k * m_size / 2)] = Gates[gate][j][k]
-            return base
-        else:
-            raise ValueError('Failed to input args!')
 
     def applyGate(self, gate, q1, q2=-1):
         if self.value:
             raise ValueError('Cannot add Gate to Measured Register')
-        if gate not in Gates:
+        if gate not in GateManager.Gates:
             raise ValueError('Gate {} is not defined in Gates'.format(gate))
         gateMatrix = self.generateMatrix(gate, q1, q2)
         self.amplitudes = np.dot(self.amplitudes, gateMatrix)
@@ -237,11 +237,7 @@ class QuantumRegister:
         elif type(place)==type(int(place)) and place>=0:
             if self.measured[place] == 1:
                 raise ValueError('{} is measured already!'.format(place))
-            index = 0
-            for i in range(place):
-                if self.measured[i] == 1:
-                    index += 1
-            index = place - index
+            index = self.getCurrentIndex(place)
             tools = Tools()
             coef, seqs = tools.decompose(self.a2wf())
             [prob_0, prob_1] = [0, 0]

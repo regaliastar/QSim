@@ -5,6 +5,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前�
 sys.path.append(BASE_DIR) #添加环境变量
 from lib.QSim import QuantumRegister
 from lib.QSim import Tools
+from lib.GateManager import GateManager
 import numpy as np
 import logging
 
@@ -51,9 +52,9 @@ def test_addGate():
 def test_gate2Matrix():
     qubit = QuantumRegister(basis='1000')
     # 控制位在上
-    Matrix1 = qubit.gate2Matrix('X', 0, 2)
-    Matrix2 = qubit.gate2Matrix('X', 2, 4)
-    Matrix3 = qubit.gate2Matrix('X', 0, 1)
+    Matrix1 = GateManager.gate2Matrix('X', 0, 2)
+    Matrix2 = GateManager.gate2Matrix('X', 2, 4)
+    Matrix3 = GateManager.gate2Matrix('X', 0, 1)
     CNOT3_02 = np.matrix('1 0 0 0 0 0 0 0; 0 1 0 0 0 0 0 0; 0 0 1 0 0 0 0 0; 0 0 0 1 0 0 0 0; 0 0 0 0 0 1 0 0; 0 0 0 0 1 0 0 0; 0 0 0 0 0 0 0 1; 0 0 0 0 0 0 1 0')
     CNOT = np.matrix("1 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0")
     assert (CNOT3_02 == np.mat(Matrix1)).all()
@@ -65,7 +66,7 @@ def test_gate2Matrix():
     CNOT4_30[np.array([3, 11])] = CNOT4_30[np.array([11, 3])]
     CNOT4_30[np.array([5, 13])] = CNOT4_30[np.array([13, 5])]
     CNOT4_30[np.array([7, 15])] = CNOT4_30[np.array([15, 7])]
-    Matrix4 = qubit.gate2Matrix('X', 3, 0)
+    Matrix4 = GateManager.gate2Matrix('X', 3, 0)
     assert (CNOT4_30 == np.mat(Matrix4)).all()
     # 测试其他门是否满足
 
@@ -75,10 +76,9 @@ def test_measure():
     qubit = QuantumRegister(3)
     qubit.applyGate('H', 0)
     qubit.applyGate('X', 0, 1)
-    log.debug(tools.print_wf(qubit.a2wf()))
+    # log.debug(tools.print_wf(qubit.a2wf()))
     m2 = qubit.measure(place=2)
-    # log.debug(qubit.getAmplitudes())
-    log.debug(tools.print_wf(qubit.a2wf()))
+    # log.debug(tools.print_wf(qubit.a2wf()))
     assert m2 == 0
     m0 = qubit.measure(place=0)
     # log.debug(tools.print_wf(qubit.a2wf()))

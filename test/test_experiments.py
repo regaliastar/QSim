@@ -51,7 +51,6 @@ def test_teleport():
     量子隐态传输实验：量子通信网络的基础，Alice:q[0,1], Bob:q[2], 要传输的 phi=q[0]
     假设 phi = sqrt(1/2)|0> + sqrt(1/2)|1>
     '''
-    log = logging.getLogger('test_teleport')
     tools = Tools()
     qubit = QuantumRegister(basis='000')
     # 先制备Bell态
@@ -70,6 +69,4 @@ def test_teleport():
     if m1 == 1:
         qubit.applyGate('Z',2)
     Bob_wf = tools.print_wf(qubit.a2wf())
-    log.debug('m1: {},m2: {}'.format(m1, m2))
-    log.debug(Bob_wf)
     assert phi == Bob_wf
