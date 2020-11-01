@@ -1,8 +1,4 @@
-import os
-import sys
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
-sys.path.append(BASE_DIR) #添加环境变量
-# from QLight.Lexer import Token
+from Token import Token
 import logging
 logging.basicConfig(filename='Lexer.log', level=logging.DEBUG)
 log = logging.getLogger('Lexer')
@@ -32,7 +28,7 @@ class Lexer:
         return self.source_code[self.current_raw][self.current_column]
 
     def back(self):
-        if self.current_column is not -1:
+        if self.current_column != -1:
             self.current_column -= 1
         else:
             self.current_raw -= 1
@@ -46,16 +42,16 @@ class Lexer:
         '''
         state = 0
         str = ''
-        while state is not 2:
-            if state is 0:
-                if ch.isalpha() or ch is '_':
+        while state != 2:
+            if state == 0:
+                if ch.isalpha() or ch == '_':
                     state = 1
                     str += ch
                 else:
                     raise ValueError('Failed to recognizeId ch: {}'.format(ch))
-            if state is 1:
+            if state == 1:
                 ch = self.getNextChar()
-                if ch.isalpha() or ch.isdigit() or ch is '_':
+                if ch.isalpha() or ch.isdigit() or ch == '_':
                     state = 1
                     str += ch
                 else:
@@ -71,17 +67,16 @@ class Lexer:
         '''
         state = 0
         str = ''
-        singleOp = ['+', '-', '*', '/', '>', '<', '=', '&', '|', '!']
-        while state is not 2:
-            if state is 0:
-                if ch in singleOp:
+        while state != 2:
+            if state == 0:
+                if Token.isOPERATOR(ch):
                     state = 0
                     str += ch
                 else:
                     raise ValueError('Failed to recognizeOp ch: {}'.format(ch))
-            if state is 1:
+            if state == 1:
                 ch = self.getNextChar()
-                if ch not in singleOp:
+                if not Token.isOPERATOR(ch):
                     state = 1
                     str += ch
                 else:
@@ -91,23 +86,31 @@ class Lexer:
 
     def scanner(self):
         ch = ''
-        while ch is not '\0':
+        while ch != '\0':
             ch = self.getNextChar()
-            if ch is ' ':
+            if ch == ' ':
                 log.debug(ch)
                 pass
-            if ch is '\n':
+            elif ch == '\n':
                 pass
-            elif ch.isalpha() or ch is '_':
+            elif ch.isalpha() or ch == '_':
                 Identify = self.recognizeId(ch)
+                if Token.isKEYWORD(Identify):
+                    pass
+                elif Token.isCIRCUIT(Identify):
+                    pass
                 log.debug(Identify)
-            elif ch is '+':
+            elif Token.isOPERATOR(ch):
+                Op = self.recognizeOp(ch)
+                log.debug(Op)
+                pass
+            elif Token.isSEPARATOR(ch):
                 pass
             else:
                 pass
-                # log.debug(ch)
+                log.debug(ch)
 
 
 if __name__ == '__main__':
-    lexer = Lexer('QLight/code_1.txt')
+    lexer = Lexer('QLight/code_0.txt')
     lexer.scanner()

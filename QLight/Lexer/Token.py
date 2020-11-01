@@ -28,8 +28,9 @@ class Token:
         ')',
         '[',
         ']',
-        '\n',
-        '\t'
+        '{',
+        '}',
+        ':'
     ]
 
     OPERATOR = [
@@ -55,3 +56,12 @@ class Token:
     def isOPERATOR(ch):
         singleOp = ['+', '-', '*', '/', '>', '<', '=', '&', '|', '!']
         return ch in singleOp
+
+    def isKEYWORD(str):
+        return str in Token.KEYWORD
+
+    def isCIRCUIT(str):
+        return str in Token.CIRCUIT
+
+    def isSEPARATOR(str):
+        return str in Token.SEPARATOR
