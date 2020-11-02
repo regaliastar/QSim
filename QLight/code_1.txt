@@ -6,7 +6,9 @@ X q[0] q[1]
 H q[0]
 m1 = measure(q[0])
 m2 = measure(q[1])
-if(m2 == 1):
+if(m2 == 1){
     X q[2]
-if(m1 == 1):
+}
+if(m1 == 1){
     Z q[2]
+}

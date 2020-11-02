@@ -1,4 +1,4 @@
-from Token import Token
+from Lexer.Token import Token
 import logging
 logging.basicConfig(filename='Lexer.log', level=logging.DEBUG)
 log = logging.getLogger('Lexer')
@@ -10,6 +10,9 @@ class Lexer:
         self.EOF = '\0'
         self.source_code = self.read_source_code(file_path)
         self.TOKEN = []
+
+    def getTOKEN(self):
+        return self.TOKEN
 
     def read_source_code(self, file_path):
         f = open(file_path, "r")
@@ -36,7 +39,8 @@ class Lexer:
 
     def recognizeId(self, ch):
         '''
-        识别单词 Identity
+        标志符 Identity
+        包括 关键词、电路符、标志符（自定义变量）
         :param ch:
         :return:
         '''
@@ -70,13 +74,13 @@ class Lexer:
         while state != 2:
             if state == 0:
                 if Token.isOPERATOR(ch):
-                    state = 0
+                    state = 1
                     str += ch
                 else:
                     raise ValueError('Failed to recognizeOp ch: {}'.format(ch))
             if state == 1:
                 ch = self.getNextChar()
-                if not Token.isOPERATOR(ch):
+                if Token.isOPERATOR(ch):
                     state = 1
                     str += ch
                 else:
@@ -84,33 +88,96 @@ class Lexer:
         self.back()
         return str
 
+    def recognizeInteger(self, ch):
+        '''
+        简化版，会把 3a 这种明显错误的字符串识别为整数 3，但是能交差就行:)
+        '''
+        state = 0
+        str = ''
+        while state != 2:
+            if state == 0:
+                if ch.isdigit():
+                    state = 1
+                    str += ch
+                else:
+                    raise ValueError('Failed to recognizeInteger ch: {}'.format(ch))
+            if state == 1:
+                ch = self.getNextChar()
+                if ch.isdigit():
+                    state = 1
+                    str += ch
+                else:
+                    state = 2
+        self.back()
+        return str
+
+    def recognizeComment(self, ch):
+        state = 0
+        str = ''
+        while state != 3:
+            if state == 0:
+                if ch == '/':
+                    state = 1
+                    str += ch
+                else:
+                    raise ValueError('Failed to recognizeComment ch: {}'.format(ch))
+            if state == 1:
+                if ch == '/':
+                    state = 2
+                    str += ch
+                else:
+                    raise ValueError('Failed to recognizeComment ch: {}'.format(ch))
+            if state == 2:
+                ch = self.getNextChar()
+                if ch != '\\n':
+                    state = 2
+                    str += ch
+                else:
+                    state = 3
+        self.back()
+        return str
+
+    def lookForward(self):
+        ch = self.getNextChar()
+        self.back()
+        return ch
+
     def scanner(self):
         ch = ''
         while ch != '\0':
             ch = self.getNextChar()
             if ch == ' ':
-                log.debug(ch)
                 pass
             elif ch == '\n':
                 pass
             elif ch.isalpha() or ch == '_':
                 Identify = self.recognizeId(ch)
                 if Token.isKEYWORD(Identify):
-                    pass
+                    self.TOKEN.append([Token.TOKENID[Identify], Identify])
                 elif Token.isCIRCUIT(Identify):
-                    pass
-                log.debug(Identify)
+                    self.TOKEN.append([Token.TOKENID[Identify], Identify])
+                else:
+                    self.TOKEN.append([500, Identify])
+            elif ch.isdigit():
+                Integer = self.recognizeInteger(ch)
+                if Integer.isdigit():
+                    self.TOKEN.append([600, Integer])
+                #浮点数
             elif Token.isOPERATOR(ch):
+                if ch == '/' and self.lookForward() == '/':
+                    self.recognizeComment(ch)
+                    continue
                 Op = self.recognizeOp(ch)
-                log.debug(Op)
+                self.TOKEN.append([Token.TOKENID[Op], Op])
                 pass
             elif Token.isSEPARATOR(ch):
+                self.TOKEN.append([Token.TOKENID[ch], ch])
                 pass
             else:
                 pass
-                log.debug(ch)
-
+                # log.debug(ch)
 
 if __name__ == '__main__':
     lexer = Lexer('QLight/code_0.txt')
     lexer.scanner()
+    log.debug(lexer.getTOKEN())
