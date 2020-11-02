@@ -137,7 +137,7 @@ class Lexer:
         self.back()
         return str
 
-    def lookForward(self):
+    def lookahead(self):
         ch = self.getNextChar()
         self.back()
         return ch
@@ -164,7 +164,7 @@ class Lexer:
                     self.TOKEN.append([600, Integer])
                 #浮点数
             elif Token.isOPERATOR(ch):
-                if ch == '/' and self.lookForward() == '/':
+                if ch == '/' and self.lookahead() == '/':
                     self.recognizeComment(ch)
                     continue
                 Op = self.recognizeOp(ch)

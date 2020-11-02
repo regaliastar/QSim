@@ -1,4 +1,4 @@
-q[3] = quantum(3)
+q = quantum(3)
 H q[1]
 X q[1] q[1]
 H q[0]  // phi = sqrt(1/2)|0> + sqrt(1/2)|1>

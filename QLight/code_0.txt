@@ -1,4 +1,4 @@
-q[3] = quantum(3)
+q = quantum(3)
 X q[0] q[1]
 func m(){
     measure(q)
