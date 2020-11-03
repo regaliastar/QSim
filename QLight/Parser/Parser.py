@@ -17,14 +17,29 @@ class Parser:
         根据grammar.txt中的文法生成First集
         这里手动填写，未来考虑自动生成
         '''
-        'FuncStatement': ['func'],
+        'Argument': ['Identifier', 'Array'],
         'Measurement': ['measure'],
         'GateOp': ['I','X','Y','Z','H','S','T','V','V_H','SWAP'],
+        'Factor': ['INT'],
+        'Expression': ['INT'],
+        'Bool': ['!', 'INT'],
+        'IFStatement': ['if'],
+        'WhileStatement': ['while'],
+        'FuncStatement': ['func'],
+        'Statement': ['I','X','Y','Z','H','S','T','V','V_H','SWAP','measure','if','while','func'],
+        'Declare': ['Identifier'],
+        'Program': ['Identifier']
     }
     def __init__(self, TOKEN):
         self.EOF = [0, '$']
         self.TOKEN = TOKEN
         self.current_token = -1
+        self.AST = []
+        self.lookahead = []
+
+    def match(self, token):
+        if self.lookahead[0] == token[0]:
+            self.lookahead = self.getNextToken()
 
     def getNextToken(self):
         self.current_token += 1
@@ -32,24 +47,29 @@ class Parser:
             return self.EOF
         return self.TOKEN[self.current_token]
 
-    def FuncStatementAnalyzer(self, token):
+    def FuncStatement(self, token):
+        pass
+
+    def Declare(self, token):
+        if token[0] == 500:
+            self.match(token)
         pass
 
     def parser(self):
-        id = ''
-        while id != 0:
-            id = self.getNextToken()[0]
-            if id >= 100 and id < 200:
+        token = []
+        while token[0] != 0:
+            token = self.getNextToken()
+            if token[0] >= 100 and token[0] < 200:
                 pass
-            elif id >= 200 and id < 300:
+            elif token[0] >= 200 and token[0] < 300:
                 pass
-            elif id >= 300 and id < 400:
+            elif token[0] >= 300 and token[0] < 400:
                 pass
-            elif id >= 400 and id < 500:
+            elif token[0] >= 400 and token[0] < 500:
                 pass
-            elif id == 500:
+            elif token[0] == 500:
                 pass
-            elif id == 600:
+            elif token[0] == 600:
                 pass
             else:
                 pass

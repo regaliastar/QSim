@@ -26,7 +26,7 @@ Compare := >|<|==|>=|<=
 
 Argument    ---------> Identifier | Array
 Measurement ---------> measure ( Argument | Identifier )
-GateOp      ---------> I|X|Y|Z|H|S|T|V|V_H|SWAP Argument|Array Array
+GateOp      ---------> I|X|Y|Z|H|S|T|V|V_H|SWAP Argument|Array Array|φ
 Factor      ---------> INT
 Expression  ---------> Factor [+|-|*|/|Compare Expression]
 Bool        ---------> [!] Identifier|Expression
