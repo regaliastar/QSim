@@ -6,14 +6,20 @@ import logging
 
 tools = Tools()
 
+def log_func_call(func):
+    def wrapper(*args, **kw):
+        if kw[1]:
+            print('执行：{} 函数, {}, {}'.format(func.__name__, kw[0], kw[1]))
+        elif kw[0]:
+            print('执行：{} 函数, {}, {}'.format(func.__name__, kw[0], None))
+        else:
+            print('执行：{} 函数, {}, {}'.format(func.__name__, None, None))
+        func(*args, **kw)
+    return wrapper
 #ccccccccccccccccc
-def t():
-    coef = [1 / np.sqrt(2), -np.sqrt(1 / 2)]
-    basis = ['0', '1']
-    qubit = QuantumRegister(coef=coef, basis=basis)
-    print(qubit.getAmplitudes())
-    qubit.applyGate('Z',0)
-    print(qubit.getAmplitudes())
+@log_func_call
+def t(a, b):
+    return a+b
 
 def test_entangled():
     print('test_entangled')
@@ -72,6 +78,7 @@ def test_teleport():
     print('Bob_wf: '+Bob_wf)
     assert phi == Bob_wf
 
-test_teleport()
+# test_teleport()
 # test_entangled()
 print('########## 外面 ##########')
+t()

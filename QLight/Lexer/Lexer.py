@@ -149,7 +149,7 @@ class Lexer:
             if ch == ' ':
                 pass
             elif ch == '\n':
-                pass
+                self.TOKEN.append([Token.TOKENID['\\n'], ch])
             elif ch.isalpha() or ch == '_':
                 Identify = self.recognizeId(ch)
                 if Token.isKEYWORD(Identify):
@@ -157,11 +157,11 @@ class Lexer:
                 elif Token.isCIRCUIT(Identify):
                     self.TOKEN.append([Token.TOKENID[Identify], Identify])
                 else:
-                    self.TOKEN.append([500, Identify])
+                    self.TOKEN.append([Token.TOKENID['Identify'], Identify])
             elif ch.isdigit():
                 Integer = self.recognizeInteger(ch)
                 if Integer.isdigit():
-                    self.TOKEN.append([600, Integer])
+                    self.TOKEN.append([Token.TOKENID['INT'], Integer])
                 #浮点数
             elif Token.isOPERATOR(ch):
                 if ch == '/' and self.lookahead() == '/':
