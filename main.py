@@ -8,18 +8,19 @@ tools = Tools()
 
 def log_func_call(func):
     def wrapper(*args, **kw):
-        if kw[1]:
-            print('执行：{} 函数, {}, {}'.format(func.__name__, kw[0], kw[1]))
-        elif kw[0]:
-            print('执行：{} 函数, {}, {}'.format(func.__name__, kw[0], None))
-        else:
-            print('执行：{} 函数, {}, {}'.format(func.__name__, None, None))
+        # print(func.__name__)
+        # for value in args:
+        #     print("arg: {}".format(value))
+        s = '函数: ' + func.__name__
+        for value in args:
+            s += ' '+str(value)
+        print(s)
         func(*args, **kw)
     return wrapper
 #ccccccccccccccccc
 @log_func_call
-def t(a, b):
-    return a+b
+def t(a, b, father = None):
+    return 0
 
 def test_entangled():
     print('test_entangled')
@@ -81,4 +82,4 @@ def test_teleport():
 # test_teleport()
 # test_entangled()
 print('########## 外面 ##########')
-t()
+t(1,[1,'a'],'ff')

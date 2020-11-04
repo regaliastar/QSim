@@ -31,12 +31,10 @@ First = {
 
 def log_func_call(func):
     def wrapper(*args, **kw):
-        if kw[1]:
-            print('执行：{} 函数, {}, {}'.format(func.__name__, kw[0], kw[1]))
-        elif kw[0]:
-            print('执行：{} 函数, {}, {}'.format(func.__name__, kw[0], None))
-        else:
-            print('执行：{} 函数, {}, {}'.format(func.__name__, None, None))
+        s = '函数: '+func.__name__
+        for value in args:
+            s += ' '+str(value)
+        print(s)
         func(*args, **kw)
     return wrapper
 
@@ -50,7 +48,7 @@ class Parser:
         self.TOKEN = TOKEN
         self.current_token = -1
         self.tree = SyntaxTree()
-        self.lookahead = [-1, 'start']
+        self.lookahead = self.getNextToken()
 
     def display(self, node):
         '''DFS遍历语法树'''
@@ -77,6 +75,7 @@ class Parser:
             return self.EOF
         return self.TOKEN[self.current_token]
 
+    @log_func_call
     def FuncStatement(self, token, father=None):
         if not father:
             father = self.tree.root
@@ -107,9 +106,12 @@ class Parser:
             # 匹配 {
             '''大括号里面的内容'''
             while self.lookahead[0] != 305:
-                self.Statement(Declare_tree.root)
+                self.Statement(Declare_tree)
             # 匹配 }
             self.match(self.lookahead)
+            if self.lookahead[0] == 308:
+                # 匹配 \n
+                self.match(self.lookahead)
         else:
             raise ValueError('Failed to FuncStatement arguments: {}'.format(self.lookahead))
 
@@ -119,6 +121,7 @@ class Parser:
     def WhileStatement(self, token, father=None):
         pass
 
+    @log_func_call
     def Declare(self, token, father=None):
         if not father:
             father = self.tree.root
@@ -143,11 +146,14 @@ class Parser:
             self.match(self.lookahead)
         elif self.lookahead[0] == 500 or self.lookahead[0] == 210 or self.lookahead[0] == 211:
             # 匹配函数调用
-            print('匹配函数调用')
             Declare_tree.add_child_node(
                 SyntaxTreeNode(token[1], 'FuncCall'))
             self.FuncCall(self.lookahead, Declare_tree.root)
+        if self.lookahead[0] == 308:
+            # 匹配 \n
+            self.match(self.lookahead)
 
+    @log_func_call
     def FuncCall(self, token, father=None):
         if not father:
             father = self.tree.root
@@ -159,13 +165,13 @@ class Parser:
         # 匹配 函数名
         self.match(token)
         func_call_tree.add_child_node(
-            SyntaxTreeNode(token[1], 'FUNCTION_NAME'))
+            SyntaxTreeNode(token[1], 'FuncCall_Name'))
         if self.lookahead[0] == 300:
             # 匹配 (
             self.match(self.lookahead)
         else:
             raise ValueError('Failed to FuncCall arguments: {}'.format(token))
-        params_list = SyntaxTreeNode('CallParameterList')
+        params_list = SyntaxTreeNode('FuncCallParameterList')
         func_call_tree.add_child_node(params_list, func_call_tree.root)
         while self.lookahead[0] != 301:
             func_call_tree.add_child_node(
@@ -174,16 +180,24 @@ class Parser:
         if self.lookahead[0] == 301:
             # 匹配 )
             self.match(self.lookahead)
-
+        if self.lookahead[0] == 308:
+            # 匹配 \n
+            self.match(self.lookahead)
+    @log_func_call
     def GateOp(self, token, father=None):
         if not father:
             father = self.tree.root
-        Declare_tree = SyntaxTree()
-        Declare_tree.current = Declare_tree.root = SyntaxTreeNode('GateOp')
-        self.tree.add_child_node(Declare_tree.root, father)
+        GateOp_tree = SyntaxTree()
+        GateOp_tree.current = GateOp_tree.root = SyntaxTreeNode('GateOp')
         if token[1] not in First['GateOp']:
             raise ValueError('Failed to GateOp arguments: {}'.format(token))
+        # 匹配 操作门
         self.match(token)
+        GateOp_tree.add_child_node(
+            SyntaxTreeNode(token[1], 'GateOp_Name'))
+        params_list = SyntaxTreeNode('GateOpParameterList')
+        GateOp_tree.add_child_node(params_list, GateOp_tree.root)
+        self.tree.add_child_node(GateOp_tree.root, father)
         while self.lookahead[0] != 308:
             if self.lookahead[0] == 500:
                 # Identify
@@ -193,6 +207,8 @@ class Parser:
                 self.match(self.lookahead)
             if self.lookahead[0] == 600:
                 # INT
+                GateOp_tree.add_child_node(
+                    SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), params_list)
                 self.match(self.lookahead)
             if self.lookahead[0] == 303:
                 # ]
@@ -201,7 +217,8 @@ class Parser:
             # 匹配 \n
             self.match(self.lookahead)
 
-    def Statement(self, father=None):
+    @log_func_call
+    def Statement(self, father_tree):
         '''
         处理大括号里面的内容，如 if while func
         '''
@@ -232,9 +249,9 @@ class Parser:
                 pass
             elif self.lookahead[0] == 500:
                 '''标志符'''
-                if self.TOKEN[self.current_token+1] == '=':
+                if self.TOKEN[self.current_token+1][1] == '=':
                     self.Declare(self.lookahead, sentence_tree.root)
-                elif self.TOKEN[self.current_token+1] == '(':
+                elif self.TOKEN[self.current_token+1][1] == '(':
                     self.FuncCall(self.lookahead, sentence_tree.root)
                 pass
             elif self.lookahead[0] == 600:
@@ -245,7 +262,6 @@ class Parser:
     def main(self):
         self.tree.current = self.tree.root = SyntaxTreeNode('Program')
         while self.lookahead[0] != 0:
-            self.lookahead = self.getNextToken()
             if self.lookahead[0] >= 100 and self.lookahead[0] < 200:
                 '''关键词'''
                 if self.lookahead[1] in First['FuncStatement']:
@@ -268,9 +284,9 @@ class Parser:
                 pass
             elif self.lookahead[0] == 500:
                 '''标志符'''
-                if self.TOKEN[self.current_token+1] == '=':
+                if self.TOKEN[self.current_token+1][1] == '=':
                     self.Declare(self.lookahead)
-                elif self.TOKEN[self.current_token+1] == '(':
+                elif self.TOKEN[self.current_token+1][1] == '(':
                     self.FuncCall(self.lookahead)
                 pass
             elif self.lookahead[0] == 600:
