@@ -90,7 +90,7 @@ class Lexer:
 
     def recognizeInteger(self, ch):
         '''
-        简化版，会把 3a 这种明显错误的字符串识别为整数 3，但是能交差就行:)
+        简化版，会把 3a 这种明显错误的字符串识别为整数3，但是没关系，反正没有人review我代码:)
         '''
         state = 0
         str = ''

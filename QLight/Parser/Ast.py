@@ -1,5 +1,7 @@
 class SyntaxTree(object):
-    '''语法树'''
+    '''
+    实现抽象语法树
+    '''
     def __init__(self):
         # 树的根节点
         self.root = None
@@ -22,6 +24,23 @@ class SyntaxTree(object):
             current_node.right = new_node
             new_node.left = current_node
         self.current = new_node
+
+    def show(self):
+        self.show_core(self.root)
+
+    def show_core(self, node):
+        '''DFS遍历语法树'''
+        if not node:
+            return
+        output = open('parser.txt', 'a')
+        output.write('( self: %s %s, father: %s, left: %s, right: %s )\r\n' % (
+        node.value, node.type, node.father.value if node.father else None, node.left.value if node.left else None,
+        node.right.value if node.right else None))
+        output.close()
+        child = node.first_son
+        while child:
+            self.show_core(child)
+            child = child.right
 
     # 交换相邻的两棵兄弟子树
     def switch(self, left, right):
