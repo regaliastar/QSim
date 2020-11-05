@@ -1,3 +1,6 @@
+'''
+接收Lexer.py生成的TOKEN串，使用递归下降生成语法树
+'''
 import os
 import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
@@ -95,7 +98,7 @@ class Parser:
         if self.lookahead[0] == 304:
             # 匹配 {
             self.match(self.lookahead)
-            '''大括号里面的内容'''
+            '''使用Statement处理大括号里面的内容'''
             while self.lookahead[0] != 305:
                 self.Statement(FuncStatement_tree)
             # 匹配 }
@@ -183,7 +186,7 @@ class Parser:
         pass
 
     def WhileStatement(self, token, father=None):
-        raise Exception('WhileStatement not defined')
+        raise Exception('WhileStatement is not defined!')
         pass
 
     @log_func_call
@@ -225,7 +228,7 @@ class Parser:
         func_call_tree = SyntaxTree()
         func_call_tree.current = func_call_tree.root = SyntaxTreeNode('FuncCall')
         self.tree.add_child_node(func_call_tree.root, father)
-        if token[0] != 500 and token[0] != 210 and token[0] != 211:
+        if token[0] != 500 and token[0] != 210 and token[0] != 211 and token[0] != 212:
             raise ValueError('Failed to FuncCall arguments: {}'.format(token))
         # 匹配 函数名
         self.match(token)
@@ -392,7 +395,7 @@ class Parser:
 
 if __name__ == '__main__':
     print('parser')
-    lexer = Lexer('QLight/code_1.txt')
+    lexer = Lexer('QLight/code_0.txt')
     lexer.scanner()
     log.debug(lexer.getTOKEN())
     parser = Parser(lexer.getTOKEN())

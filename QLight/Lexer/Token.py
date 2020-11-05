@@ -21,7 +21,8 @@ class Token:
         'V_H',
         'SWAP',
         'measure',
-        'quantum'
+        'quantum',
+        'show'
     ]
 
     SEPARATOR = [
@@ -76,6 +77,7 @@ class Token:
         'SWAP': 209,
         'measure': 210,
         'quantum': 211,
+        'show': 212,
         '(': 300,
         ')': 301,
         '[': 302,
