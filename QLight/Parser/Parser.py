@@ -24,6 +24,7 @@ First = {
     'IFStatement': ['if'],
     'WhileStatement': ['while'],
     'FuncStatement': ['func'],
+    'Return': ['return'],
     'Statement': ['I', 'X', 'Y', 'Z', 'H', 'S', 'T', 'V', 'V_H', 'SWAP', 'measure', 'if', 'while', 'func'],
     'Declare': ['Identifier'],
     'Program': ['Identifier'],
@@ -32,7 +33,7 @@ First = {
 
 def log_func_call(func):
     def wrapper(*args, **kw):
-        s = 'Parser function call: '+func.__name__
+        s = 'Parser-Function-Call: '+func.__name__
         for value in args:
             s += ' '+str(value)
         print(s)
@@ -50,8 +51,6 @@ class Parser:
         self.current_token = -1
         self.tree = SyntaxTree()
         self.lookahead = self.getNextToken()
-
-
 
     def match(self, token):
         if self.lookahead[0] == token[0]:
@@ -107,10 +106,84 @@ class Parser:
         else:
             raise ValueError('Failed to FuncStatement arguments: {}'.format(self.lookahead))
 
+    @log_func_call
+    def Return(self, token, father=None):
+        if not father:
+            father = self.tree.root
+        Return_tree = SyntaxTree()
+        Return_tree.current = Return_tree.root = SyntaxTreeNode('Return')
+        self.tree.add_child_node(Return_tree.root, father)
+        if token[0] != 105:
+            raise ValueError('Failed to FuncStatement arguments: {}'.format(token))
+        # 匹配 return
+        if self.lookahead[0] == 106:
+            self.match(self.lookahead)
+        else:
+            raise ValueError('Failed to Return arguments: {}'.format(self.lookahead))
+        '''返回的值是 Identity或者INT'''
+        if self.lookahead[0] == 500 or self.lookahead[0] == 600:
+            Return_tree.add_child_node(
+                SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), Return_tree.root)
+            self.match(self.lookahead)
+        else:
+            raise ValueError('Failed to Return: {}'.format(self.lookahead))
+        pass
+
+    @log_func_call
+    def Bool(self, token, father=None):
+        if not father:
+            father = self.tree.root
+        Bool_call_tree = SyntaxTree()
+        Bool_call_tree.current = Bool_call_tree.root = SyntaxTreeNode('Bool')
+        self.tree.add_child_node(Bool_call_tree.root, father)
+        while self.lookahead[0] != 301:
+            Bool_call_tree.add_child_node(
+                SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), Bool_call_tree.root)
+            self.match(self.lookahead)
+
+    @log_func_call
     def IFStatement(self, token, father=None):
+        if not father:
+            father = self.tree.root
+        IFStatement_tree = SyntaxTree()
+        IFStatement_tree.current = IFStatement_tree.root = SyntaxTreeNode('IFStatement')
+        self.tree.add_child_node(IFStatement_tree.root, father)
+        if token[0] != 100:
+            raise ValueError('Failed to IFStatement arguments: {}'.format(token))
+        # 匹配 if
+        self.match(token)
+        if self.lookahead[0] == 300:
+            # 匹配 (
+            self.match(self.lookahead)
+        else:
+            raise ValueError('Failed to IFStatement arguments: {}'.format(self.lookahead))
+        '''
+        匹配 比较
+        交给Bool函数处理比较运算
+        '''
+        self.Bool(self.lookahead, IFStatement_tree.root)
+        if self.lookahead[0] == 301:
+            # 匹配 )
+            self.match(self.lookahead)
+        else:
+            raise ValueError('Failed to IFStatement arguments: {}'.format(self.lookahead))
+        if self.lookahead[0] == 304:
+            # 匹配 {
+            self.match(self.lookahead)
+            '''大括号里面的内容'''
+            while self.lookahead[0] != 305:
+                self.Statement(IFStatement_tree)
+            # 匹配 }
+            self.match(self.lookahead)
+            if self.lookahead[0] == 308:
+                # 匹配 \n
+                self.match(self.lookahead)
+        else:
+            raise ValueError('Failed to IFStatement arguments: {}'.format(self.lookahead))
         pass
 
     def WhileStatement(self, token, father=None):
+        raise Exception('WhileStatement not defined')
         pass
 
     @log_func_call
@@ -131,17 +204,15 @@ class Parser:
                 SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), Declare_tree.root)
             self.match(self.lookahead)
         else:
-            raise ValueError('Failed to Declare arguments: {}'.format(token))
+            raise ValueError('Failed to Declare arguments: {}'.format(self.lookahead))
         '''有 整数赋值 和 函数调用赋值 两种方式'''
         if self.lookahead[0] == 600:
-            # 匹配整数
+            # 匹配 整数
             Declare_tree.add_child_node(
                 SyntaxTreeNode(token[1], 'INT'), Declare_tree.root)
             self.match(self.lookahead)
         elif self.lookahead[0] == 500 or self.lookahead[0] == 210 or self.lookahead[0] == 211:
-            # 匹配函数调用
-            # Declare_tree.add_child_node(
-            #     SyntaxTreeNode(self.lookahead[1], 'FuncCall'))
+            # 匹配 函数调用
             self.FuncCall(self.lookahead, Declare_tree.root)
         if self.lookahead[0] == 308:
             # 匹配 \n
@@ -197,17 +268,25 @@ class Parser:
             if self.lookahead[0] == 500:
                 # Identify
                 self.match(self.lookahead)
+            else:
+                raise ValueError('Failed to GateOp arguments: {}'.format(self.lookahead))
             if self.lookahead[0] == 302:
                 # [
                 self.match(self.lookahead)
+            else:
+                raise ValueError('Failed to GateOp arguments: {}'.format(self.lookahead))
             if self.lookahead[0] == 600:
                 # INT
                 GateOp_tree.add_child_node(
                     SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), params_list)
                 self.match(self.lookahead)
+            else:
+                raise ValueError('Failed to GateOp arguments: {}'.format(self.lookahead))
             if self.lookahead[0] == 303:
                 # ]
                 self.match(self.lookahead)
+            else:
+                raise ValueError('Failed to GateOp arguments: {}'.format(self.lookahead))
         if self.lookahead[0] == 308:
             # 匹配 \n
             self.match(self.lookahead)
@@ -221,7 +300,6 @@ class Parser:
         Statement_tree.current = Statement_tree.root = SyntaxTreeNode('Statement')
         father_tree.add_child_node(Statement_tree.root, father_tree.root)
         while self.lookahead[0] != 305:
-            print(self.lookahead)
             if self.lookahead[0] >= 100 and self.lookahead[0] < 200:
                 '''关键词'''
                 if self.lookahead[1] in First['FuncStatement']:
@@ -230,6 +308,8 @@ class Parser:
                     self.IFStatement(self.lookahead, Statement_tree.root)
                 elif self.lookahead[1] in First['WhileStatement']:
                     self.WhileStatement(self.lookahead, Statement_tree.root)
+                elif self.lookahead[1] in First['Return']:
+                    self.Return(self.lookahead, Statement_tree.root)
                 pass
             elif self.lookahead[0] >= 200 and self.lookahead[0] < 300:
                 '''电路操作'''
@@ -244,12 +324,11 @@ class Parser:
                 pass
             elif self.lookahead[0] >= 300 and self.lookahead[0] < 400:
                 '''分隔符'''
-                if self.lookahead[0] == 308:
+                if self.lookahead[0] == 308:    # \n
                     self.match(self.lookahead)
-                else:
-                    pass
             elif self.lookahead[0] >= 400 and self.lookahead[0] < 500:
                 '''运算符'''
+                self.match(self.lookahead)
                 pass
             elif self.lookahead[0] == 500:
                 '''标志符'''
@@ -260,6 +339,9 @@ class Parser:
                 pass
             elif self.lookahead[0] == 600:
                 '''整数'''
+                self.match(self.lookahead)
+            else:
+                raise ValueError('Failed to Statement arguments: {}'.format(self.lookahead))
 
     @log_func_call
     def main(self):
@@ -285,12 +367,13 @@ class Parser:
                 pass
             elif self.lookahead[0] >= 300 and self.lookahead[0] < 400:
                 '''分隔符'''
-                if self.lookahead[0] == 308:
+                if self.lookahead[0] == 308:    # \n
                     self.match(self.lookahead)
                 else:
                     pass
             elif self.lookahead[0] >= 400 and self.lookahead[0] < 500:
                 '''运算符'''
+                self.match(self.lookahead)
                 pass
             elif self.lookahead[0] == 500:
                 '''标志符'''
@@ -303,10 +386,13 @@ class Parser:
                 pass
             elif self.lookahead[0] == 600:
                 '''整数'''
+                self.match(self.lookahead)
+            else:
+                raise ValueError('Failed to Main arguments: {}'.format(self.lookahead))
 
 if __name__ == '__main__':
     print('parser')
-    lexer = Lexer('QLight/code_0.txt')
+    lexer = Lexer('QLight/code_1.txt')
     lexer.scanner()
     log.debug(lexer.getTOKEN())
     parser = Parser(lexer.getTOKEN())

@@ -34,6 +34,7 @@ Bool        ---------> [!] Identifier|Expression
 IFStatement ---------> if(Bool) { ; Statement}
 WhileStatement ------> while(Bool) { ; Statement}
 FuncStatement -------> func Identifier() { ; Statement}
+Return      ---------> return INT|Identifier
 Statement   ---------> GateOp | Measurement | IFStatement | WhileStatement | FuncStatement
 Declare     ---------> Identifier = quantum(INT)|INT
 Program     ---------> Declare { ; Statement}

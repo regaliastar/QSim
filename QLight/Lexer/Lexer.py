@@ -166,6 +166,7 @@ class Lexer:
             elif Token.isOPERATOR(ch):
                 if ch == '/' and self.lookahead() == '/':
                     self.recognizeComment(ch)
+                    self.TOKEN.append([Token.TOKENID['\\n'], '\n'])
                     continue
                 Op = self.recognizeOp(ch)
                 self.TOKEN.append([Token.TOKENID[Op], Op])
