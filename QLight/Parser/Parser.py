@@ -1,15 +1,16 @@
 '''
 接收Lexer.py生成的TOKEN串，使用递归下降生成语法树
+date: 2020-11-5
 '''
 import os
 import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
 sys.path.append(BASE_DIR) #添加环境变量
 from Lexer.Lexer import Lexer
-from Ast import SyntaxTree
-from Ast import SyntaxTreeNode
+from Parser.Ast import SyntaxTree
+from Parser.Ast import SyntaxTreeNode
 import logging
-logging.basicConfig(filename='Parser.log', level=logging.DEBUG)
+logging.basicConfig(filename='log/Parser.log', level=logging.DEBUG)
 log = logging.getLogger('Parser')
 
 First = {
@@ -86,7 +87,7 @@ class Parser:
         else:
             raise ValueError('Failed to FuncStatement arguments: {}'.format(self.lookahead))
         '''匹配输入参数'''
-        params_list = SyntaxTreeNode('FuncCallParameterList')
+        params_list = SyntaxTreeNode('ParameterList')
         FuncStatement_tree.add_child_node(params_list, FuncStatement_tree.root)
         while self.lookahead[0] != 301:
             FuncStatement_tree.add_child_node(
@@ -239,7 +240,7 @@ class Parser:
             self.match(self.lookahead)
         else:
             raise ValueError('Failed to FuncCall arguments: {}'.format(token))
-        params_list = SyntaxTreeNode('FuncCallParameterList')
+        params_list = SyntaxTreeNode('ParameterList')
         func_call_tree.add_child_node(params_list, func_call_tree.root)
         while self.lookahead[0] != 301:
             func_call_tree.add_child_node(
@@ -264,7 +265,7 @@ class Parser:
         self.match(token)
         GateOp_tree.add_child_node(
             SyntaxTreeNode(token[1], 'GateOp_Name'))
-        params_list = SyntaxTreeNode('GateOpParameterList')
+        params_list = SyntaxTreeNode('ParameterList')
         GateOp_tree.add_child_node(params_list, GateOp_tree.root)
         self.tree.add_child_node(GateOp_tree.root, father)
         while self.lookahead[0] != 308:

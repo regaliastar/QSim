@@ -9,7 +9,7 @@ from lib.GateManager import GateManager
 import numpy as np
 import logging
 
-logging.basicConfig(filename='test.log', level=logging.DEBUG,
+logging.basicConfig(filename='log/test.log', level=logging.DEBUG,
                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
 #############################################

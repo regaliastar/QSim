@@ -27,7 +27,7 @@ class SyntaxTree(object):
         '''DFS遍历语法树'''
         if not node:
             return
-        output = open('parser.txt', 'a')
+        output = open('log/parser.txt', 'a')
         output.write('( self: %s %s, father: %s, left: %s, right: %s )\r\n' % (
         node.value, node.type, node.father.value if node.father else None, node.left.value if node.left else None,
         node.right.value if node.right else None))

@@ -1,9 +1,10 @@
 '''
 读取源文件生成TOKEN串，根据DAG来编写读取程序
+date: 2020-11-2
 '''
 from Lexer.Token import Token
 import logging
-logging.basicConfig(filename='Lexer.log', level=logging.DEBUG)
+logging.basicConfig(filename='log/Lexer.log', level=logging.DEBUG)
 log = logging.getLogger('Lexer')
 
 class Lexer:
