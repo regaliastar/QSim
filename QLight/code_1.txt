@@ -1,3 +1,4 @@
+// quantum teleport
 q = quantum(3)
 H q[1]
 X q[0] q[1]

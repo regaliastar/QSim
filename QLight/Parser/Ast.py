@@ -20,6 +20,21 @@ class SyntaxTree(object):
             new_node.left = current_node
         self.current = new_node
 
+    def find_all_child(self, node):
+        """
+        遍历node子节点
+        :return list
+        """
+        if node.first_son:
+            res = []
+            child = node.first_son
+            while child:
+                res.append(child)
+                child = child.right
+            return res
+        else:
+            return []
+
     def show(self):
         self.show_core(self.root)
 
@@ -28,9 +43,7 @@ class SyntaxTree(object):
         if not node:
             return
         output = open('log/parser.txt', 'a')
-        output.write('( self: %s %s, father: %s, left: %s, right: %s )\r\n' % (
-        node.value, node.type, node.father.value if node.father else None, node.left.value if node.left else None,
-        node.right.value if node.right else None))
+        output.write(node.format())
         output.close()
         child = node.first_son
         while child:
@@ -47,9 +60,16 @@ class SyntaxTreeNode(object):
         self.left = None
         self.right = None
         self.first_son = None
+
     def set_value(self, value):
         self.value = value
     def set_type(self, _type):
         self.type = _type
     def set_extra_info(self, extra_info):
         self.extra_info = extra_info
+
+    def format(self):
+        '''格式化输出'''
+        return '( self: %s %s,first_son: %s, father: %s, left: %s, right: %s )\r\n' % (
+            self.value, self.type, self.first_son.value if self.first_son else None, self.father.value if self.father else None, self.left.value if self.left else None,
+            self.right.value if self.right else None)

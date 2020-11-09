@@ -1,4 +1,0 @@
-
-def m():
-    measure(q)
-

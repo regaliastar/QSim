@@ -8,7 +8,7 @@ from scipy.linalg import kron
 from sklearn.preprocessing import normalize
 
 class Tools:
-    def basis(self, string='00010'):
+    def basis(self, string='00000'):
         '''string: the qubits sequence'''
         spin_up = np.array([[1, 0]]).T
         spin_down = np.array([[0, 1]]).T
@@ -40,9 +40,7 @@ class Tools:
 
     # @param wave_func: np.martix
     def project(self, wave_func, direction):
-        '''
-        <Psi | phi_i> to get the amplitude
-        '''
+        '''<Psi | phi_i> to get the amplitude'''
         return wave_func.H * direction
 
     def decompose(self, wave_func):
@@ -214,7 +212,8 @@ class QuantumRegister:
         :return: str
         '''
         if(self.value):
-            return print_wf(self.value)
+            t = Tools()
+            return t.print_wf(self.value)
         if place == -1:
             _v = {'value':{}}
             _v['count'] = count
@@ -240,7 +239,7 @@ class QuantumRegister:
             index = self.getCurrentIndex(place)
             tools = Tools()
             coef, seqs = tools.decompose(self.a2wf())
-            [prob_0, prob_1] = [0, 0]
+            prob_0 = 0
             probabilities = np.zeros(2)
             for i, seq in enumerate(seqs):
                 prob_0 += np.square(coef[i]) if seq[index] == '0' else 0

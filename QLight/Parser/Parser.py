@@ -40,7 +40,7 @@ def log_func_call(func):
         s = 'Parser-Function-Call: '+func.__name__
         for value in args:
             s += ' '+str(value)
-        print(s)
+        # print(s)
         func(*args, **kw)
     return wrapper
 
@@ -212,11 +212,20 @@ class Parser:
         '''有 整数赋值 和 函数调用赋值 两种方式'''
         if self.lookahead[0] == 600:
             # 匹配 整数
+            Declare_tree.root.set_value('Declare_INT')
             Declare_tree.add_child_node(
                 SyntaxTreeNode(token[1], 'INT'), Declare_tree.root)
             self.match(self.lookahead)
-        elif self.lookahead[0] == 500 or self.lookahead[0] == 210 or self.lookahead[0] == 211:
+        elif self.lookahead[0] == 500 or self.lookahead[0] == 210 or self.lookahead[0] == 211 or self.lookahead[0] == 212:
             # 匹配 函数调用
+            if self.lookahead[0] == 210:
+                Declare_tree.root.set_value('Declare_measure')
+            elif self.lookahead[0] == 211:
+                Declare_tree.root.set_value('Declare_quantum')
+            elif self.lookahead[0] == 212:
+                Declare_tree.root.set_value('Declare_show')
+            else:
+                Declare_tree.root.set_value('Declare_func')
             self.FuncCall(self.lookahead, Declare_tree.root)
         if self.lookahead[0] == 308:
             # 匹配 \n
