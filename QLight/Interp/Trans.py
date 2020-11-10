@@ -14,7 +14,7 @@ logging.basicConfig(filename='log/translate.log', level=logging.DEBUG)
 log = logging.getLogger('translate')
 
 py_template = {
-    'import':
+    'header':
     '''
 # -*- coding: utf-8 -*-
 import pytest
@@ -31,27 +31,32 @@ Template('''
 def $FuncStatement_Name($ParameterList):
     $Statement
 '''),
+    'IFStatement':
+Template('''
+if $bool_str:
+    $Statement
+'''),
     'Declare_func':
 Template('''$name = $FuncCall_Name($ParameterList)'''),
     'Declare_INT':
-Template('''
-$name = $INT
-'''),
+Template('''$name = $INT'''),
     'GateOp':
-Template('''qubit.applyGate($GateOp_Name,$placeList)'''),
+Template('''qubit.applyGate('$GateOp_Name',$placeList)'''),
     'FuncCall':
 Template('''$FuncCall_Name($ParameterList)'''),
     'measure':
 Template('''qubit.measure(place=$place, count=$count)'''),
     'Declare_quantum':
-Template('''qubit = QuantumRegister($numQubits)''')
+Template('''qubit = QuantumRegister($numQubits)'''),
+    'Declare_measure':
+Template('''$Iden = qubit.measure(place=$place, count=$count)'''),
 }
 
 class pyFileHandler():
     '''维护生成的代码'''
     def __init__(self):
         self.result = []
-        self.result.append(py_template['import'])
+        self.result.append(py_template['header'])
 
     def insert(self, _value, _type):
         s = py_template[_type].substitute(_value)
@@ -70,6 +75,7 @@ class Translate:
         self.fileHandler = pyFileHandler()
 
     def process_statement(self, node):
+        '''处理大括号内的情况，如if,while,func'''
         if not node:
             return
         child = node.first_son
@@ -83,9 +89,12 @@ class Translate:
                 pass
             elif child.value == 'Declare_quantum':
                 dict = self.Declare_quantum(child)
-                s = py_template['Declare_func'].substitute(dict)
+                s = py_template['Declare_quantum'].substitute(dict)
                 statement_list.append(s)
                 pass
+            elif child.value == 'Declare_measure':
+                dict = self.Declare_measure(child)
+                self.fileHandler.insert(dict, 'Declare_measure')
             elif child.value == 'GateOp':
                 dict = self.GateOp(child)
                 s = py_template['GateOp'].substitute(dict)
@@ -103,27 +112,6 @@ class Translate:
                     dict = self.FuncCall(child)
                     s = py_template['FuncCall'].substitute(dict)
                     statement_list.append(s)
-
-            # if child.value == 'Declare_func':
-            #     dict = self.Declare_func(child)
-            #     s = py_template['Declare_func'].substitute(dict)
-            #     statement_list.append(s)
-            # elif child.value == 'Declare_INT':
-            #     pass
-            # elif child.value == 'GateOp':
-            #     dict = self.GateOp(child)
-            #     s = py_template['GateOp'].substitute(dict)
-            #     statement_list.append(s)
-            # elif child.value == 'FuncStatement':
-            #     dict = self.FuncStatement(child)
-            #     s = py_template['FuncStatement'].substitute(dict)
-            #     statement_list.append(s)
-            #     pass
-            # elif child.value == 'FuncCall':
-            #     dict = self.FuncCall(child)
-            #     s = py_template['FuncCall'].substitute(dict)
-            #     statement_list.append(s)
-            #     pass
             child = child.right
         statement_str = ''.join(statement_list) + '\n'
         return statement_str
@@ -149,6 +137,24 @@ class Translate:
                 raise ValueError('Failed to analyze child: {}'.format(child.format())) 
             child = child.right
         return dict(FuncStatement_Name=FuncStatement_Name,ParameterList=ParameterList,Statement=Statement_str)
+
+    def IFStatement(self, node):
+        if not node:
+            return
+        child = node.first_son
+        bool_str = ''
+        statement_str = ''
+        while child:
+            if child.value == 'Bool' and child.type == None:
+                bs = self.tree.find_all_child(child)
+                for b in bs:
+                    bool_str += b.value
+            elif child.value == 'Statement' and child.type == None:
+                Statement_str = self.process_statement(child)
+            else:
+                raise ValueError('Failed to analyze child: {}'.format(child.format())) 
+            child = child.right
+        return dict(bool_str=bool_str, statement=statement_str)
 
     def Declare_func(self, node):
         if not node:
@@ -233,7 +239,7 @@ class Translate:
                     if p.type == 500:
                         pass
                     elif p.type == 600:
-                        place = 600
+                        place = p.value
             else:
                 raise ValueError('Failed to analyze child: {}'.format(child.format()))
             child = child.right
@@ -265,6 +271,36 @@ class Translate:
             child = child.right
         return dict(qubit=qubit, numQubits=numQubits)
 
+    def Declare_measure(self, node):
+        if not node:
+            return
+        child = node.first_son
+        Iden = 'm'
+        place = '-1'
+        count = '1'
+        while child:
+            if child.type == 500:
+                Iden = child.value
+            elif child.value == '=':
+                pass
+            elif child.value == 'FuncCall' and child.type == None:
+                list = self.tree.find_all_child(child)
+                for n in list:
+                    if n.type == 'FuncCall_Name':
+                        pass
+                    elif n.value == 'ParameterList' and n.type == None:
+                        pl = self.tree.find_all_child(n)
+                        '''这里需要分别处理measure(q), measure(q[0])的情况'''
+                        for p in pl:
+                            if p.type == 500:
+                                pass
+                            elif p.type == 600:
+                                place = p.value
+            else:
+                raise ValueError('Failed to analyze child: {}'.format(child.format()))
+            child = child.right
+        return dict(Iden=Iden, place=place, count=count)
+
     def main(self):
         tree = self.tree
         childs = tree.find_all_child(tree.root)
@@ -277,7 +313,9 @@ class Translate:
             elif child.value == 'Declare_quantum':
                 dict = self.Declare_quantum(child)
                 self.fileHandler.insert(dict, 'Declare_quantum')
-                pass
+            elif child.value == 'Declare_measure':
+                dict = self.Declare_measure(child)
+                self.fileHandler.insert(dict, 'Declare_measure')
             elif child.value == 'GateOp':
                 dict = self.GateOp(child)
                 self.fileHandler.insert(dict, 'GateOp')
@@ -295,7 +333,7 @@ class Translate:
 
 if __name__ == '__main__':
     print('translate')
-    lexer = Lexer('QLight/code_0.txt')
+    lexer = Lexer('QLight/code_1.txt')
     lexer.scanner()
     log.debug(lexer.getTOKEN())
     parser = Parser(lexer.getTOKEN())
