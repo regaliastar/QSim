@@ -214,10 +214,10 @@ class Parser:
             # 匹配 整数
             Declare_tree.root.set_value('Declare_INT')
             Declare_tree.add_child_node(
-                SyntaxTreeNode(token[1], 'INT'), Declare_tree.root)
+                SyntaxTreeNode(self.lookahead[1], 'INT'), Declare_tree.root)
             self.match(self.lookahead)
         elif self.lookahead[0] == 500 or self.lookahead[0] == 210 or self.lookahead[0] == 211 or self.lookahead[0] == 212:
-            # 匹配 函数调用
+            # 匹配 func、measure、quantum、show
             if self.lookahead[0] == 210:
                 Declare_tree.root.set_value('Declare_measure')
             elif self.lookahead[0] == 211:

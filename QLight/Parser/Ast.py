@@ -42,7 +42,7 @@ class SyntaxTree(object):
         '''DFS遍历语法树'''
         if not node:
             return
-        output = open('log/parser.txt', 'a')
+        output = open('log/parser.txt', 'a', encoding = 'utf-8')
         output.write(node.format())
         output.close()
         child = node.first_son

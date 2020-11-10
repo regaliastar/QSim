@@ -1,7 +1,7 @@
-// quantum teleport
+// 量子隐态传输
 q = quantum(3)
 H q[1]
-X q[0] q[1]
+X q[1] q[2] // bell state
 H q[0]  // phi = sqrt(1/2)|0> + sqrt(1/2)|1>
 X q[0] q[1]
 H q[0]

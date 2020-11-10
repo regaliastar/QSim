@@ -1,6 +1,6 @@
 '''
 根据QSim将Parser生成的语法树翻译成Pyhton代码
-date: 2020-11-6
+date: 2020-11-10
 '''
 import os
 import sys
@@ -16,7 +16,6 @@ log = logging.getLogger('translate')
 py_template = {
     'header':
     '''
-# -*- coding: utf-8 -*-
 import pytest
 import os
 import sys
@@ -24,7 +23,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前�
 sys.path.append(BASE_DIR)
 from lib.QSim import QuantumRegister
 from lib.QSim import Tools
+tools = Tools()
 import numpy as np
+    ''',
+    'footer':
+    '''
+_wf = tools.print_wf(qubit.a2wf())
+print(_wf)
     ''',
     'FuncStatement':
 Template('''
@@ -39,7 +44,7 @@ if $bool_str:
     'Declare_func':
 Template('''$name = $FuncCall_Name($ParameterList)'''),
     'Declare_INT':
-Template('''$name = $INT'''),
+Template('''$Iden = $INT'''),
     'GateOp':
 Template('''qubit.applyGate('$GateOp_Name',$placeList)'''),
     'FuncCall':
@@ -65,7 +70,8 @@ class pyFileHandler():
     def generate_file(self, file_name=None):
         if not file_name:
             file_name = 'log/auto'
-        self.file = open(file_name + '.py', 'w+')
+        self.result.append(py_template['footer'])
+        self.file = open(file_name + '.py', 'w+', encoding = 'utf-8')
         self.file.write('\n'.join(self.result) + '\n')
         self.file.close()
 
@@ -86,7 +92,8 @@ class Translate:
                 s = py_template['Declare_func'].substitute(dict)
                 statement_list.append(s)
             elif child.value == 'Declare_INT':
-                pass
+                dict = self.Declare_INT(child)
+                self.fileHandler.insert(dict, 'Declare_INT')
             elif child.value == 'Declare_quantum':
                 dict = self.Declare_quantum(child)
                 s = py_template['Declare_quantum'].substitute(dict)
@@ -301,6 +308,24 @@ class Translate:
             child = child.right
         return dict(Iden=Iden, place=place, count=count)
 
+    def Declare_INT(self, node):
+        if not node:
+            return
+        child = node.first_son
+        Iden = 'Iden'
+        INT = ''
+        while child:
+            if child.type == 500:
+                Iden = child.value
+            elif child.value == '=':
+                pass
+            elif child.type == 'INT':
+                INT = child.value
+            else:
+                raise ValueError('Failed to analyze child: {}'.format(child.format()))
+            child = child.right
+        return dict(Iden=Iden, INT=INT)
+
     def main(self):
         tree = self.tree
         childs = tree.find_all_child(tree.root)
@@ -309,7 +334,8 @@ class Translate:
                 dict = self.Declare_func(child)
                 self.fileHandler.insert(dict, 'Declare_func')
             elif child.value == 'Declare_INT':
-                pass
+                dict = self.Declare_INT(child)
+                self.fileHandler.insert(dict, 'Declare_INT')
             elif child.value == 'Declare_quantum':
                 dict = self.Declare_quantum(child)
                 self.fileHandler.insert(dict, 'Declare_quantum')
@@ -335,7 +361,6 @@ if __name__ == '__main__':
     print('translate')
     lexer = Lexer('QLight/code_1.txt')
     lexer.scanner()
-    log.debug(lexer.getTOKEN())
     parser = Parser(lexer.getTOKEN())
     parser.main()
     # parser.tree.show()

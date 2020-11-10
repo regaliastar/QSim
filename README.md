@@ -45,19 +45,10 @@ FuncCall    ---------> Identifier([INT]*)
 #############################################
 #                 QLight语法实例             #
 #############################################
-// 注释
-// 函数
-func bell(){
-    q[2] = quantum(2)
-    H q[0]
-    X q[0] q[1]
-    return q
-}
-bell()
 // 量子隐态传输
-q[3] = quantum(3)
+q = quantum(3)
 H q[1]
-X q[1] q[1]
+X q[1] q[2] // bell state
 H q[0]  // phi = sqrt(1/2)|0> + sqrt(1/2)|1>
 X q[0] q[1]
 H q[0]
@@ -66,7 +57,6 @@ m2 = measure(q[1])
 if(m2 == 1){
     X q[2]
 }
-
 if(m1 == 1){
     Z q[2]
 }

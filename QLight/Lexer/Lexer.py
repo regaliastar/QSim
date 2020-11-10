@@ -19,7 +19,7 @@ class Lexer:
         return self.TOKEN
 
     def read_source_code(self, file_path):
-        f = open(file_path, "r")
+        f = open(file_path, "r", encoding='utf-8')
         source_code = f.readlines()
         f.close()
         return source_code
