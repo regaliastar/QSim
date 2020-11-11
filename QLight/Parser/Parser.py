@@ -109,6 +109,24 @@ class Parser:
                 self.match(self.lookahead)
         else:
             raise ValueError('Failed to FuncStatement arguments: {}'.format(self.lookahead))
+    
+    @log_func_call
+    def Expression(self, token, father=None):
+        if not father:
+            father = self.tree.root
+        Expression_tree = SyntaxTree()
+        Expression_tree.current = Expression_tree.root = SyntaxTreeNode('Expression')
+        self.tree.add_child_node(Expression_tree.root, father)
+        while self.lookahead[0] != 308:
+            Expression_tree.add_child_node(
+                SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), Expression_tree.root)
+            self.match(self.lookahead)
+        if self.lookahead[0] == 308:
+            # 匹配 \n
+            self.match(self.lookahead)
+        else:
+            raise ValueError('Failed to FuncStatement arguments: {}'.format(self.lookahead))
+    
 
     @log_func_call
     def Return(self, token, father=None):
@@ -117,21 +135,24 @@ class Parser:
         Return_tree = SyntaxTree()
         Return_tree.current = Return_tree.root = SyntaxTreeNode('Return')
         self.tree.add_child_node(Return_tree.root, father)
-        if token[0] != 105:
-            raise ValueError('Failed to FuncStatement arguments: {}'.format(token))
+        # if token[0] != 105:
+        #     raise ValueError('Failed to Return arguments: {}'.format(token))
         # 匹配 return
         if self.lookahead[0] == 106:
             self.match(self.lookahead)
         else:
             raise ValueError('Failed to Return arguments: {}'.format(self.lookahead))
-        '''返回的值是 Identity或者INT'''
+        '''返回的值是 Identity或INT或Expression'''
         if self.lookahead[0] == 500 or self.lookahead[0] == 600:
-            Return_tree.add_child_node(
-                SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), Return_tree.root)
-            self.match(self.lookahead)
+            '''解析Expression'''
+            if self.TOKEN[self.current_token+1][0] >= 400 and self.TOKEN[self.current_token+1][0] < 500:
+                self.Expression(self.lookahead, Return_tree.root)
+            else:  
+                Return_tree.add_child_node(
+                    SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), Return_tree.root)
+                self.match(self.lookahead)
         else:
             raise ValueError('Failed to Return: {}'.format(self.lookahead))
-        pass
 
     @log_func_call
     def Bool(self, token, father=None):

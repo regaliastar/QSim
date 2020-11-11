@@ -157,11 +157,17 @@ class Translate:
                 for b in bs:
                     bool_str += b.value
             elif child.value == 'Statement' and child.type == None:
-                Statement_str = self.process_statement(child)
+                statement_str = self.process_statement(child)
             else:
                 raise ValueError('Failed to analyze child: {}'.format(child.format())) 
             child = child.right
         return dict(bool_str=bool_str, statement=statement_str)
+
+    def Return(self, node):
+        pass
+
+    def Expression(self, node):
+        pass
 
     def Declare_func(self, node):
         if not node:
@@ -361,6 +367,7 @@ if __name__ == '__main__':
     print('translate')
     lexer = Lexer('QLight/code_1.txt')
     lexer.scanner()
+    # log.debug(lexer.getTOKEN())
     parser = Parser(lexer.getTOKEN())
     parser.main()
     # parser.tree.show()
