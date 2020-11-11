@@ -80,6 +80,9 @@ print(result)
 ```
 ## Options
 ```
+安装环境
+pip install -r requirements.txt
+
 测试
 pytest --disable-warnings  
 ```

@@ -45,8 +45,6 @@ class Lexer:
         '''
         标志符 Identity
         包括 关键词、电路符、标志符（自定义变量）
-        :param ch:
-        :return:
         '''
         state = 0
         str = ''
@@ -68,11 +66,7 @@ class Lexer:
         return str
 
     def recognizeOp(self, ch):
-        '''
-        识别操作数 OPERATOR
-        :param ch:
-        :return:
-        '''
+        '''识别操作数 OPERATOR'''
         state = 0
         str = ''
         while state != 2:

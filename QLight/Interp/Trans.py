@@ -167,7 +167,13 @@ class Translate:
         pass
 
     def Expression(self, node):
-        pass
+        if not node:
+            return
+        child = node.first_son
+        Expression_str = ''
+        while child:
+            Expression_str += child.value
+        return Expression_str
 
     def Declare_func(self, node):
         if not node:
