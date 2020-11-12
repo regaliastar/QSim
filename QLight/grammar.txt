@@ -1,45 +1,20 @@
-*terminals
-func
-if
-elif
-else
-while
-break
-return
-(
-)
-{
-}
-[
-]
-:
-+
--
-*
-/
->
-<
-=
->=
-<=
-==
-+=
--=
-*=
-/=
-|
-&
-!
-I
-X
-Y
-Z
-H
-S
-T
-V
-V_H
-SWAP
-measure
-quantum
-*productions
+INT := [0-9]+
+Array := [a-zA-Z]*\[INT\]
+Identifier := [_a-zA-Z]+[_a-zA-Z0-9]*
+Compare := >|<|==|>=|<=
+
+Argument    ---------> Identifier | Array
+Measurement ---------> measure ( Argument | Identifier )
+QuantumRegister -----> quantum (INT)
+GateOp      ---------> I|X|Y|Z|H|S|T|V|V_H|SWAP Argument|Array Array|φ
+Factor      ---------> INT
+Expression  ---------> Factor [+|-|*|/|Compare Expression]
+Bool        ---------> [!] Identifier|Expression
+IFStatement ---------> if(Bool) { ; Statement}
+WhileStatement ------> while(Bool) { ; Statement}
+FuncStatement -------> func Identifier() { ; Statement}
+Return      ---------> return INT|Identifier
+Statement   ---------> GateOp | Measurement | IFStatement | WhileStatement | FuncStatement
+Declare     ---------> Identifier = quantum(INT)|INT
+Program     ---------> Declare { ; Statement}
+FuncCall    ---------> Identifier([INT]*)

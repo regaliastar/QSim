@@ -1,55 +1,26 @@
 # QSim
 `QLight`：一种轻量级解释型编程语言  
-`QSim`：配套的量子编程模拟器  
-## Document-tree
-* /QLight
-   * /Parser 语法分析程序。包含对语法文件的解析，语法树的生成等
-   * /Optimizer 优化器。优化线路的执行
-   * /Interpreter 解释器。将Qlight转为能执行的Python文件
-   * /Lexer 词法分析器。
-   * main.py 入口文件
-* /lib  定义了QLight的原生库函数
-   * Gates.py 定义量子门
-   * Qsim.py 执行引擎
-* /views 视图文件
-* /test 测试文件
-* main.py 程序入口
-## Grammar
-```
-#############################################
-#                 LL(1)文法设计              #
-#############################################
-INT := [0-9]+
-Array := [a-zA-Z]*\[INT\]
-Identifier := [_a-zA-Z]+[_a-zA-Z0-9]*
-Compare := >|<|==|>=|<=
+`QSim`：配套的量子模拟器  
 
-Argument    ---------> Identifier | Array
-Measurement ---------> measure ( Argument | Identifier )
-QuantumRegister -----> quantum (INT)
-GateOp      ---------> I|X|Y|Z|H|S|T|V|V_H|SWAP Argument|Array Array|φ
-Factor      ---------> INT
-Expression  ---------> Factor [+|-|*|/|Compare Expression]
-Bool        ---------> [!] Identifier|Expression
-IFStatement ---------> if(Bool) { ; Statement}
-WhileStatement ------> while(Bool) { ; Statement}
-FuncStatement -------> func Identifier() { ; Statement}
-Return      ---------> return INT|Identifier
-Statement   ---------> GateOp | Measurement | IFStatement | WhileStatement | FuncStatement
-Declare     ---------> Identifier = quantum(INT)|INT
-Program     ---------> Declare { ; Statement}
-FuncCall    ---------> Identifier([INT]*)
-```
+*QSim*是基于*Python+JavaScript*实现的量子计算机模拟器。内核计算使用`numpy`，界面使用`electron`框架
+
+在前端界面书写的*QLight*文本会被解释成Python语句执行，脚本文件和量子线路*mvvm*绑定，做到所见即所算。你也可以将线路保存为*LaTeX*语句或字符集合
+
+*Qsim*的*API*库实现了量子线路最新论文的算法，使用时通过配置`config`文件加载
+
+## Demo
+*To be written...*
+
 ## Introduction
 ```
 #############################################
-#                 QLight语法实例             #
+#                 Quick start               #
 #############################################
 // 量子隐态传输
 q = quantum(3)
 H q[1]
-X q[1] q[2] // bell state
-H q[0]  // phi = sqrt(1/2)|0> + sqrt(1/2)|1>
+X q[1] q[2]     // bell state
+H q[0]          // phi = sqrt(1/2)|0> + sqrt(1/2)|1>
 X q[0] q[1]
 H q[0]
 m1 = measure(q[0])
@@ -61,7 +32,6 @@ if(m1 == 1){
     Z q[2]
 }
 
-
 #############################################
 #                 Introduction              #
 #############################################
@@ -72,17 +42,20 @@ from QSim import QuantumRegister
 from QSim import Tools
 
 qubit = QuantumRegister(3)
-qubit.applyGate('H',0)
-qubit.applyGate('X',0,1)
+qubit.applyGate('H', 0)
+qubit.applyGate('X', 0, 1)
 
 result = qubit.measure()
 print(result)
 ```
 ## Options
 ```
-安装环境
+// env
 pip install -r requirements.txt
 
-测试
+// test
 pytest --disable-warnings  
 ```
+## API docs
+*To be written...*
+
