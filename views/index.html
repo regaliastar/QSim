@@ -9,14 +9,7 @@
 		<link rel="stylesheet" href="assets/css/Q-Circuit-Editor.css">
 		<link rel="stylesheet" href="assets/css/documentation.css">
 
-		<script src="assets/js/Q.js"></script>
-		<script src="assets/js/Q-ComplexNumber.js"></script>
-		<script src="assets/js/Q-Matrix.js"></script>
-		<script src="assets/js/Q-Qubit.js"></script>
-		<script src="assets/js/Q-Gate.js"></script>
-		<script src="assets/js/Q-History.js"></script>
-		<script src="assets/js/Q-Circuit.js"></script>
-		<script src="assets/js/Q-Circuit-Editor.js"></script>
+        <script src="v.js"></script>
 	</head>
 	<body>
 		<main>
@@ -29,32 +22,25 @@
 		Array
             .from( document.querySelectorAll( '.Q-circuit-palette' ))
             .forEach( function( el ){
-                Q.Circuit.Editor.createPalette( el )
+                QSim.Editor.createPalette(el)
             })
 
 		const updatePlayground = () => {
+            const circuit = QSim.init( 2, 4 )
+			// .h( 1, 1 )
+			// .x( 2, [ 1, 2 ])
+            const domEl = document.getElementById( 'playground' )
+            if( domEl ){
+                while( domEl.lastChild ){
+                    
+                    domEl.removeChild( domEl.lastChild )
+                }
 
-			const circuit = Q( 2, 3 )
-			.h( 1, 1 )
-			.x( 2, [ 1, 2 ])
-			if( circuit instanceof Q.Circuit ){
-				circuit.name = 'playground'
-				const domEl = document.getElementById( 'playground' )
-				if( domEl ){
-					while( domEl.lastChild ){
-						
-						domEl.removeChild( domEl.lastChild )
-					}
-					circuit.sort$()
-					circuit.toDom( domEl )				
-				}
-				circuit.evaluate$()
-				}
-			else {
-				console.log( 'There’s an error in your circuit!!' )
-			}
-		}
-		updatePlayground()
-		
+                circuit.toDom( domEl )	
+            }
+        }
+	
+        updatePlayground()
+        
 	</script>
 </html>
