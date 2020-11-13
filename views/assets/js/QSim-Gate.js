@@ -8,6 +8,8 @@ const QSim_Gate = {
     '*':''
 }
 
+QSim.Gate.totalGate = ['H', 'P', 'X', 'Y', 'Z', 'T', 'I']
+
 QSim.Gate.findBySymbol = symbol => {
     const contain = {
         'H':{
@@ -55,10 +57,8 @@ QSim.Gate.findBySymbol = symbol => {
         Object
         .values( contain )
         .find( function( item ){
-
             if( typeof symbol === 'string' && 
                 typeof item[ 'symbol' ] === 'string' ){
-
                 return symbol.toLowerCase() === item[ 'symbol' ].toLowerCase()
             }
             return symbol === item[ 'symbol' ]

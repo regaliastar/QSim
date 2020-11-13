@@ -5,8 +5,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-		<link rel="stylesheet" href="assets/css/Q.css">
-		<link rel="stylesheet" href="assets/css/Q-Circuit-Editor.css">
+		<link rel="stylesheet" href="assets/css/QSim.css">
+		<link rel="stylesheet" href="assets/css/Editor.css">
 		<link rel="stylesheet" href="assets/css/documentation.css">
 
 		<script src="assets/js/QSim.js"></script>
@@ -22,7 +22,7 @@
 		</main>
 	</body>
 	<script>
-		// 创造量子门的图表，以供拖拽使用
+		// 创造量子门的图标
 		Array
             .from( document.querySelectorAll( '.Q-circuit-palette' ))
             .forEach( function( el ){
@@ -31,13 +31,15 @@
 
 		const updatePlayground = () => {
             const circuit = QSim.init( 3, 4 )
-            circuit.addGates(
-                `
-                H 0
-                X 0 1
-                `)
-			// .h( 1, 1 )
-			// .x( 2, [ 1, 2 ])
+			circuit.set_source_code(`
+				func f()
+				{}
+				a = 8
+                H 0 
+				X 0 1
+				X 0 2
+				`)
+
             const domEl = document.getElementById( 'playground' )
             if( domEl ){
                 while( domEl.lastChild ){
@@ -50,5 +52,9 @@
 	
         updatePlayground()
         
+	</script>
+	<script>
+		// 这个script用来测试使用
+		
 	</script>
 </html>

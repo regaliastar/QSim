@@ -1,4 +1,5 @@
-// 绘制线路
+// 绘制整个线路
+// 与CSS进行交互
 QSim.Editor = function( circuit, targetEl ){
     this.name = 'playground'
     const createDiv = function(){
@@ -122,7 +123,7 @@ QSim.Editor = function( circuit, targetEl ){
 		wireEl.classList.add( 'Q-circuit-register-wire' )
 	}
 
-//  Create background highlight bars 
+    //  Create background highlight bars 
 	//  for each column.
 
 	for( let i = 0; i < circuit.timewidth; i ++ ){
@@ -231,8 +232,8 @@ QSim.Editor = function( circuit, targetEl ){
 		isControlled: false,
 		momentIndex: 1,
 		registerIndices: [1],
-	},
-	{
+    },
+    {
 		gate: {
 			name: "Pauli X",
 			nameCss: "pauli-x",
@@ -241,8 +242,19 @@ QSim.Editor = function( circuit, targetEl ){
 		isControlled: true,
 		momentIndex: 2,
 		registerIndices: [1, 2]
-	}]
-	g_arr.forEach(operation => {
+    },
+	{
+		gate: {
+			name: "Pauli X",
+			nameCss: "pauli-x",
+			symbol: "X"
+		},
+		isControlled: true,
+		momentIndex: 3,
+		registerIndices: [1, 3]
+    }]
+    
+	circuit.gates.forEach(operation => {
 		QSim.Editor.set( circuitEl, operation )
 	})
 
@@ -274,7 +286,6 @@ Object.assign( QSim.Editor, {
 			y: event.changedTouches[ 0 ][ pageOrClient +'Y' ]
 		}
 		return {
-
 			x: event[ pageOrClient +'X' ],
 			y: event[ pageOrClient +'Y' ]
 		}
@@ -285,7 +296,6 @@ Object.assign( QSim.Editor, {
 		const 
 		paletteEl = targetEl instanceof HTMLElement ? targetEl : document.createElement( 'div' ),
 		randomRangeAndSign = function(  min, max ){
-
 			const r = min + Math.random() * ( max - min )
 			return Math.floor( Math.random() * 2 ) ? r : -r
 		}

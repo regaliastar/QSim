@@ -1,44 +1,6 @@
-/*
-
-	Copyright © 2019–2020, Stewart Smith. See LICENSE for details.
-
-*/
 @charset "utf-8";
 
-
-
-
-/*
-
-	This file is in the process of being separated
-	in to “essential global Q.js styles” which will
-	remain here in Q.css, and “documentation-specific”
-	styles which will be removed from here and placed
-	within the /other/documentation.css file instead.
-
-	The goal is for a developer to be able to place 
-	this Q.css file into their own web app with little
-	to no interference with their app. All variables
-	and styles here will ultimately be prefaced with
-	a capital Q, eg. --Q-color-base, or .Q-text-input
-	and so on.
-
-
-*/
-
-
-
-
 svg, :root {
-
-
-
-	    /**************/
-	   /*            */
-	  /*   Colors   */
-	 /*            */
-	/**************/
-
 
 	/*  Base color (blue)  */
 
