@@ -1,13 +1,4 @@
-const QSim = {
-    init: function(bandwidth, timewidth){
-        return new QSim.Circuit(bandwidth, timewidth)
-    },
-    Editor: {},
-    Circuit: {},
-    gate: {}
-}
-
-
+// 绘制线路
 QSim.Editor = function( circuit, targetEl ){
     this.name = 'playground'
     const createDiv = function(){
@@ -16,7 +7,6 @@ QSim.Editor = function( circuit, targetEl ){
     const circuitEl = targetEl instanceof HTMLElement ? targetEl : createDiv()
     circuitEl.classList.add( 'Q-circuit' )
     if( typeof circuitEl.getAttribute( 'id' ) === 'string' ){
-
 		this.domId = circuitEl.getAttribute( 'id' )
 	}else {
 
@@ -119,7 +109,6 @@ QSim.Editor = function( circuit, targetEl ){
 	//  for each row.
 
 	for( let i = 0; i < circuit.bandwidth; i ++ ){
-
 		const rowEl = createDiv()
 		backgroundEl.appendChild( rowEl )
 		rowEl.style.position = 'relative'
@@ -137,7 +126,6 @@ QSim.Editor = function( circuit, targetEl ){
 	//  for each column.
 
 	for( let i = 0; i < circuit.timewidth; i ++ ){
-
 		const columnEl = createDiv()
 		backgroundEl.appendChild( columnEl )
 		columnEl.style.gridRowStart = 2
@@ -168,7 +156,6 @@ QSim.Editor = function( circuit, targetEl ){
     //  Add register index symbols to left-hand column.
 	
 	for( let i = 0; i < circuit.bandwidth; i ++ ){
-
 		const 
 		registerIndex = i + 1,
 		registersymbolEl = createDiv()
@@ -195,7 +182,6 @@ QSim.Editor = function( circuit, targetEl ){
 	//  Add moment index symbols to top row.
 
 	for( let i = 0; i < circuit.timewidth; i ++ ){
-
 		const 
 		momentIndex = i + 1,
 		momentsymbolEl = createDiv()
@@ -221,7 +207,6 @@ QSim.Editor = function( circuit, targetEl ){
     //  Add input values.
 
 	circuit.qubits.forEach( function( qubit, i ){
-
 		const 
 		rowIndex = i + 1,
 		inputEl = createDiv()
@@ -233,8 +218,36 @@ QSim.Editor = function( circuit, targetEl ){
         // inputEl.innerText = qubit.beta.toText()
         inputEl.innerText = 'q'+i
 		foregroundEl.appendChild( inputEl )
+    })
+    
+    // 对量子门进行绘制
+	// 测试 定义量子门
+	g_arr = [{
+		gate: {
+            symbol:    'H',
+            nameCss: 'hadamard',
+            name:    'Hadamard'
+		},
+		isControlled: false,
+		momentIndex: 1,
+		registerIndices: [1],
+	},
+	{
+		gate: {
+			name: "Pauli X",
+			nameCss: "pauli-x",
+			symbol: "X"
+		},
+		isControlled: true,
+		momentIndex: 2,
+		registerIndices: [1, 2]
+	}]
+	g_arr.forEach(operation => {
+		QSim.Editor.set( circuitEl, operation )
 	})
+
 }
+
 
 Object.assign( QSim.Editor, {
 	index: 0,
@@ -253,7 +266,6 @@ Object.assign( QSim.Editor, {
 		return rem * QSim.Editor.gridSize * ( g - 1 )
 	},
 	getInteractionCoordinates: function( event, pageOrClient ){
-
 		if( typeof pageOrClient !== 'string' ) pageOrClient = 'client'//page
 		if( event.changedTouches && 
 			event.changedTouches.length ) return {
@@ -268,7 +280,6 @@ Object.assign( QSim.Editor, {
 		}
 	},
 	createPalette: function( targetEl ){
-
 		if( typeof targetEl === 'string' ) targetEl = document.getElementById( targetEl )	
 
 		const 
@@ -284,9 +295,7 @@ Object.assign( QSim.Editor, {
 		'HXYZPT*'
 		.split( '' )
 		.forEach( function( symbol ){
-
-            const gate = QSim.gate.findBySymbol( symbol )
-            // console.log(gate)
+            const gate = QSim.Gate.findBySymbol( symbol )
 
 			const operationEl = document.createElement( 'div' )
 			paletteEl.appendChild( operationEl )
@@ -311,133 +320,94 @@ Object.assign( QSim.Editor, {
 		paletteEl.addEventListener( 'mousedown',  QSim.Editor.onPointerPress )
 		paletteEl.addEventListener( 'touchstart', QSim.Editor.onPointerPress )
 		return paletteEl
-	}
+    },
+    
 })
 
-QSim.Circuit = function( bandwidth, timewidth ){
+
+QSim.Editor.set = function( circuitEl, operation ){
+	const
+	backgroundEl = circuitEl.querySelector( '.Q-circuit-board-background' ),
+	foregroundEl = circuitEl.querySelector( '.Q-circuit-board-foreground' ),
+	circuit = circuitEl.circuit,
+	operationIndex = circuitEl.circuit.operations.indexOf( operation )
+
+	operation.registerIndices.forEach( function( registerIndex, i ){
+		const operationEl = document.createElement( 'div' )
+		foregroundEl.appendChild( operationEl )
+		operationEl.classList.add( 'Q-circuit-operation', 'Q-circuit-operation-'+ operation.gate.nameCss )
+		// operationEl.setAttribute( 'operation-index', operationIndex )		
+		operationEl.setAttribute( 'gate-symbol', operation.gate.symbol )
+		operationEl.setAttribute( 'gate-index', operation.gate.index )//  Used as an application-wide unique ID!
+		operationEl.setAttribute( 'moment-index', operation.momentIndex )
+		operationEl.setAttribute( 'register-index', registerIndex )
+		operationEl.setAttribute( 'register-array-index', i )//  Where within the registerIndices array is this operations fragment located?
+		operationEl.setAttribute( 'is-controlled', operation.isControlled )
+		operationEl.setAttribute( 'title', operation.gate.name )
+		operationEl.style.gridColumnStart = QSim.Editor.momentIndexToGridColumn( operation.momentIndex )
+		operationEl.style.gridRowStart = QSim.Editor.registerIndexToGridRow( registerIndex )
+
+		const tileEl = document.createElement( 'div' )
+		operationEl.appendChild( tileEl )
+		tileEl.classList.add( 'Q-circuit-operation-tile' )	
+		if( operation.gate.symbol !== '*' ) tileEl.innerText = operation.gate.symbol
 
 
+		//  Add operation link wires
+		//  for multi-qubit operations.
 
-	//  How many qubits (registers) shall we use?
+		if( operation.registerIndices.length > 1 ){
+			operationEl.setAttribute( 'register-indices', operation.registerIndices )
+			operationEl.setAttribute( 'register-indices-index', i )
+			operationEl.setAttribute( 
+				
+				'sibling-indices', 
+				 operation.registerIndices
+				.filter( function( siblingRegisterIndex ){
 
-	if( !bandwidth) bandwidth = 3
-	this.bandwidth = bandwidth
+					return registerIndex !== siblingRegisterIndex
+				})
+			)
+			operation.registerIndices.forEach( function( registerIndex, i ){
 
+				if( i < operation.registerIndices.length - 1 ){			
+					const 
+					siblingRegisterIndex = operation.registerIndices[ i + 1 ],
+					registerDelta = Math.abs( siblingRegisterIndex - registerIndex ),
+					start = Math.min( registerIndex, siblingRegisterIndex ),
+					end   = Math.max( registerIndex, siblingRegisterIndex ),
+					containerEl = document.createElement( 'div' ),
+					linkEl = document.createElement( 'div' )
 
-	//  How many operations can we perform on each qubit?
-	//  Each operation counts as one moment; one clock tick.
+					backgroundEl.appendChild( containerEl )							
+					containerEl.setAttribute( 'moment-index', operation.momentIndex )
+					containerEl.setAttribute( 'register-index', registerIndex )
+					containerEl.classList.add( 'Q-circuit-operation-link-container' )
+					containerEl.style.gridRowStart = QSim.Editor.registerIndexToGridRow( start )
+					containerEl.style.gridRowEnd   = QSim.Editor.registerIndexToGridRow( end + 1 )
+					containerEl.style.gridColumn   = QSim.Editor.momentIndexToGridColumn( operation.momentIndex )
 
-	if( !timewidth) timewidth = 5
-	this.timewidth = timewidth
-
-
-	//  We’ll start with Horizontal qubits (zeros) as inputs
-	//  but we can of course modify this after initialization.
-
-	this.qubits = new Array( bandwidth ).fill( 'test' )
-
-
-	//  What operations will we perform on our qubits?
-	
-	this.operations = []
-
-
-	//  Does our circuit need evaluation?
-	//  Certainly, yes!
-	// (And will again each time it is modified.)
-
-	this.needsEvaluation = true
-	
-
-	//  When our circuit is evaluated 
-	//  we store those results in this array.
-
-	this.results = []
-	this.matrix  = null
-
-    this.toDom = ( targetEl ) => {
-        return new QSim.Editor( this, targetEl ).domElement
-    }
-}
-
-const QSim_gate = {
-    'H':'',
-    'X':'',
-    'Y':'',
-    'Z':'',
-    'P':'',
-    'T':'',
-    '*':''
+					containerEl.appendChild( linkEl )
+					linkEl.classList.add( 'Q-circuit-operation-link' )
+					if( registerDelta > 1 ) linkEl.classList.add( 'Q-circuit-operation-link-curved' )
+				}
+			})
+			if( operation.isControlled && i === 0 ){
+				operationEl.classList.add( 'Q-circuit-operation-control' )
+				operationEl.setAttribute( 'title', 'Control' )
+				tileEl.innerText = ''
+			}
+			else operationEl.classList.add( 'Q-circuit-operation-target' )
+		}
+	})
 }
 
 QSim.Editor.unhighlightAll = function( circuitEl ){
-
 	Array.from( circuitEl.querySelectorAll( 
-
 		'.Q-circuit-board-background > div,'+
 		'.Q-circuit-board-foreground > div'
 	))
 	.forEach( function( el ){
-
 		el.classList.remove( 'Q-circuit-cell-highlighted' )
 	})
-}
-
-QSim.gate.findBySymbol = symbol => {
-    const contain = {
-        'H':{
-            symbol:    'H',
-            nameCss: 'hadamard',
-            name:    'Hadamard'
-        },
-        'P':{
-            symbol:    'P',
-		    name:      'Phase',
-		    nameCss:   'phase',
-        },
-        'X':{
-            symbol:    'X',
-            name:      'Pauli X',
-            nameCss:   'pauli-x',
-        },
-        'Y':{
-            symbol:    'Y',
-            name:      'Pauli Y',
-            nameCss:   'pauli-y',
-        },
-        'Z':{
-            symbol:    'Z',
-		    name:      'Pauli Z',
-		    nameCss:   'pauli-z',
-        },
-        'T':{
-            symbol:    'T',
-		    name:      'π ÷ 8',
-		    nameCss:   'pi8',
-        },
-        'I':{
-            symbol:    'I',
-            name:      'Identity',
-            nameCss:   'identity',
-        },
-        'CURSOR':{
-            symbol:    '*',
-		    name:      'Identity',
-		    nameCss:   'identity',
-        }
-    }
-    return (
-			
-        Object
-        .values( contain )
-        .find( function( item ){
-
-            if( typeof symbol === 'string' && 
-                typeof item[ 'symbol' ] === 'string' ){
-
-                return symbol.toLowerCase() === item[ 'symbol' ].toLowerCase()
-            }
-            return symbol === item[ 'symbol' ]
-        })
-    )
 }

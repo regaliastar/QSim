@@ -9,7 +9,11 @@
 		<link rel="stylesheet" href="assets/css/Q-Circuit-Editor.css">
 		<link rel="stylesheet" href="assets/css/documentation.css">
 
-        <script src="v.js"></script>
+		<script src="assets/js/QSim.js"></script>
+		<script src="assets/js/QSim-Gate.js"></script>
+		<script src="assets/js/QSim-Circuit.js"></script>
+		<script src="assets/js/QSim-Editor.js"></script>
+		
 	</head>
 	<body>
 		<main>
@@ -26,7 +30,12 @@
             })
 
 		const updatePlayground = () => {
-            const circuit = QSim.init( 2, 4 )
+            const circuit = QSim.init( 3, 4 )
+            circuit.addGates(
+                `
+                H 0
+                X 0 1
+                `)
 			// .h( 1, 1 )
 			// .x( 2, [ 1, 2 ])
             const domEl = document.getElementById( 'playground' )
@@ -35,7 +44,6 @@
                     
                     domEl.removeChild( domEl.lastChild )
                 }
-
                 circuit.toDom( domEl )	
             }
         }
