@@ -1,9 +1,14 @@
 QSim.Circuit = function( bandwidth, timewidth ){
 	if( !bandwidth) bandwidth = 3
 	this.bandwidth = bandwidth
+    this.set_bandwidth = bandwidth => {
+        this.bandwidth = bandwidth
+        this.qubits = new Array( bandwidth ).fill( 'test' )
+    }
 
 	if( !timewidth) timewidth = 5
-	this.timewidth = timewidth
+    this.timewidth = timewidth
+    this.set_timewidth = timewidth => {this.timewidth = timewidth}
 
 	this.qubits = new Array( bandwidth ).fill( 'test' )
 
@@ -30,7 +35,9 @@ QSim.Circuit = function( bandwidth, timewidth ){
      * `
      */
     this.set_source_code = txt => {
-        this.gates = QSim.Circuit.Scanner(txt)
+        scan = QSim.Circuit.Scanner(txt)
+        this.gates = scan.gates
+        this.qubits_count = scan.qubits_count
     }
 }
 
@@ -88,7 +95,11 @@ QSim.Circuit.Scanner = (txt) => {
 
     let ptr = 0
     let state = 0   //state是必要的，为了能够将门和其他的语句区分开
-    let result = []
+    let qubit_state = 0
+    let result = {
+        gates: [],
+        qubits_count: 0
+    }
     let item = {
         gate: null,
         registerIndices: [],
@@ -104,20 +115,29 @@ QSim.Circuit.Scanner = (txt) => {
                 // console.log(1, iden)
                 item.gate = QSim.Gate.findBySymbol(iden)
             }
+            else if(iden == 'quantum'){
+                qubit_state = 1
+            }
         }
-        else if (state == 1 && /^\d+$/.test(cont.charAt(ptr))){
+        else if ((qubit_state == 1 ||state == 1) && /^\d+$/.test(cont.charAt(ptr))){
             // console.log(2, cont.charAt(ptr))
             let s_int = recognizeInteger(cont.charAt(ptr))
             // console.log('s_int', s_int)
             s_int = Number.parseInt(s_int)
-            item.registerIndices.push(++s_int)
-            if(item.registerIndices.length > 1) item.isControlled = true
+            if(state == 1){
+                item.registerIndices.push(++s_int)
+                if(item.registerIndices.length > 1) item.isControlled = true
+            }
+            if(qubit_state == 1){
+                result.qubits_count = s_int
+                qubit_state = 0
+            }
         }
         else if(state == 1 && cont.charAt(ptr) == '\n'){
             state = 0
             // console.log(3, cont.charAt(ptr))
             item.momentIndex = momentIndex
-            result.push(JSON.parse(JSON.stringify(item)))
+            result.gates.push(JSON.parse(JSON.stringify(item)))
             item = {
                 gate: null,
                 registerIndices: [],
@@ -131,7 +151,7 @@ QSim.Circuit.Scanner = (txt) => {
     if(state == 1){
         state = 0
         item.momentIndex = momentIndex
-        result.push(JSON.parse(JSON.stringify(item)))
+        result.gates.push(JSON.parse(JSON.stringify(item)))
     }
     return result
 }

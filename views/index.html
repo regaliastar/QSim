@@ -32,13 +32,13 @@
 		const updatePlayground = () => {
             const circuit = QSim.init( 3, 4 )
 			circuit.set_source_code(`
-				func f()
-				{}
-				a = 8
+				q = quantum(4)
                 H 0 
 				X 0 1
 				X 0 2
 				`)
+			circuit.set_timewidth(circuit.gates.length)
+			circuit.set_bandwidth(circuit.qubits_count)
 
             const domEl = document.getElementById( 'playground' )
             if( domEl ){
