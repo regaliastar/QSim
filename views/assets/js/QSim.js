@@ -8,6 +8,10 @@ const QSim = {
 }
 
 Object.assign(QSim, {
+    log: function(){
+        console.log( ...arguments )
+		return '(log)' 
+    },
 
     warn: function(){
 		console.warn( ...arguments )
@@ -31,7 +35,7 @@ Object.assign(QSim, {
     },
 
     printInTerminal: function(){
-        
+
     }
     
 })

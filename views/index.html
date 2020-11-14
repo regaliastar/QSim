@@ -17,7 +17,9 @@
 	</head>
 	<body>
 		<main>
-			<textarea autofocus class="Q-circuit-text-input" id="playground-input"></textarea>
+			<textarea autofocus 
+			oninput="inputListener()"
+			class="Q-circuit-text-input" id="playground-input"></textarea>
 			<p class="right">
 				<button class="Q-button" id="playground-apply-button" type="button" onclick="updatePlayground()">
 					Debug
@@ -37,13 +39,16 @@
                 QSim.Editor.createPalette(el)
             })
 
-		const updatePlayground = () => {
+		const updatePlayground = (source_code) => {
 			const circuit = QSim.init( 3, 4 )
-			const source_code = document.getElementById('playground-input').value.trim()
+
+			if(!source_code){
+				source_code = document.getElementById('playground-input').value.trim()
+			}
 
 			circuit.set_source_code(source_code)
 			
-			if(circuit.gates.length) circuit.set_timewidth(circuit.gates.length)
+			if(circuit.gates.length) circuit.set_timewidth(circuit.gates.length+1)
 			if(circuit.qubits_count) circuit.set_bandwidth(circuit.qubits_count)
 			
             const domEl = document.getElementById( 'playground' )
@@ -56,8 +61,15 @@
             }
         }
 		
-        updatePlayground()
-        
+        const inputListener = () => {
+			const source_code = document.getElementById('playground-input').value.trim()
+			scan = QSim.Circuit.Scanner(source_code)
+			
+			if( QSim.Circuit.checkScan(scan) ){
+				QSim.log('checkScan', scan)
+				updatePlayground()
+			}
+		}
 	</script>
 	<script>
 		// 这个script用来测试使用

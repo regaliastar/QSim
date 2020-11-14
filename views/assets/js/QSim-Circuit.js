@@ -48,8 +48,16 @@ QSim.Circuit = function( bandwidth, timewidth ){
     }
 }
 
-// 文本分析，将代码转为量子门
+
+    //////////////////////////////////
+   //                              //
+  //   文本分析，将代码转为量子门   //
+ //                              //
+//////////////////////////////////
+
+
 QSim.Circuit.Scanner = (txt) => {
+
     function getNextChar(){
         ptr ++
         if(ptr >= cont.length){
@@ -106,7 +114,7 @@ QSim.Circuit.Scanner = (txt) => {
     }
 
     const cont = txt.trim()
-    console.log('Scanner source code: ',cont)
+    // console.log('Scanner source code: ',cont)
 
     let ptr = 0
     let state = 0   //state是必要的，为了能够将门和其他的语句区分开
@@ -171,6 +179,31 @@ QSim.Circuit.Scanner = (txt) => {
     return result
 }
 
+
+    //////////////////////////////////
+   //                              //
+  //   语义，检测scan是否正确      //
+ //                              //
+//////////////////////////////////
+
+
+QSim.Circuit.checkScan = (scan) => {
+    
+    // 先检查 qubits_count
+    const qubits_count = scan.qubits_count
+    if(!QSim.isUsefulInteger(qubits_count) || qubits_count == 0) return false
+
+    // 检查 Gates
+    const gates = scan.gates
+    for( let i = 0; i < gates.length; i++){
+        if(gates[i].registerIndices.length == 0)    return false
+
+    }
+
+    return true
+
+}
+
 Object.assign(QSim.Circuit.prototype, {
     set$: function( gate, momentIndex, registerIndices ){
 
@@ -209,7 +242,7 @@ Object.assign(QSim.Circuit.prototype, {
 			return QSim.warn( `QSim.Circuit attempted to add a gate to circuit #${ this.index } at moment #${ momentIndex } with some out of range qubit indices:`, registerIndices )
 		}
 
-        console.log('registerIndices', registerIndices)
+        // console.log('registerIndices', registerIndices)
 		//  Ok, now we can check if this set$ command
 		//  is redundant.
 

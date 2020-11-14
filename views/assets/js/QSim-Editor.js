@@ -335,7 +335,7 @@ Object.assign( QSim.Editor, {
 
 
 QSim.Editor.prototype.onExternalSet = function( event ){
-	console.log('onExternalSet')
+	// console.log('onExternalSet')
 
 	QSim.Editor.set( this.domElement, event.detail.operation )
 }
@@ -473,7 +473,7 @@ QSim.Editor.unhighlightAll = function( circuitEl ){
 
 QSim.Editor.onPointerMove = function( event ){
 
-	console.log('onPointerMove')
+	// console.log('onPointerMove')
 	//  We need our cursor coordinates straight away.
 	//  We’ll use that both for dragging (immediately below)
 	//  and for hover highlighting (further below).
@@ -652,7 +652,7 @@ QSim.Editor.onPointerMove = function( event ){
 
 QSim.Editor.onPointerPress = function( event ){
 
-	console.log('onPointerPress')
+	// console.log('onPointerPress')
 	//  This is just a safety net
 	//  in case something terrible has ocurred.
 	// (ex. Did the user click and then their mouse ran
@@ -762,7 +762,7 @@ QSim.Editor.onPointerPress = function( event ){
 			!addMomentEl &&
 			!addRegisterEl ) return
 
-		console.log('cellEl',cellEl)
+		// console.log('cellEl',cellEl)
 		//  By this point we know that the circuit is unlocked
 		//  and that we’ll activate a button / drag event / etc.
 		//  So we need to hault futher event propagation
@@ -1046,7 +1046,7 @@ QSim.Editor.onPointerPress = function( event ){
 
 QSim.Editor.onPointerRelease = function( event ){
 
-	console.log('onPointerRelease')
+	// console.log('onPointerRelease')
 	//  If there’s no dragEl then bail immediately.
 
 	if( QSim.Editor.dragEl === null ) return
@@ -1569,7 +1569,7 @@ QSim.Editor.onPointerRelease = function( event ){
 	
 
 	//  DO IT DO IT DO IT
-	console.log('setCommands',setCommands)
+	// console.log('setCommands',setCommands)
 	setCommands.forEach( function( setCommand ){
 
 		circuit.set$.apply( circuit, setCommand )
