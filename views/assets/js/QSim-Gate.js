@@ -51,6 +51,11 @@ QSim.Gate.findBySymbol = symbol => {
             symbol:    '*',
 		    name:      'Identity',
 		    nameCss:   'identity',
+        },
+        'SWAP':{
+            symbol:    'S',
+		    name:      'Swap',
+		    nameCss:   'swap',
         }
     }
     return (

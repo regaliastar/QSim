@@ -17,8 +17,16 @@
 	</head>
 	<body>
 		<main>
-			<div class='Q-circuit-palette'></div>
+			<textarea autofocus class="Q-circuit-text-input" id="playground-input"></textarea>
+			<p class="right">
+				<button class="Q-button" id="playground-apply-button" type="button" onclick="updatePlayground()">
+					Debug
+				</button>
+				<br><br>
+			</p>
 			<div id="playground"></div>
+			<div class='Q-circuit-palette'></div>
+
 		</main>
 	</body>
 	<script>
@@ -30,16 +38,14 @@
             })
 
 		const updatePlayground = () => {
-            const circuit = QSim.init( 3, 4 )
-			circuit.set_source_code(`
-				q = quantum(4)
-                H 0 
-				X 0 1
-				X 0 2
-				`)
-			circuit.set_timewidth(circuit.gates.length)
-			circuit.set_bandwidth(circuit.qubits_count)
+			const circuit = QSim.init( 3, 4 )
+			const source_code = document.getElementById('playground-input').value.trim()
 
+			circuit.set_source_code(source_code)
+			
+			if(circuit.gates.length) circuit.set_timewidth(circuit.gates.length)
+			if(circuit.qubits_count) circuit.set_bandwidth(circuit.qubits_count)
+			
             const domEl = document.getElementById( 'playground' )
             if( domEl ){
                 while( domEl.lastChild ){
@@ -49,7 +55,7 @@
                 circuit.toDom( domEl )	
             }
         }
-	
+		
         updatePlayground()
         
 	</script>
