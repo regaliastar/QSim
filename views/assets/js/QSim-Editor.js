@@ -425,16 +425,14 @@ QSim.Editor.set = function( circuitEl, operation ){
 
 
 QSim.Editor.prototype.onExternalClear = function( event ){
-
+	QSim.log('onExternalClear')
 	QSim.Editor.clear( this.domElement, {
-
 		momentIndex: event.detail.momentIndex,
 		registerIndices: event.detail.registerIndices
 	})
-	
 }
 QSim.Editor.clear = function( circuitEl, operation ){
-
+	QSim.log('clear', operation)
 	const momentIndex = operation.momentIndex
 	operation.registerIndices.forEach( function( registerIndex ){
 
@@ -516,7 +514,6 @@ QSim.Editor.onPointerMove = function( event ){
 	//  If we’re not over a circuit board container
 	//  then there’s no highlighting work to do
 	//  so let’s bail now.
-
 	if( !boardContainerEl ) return
 
 
@@ -1036,7 +1033,6 @@ QSim.Editor.onPointerPress = function( event ){
 }
 
 
-
     /////////////////////////
    //                     //
   //   Pointer RELEASE   //
@@ -1101,15 +1097,15 @@ QSim.Editor.onPointerRelease = function( event ){
 	//  If we have not dragged on to a circuit board
 	//  then we’re throwing away this operation.
 
+
 	if( !boardContainerEl ){
-	
+		
+		QSim.log('!boardContainerEl')
 		if( QSim.Editor.dragEl.circuitEl ){
 
 			const 
 			originCircuitEl = QSim.Editor.dragEl.circuitEl
 			originCircuit = originCircuitEl.circuit
-			
-			// originCircuit.history.createEntry$()
 			Array
 			.from( QSim.Editor.dragEl.children )
 			.forEach( function( child ){
@@ -1119,6 +1115,12 @@ QSim.Editor.onPointerRelease = function( event ){
 					child.origin.momentIndex,
 					child.origin.registerIndex
 				)
+				
+				// QSim.log(originCircuit.gates)
+				// originCircuit.gates.forEach(operation => {
+				// 	QSim.Editor.set( circuitEl, operation )
+				// })
+
 			})
 			QSim.Editor.onSelectionChanged( originCircuitEl )
 			QSim.Editor.onCircuitChanged( originCircuitEl )
@@ -1131,11 +1133,9 @@ QSim.Editor.onPointerRelease = function( event ){
 		
 		let clipboardToDestroy = QSim.Editor.dragEl
 
-
 		//  Now we can remove our dragging reference.
 
 		QSim.Editor.dragEl = null
-
 
 		//  Add our CSS animation routine
 		//  which will run for 1 second.
@@ -1157,13 +1157,10 @@ QSim.Editor.onPointerRelease = function( event ){
 
 		}, 500 )
 		
-
-		//  No more to do here. Goodbye.
-
 		return
 	}
-
-
+	
+	
 	//  If we couldn’t determine a circuitEl
 	//  from the drop target,
 	//  or if there is a target circuit but it’s locked,
@@ -1241,7 +1238,6 @@ QSim.Editor.onPointerRelease = function( event ){
 	//  this was user-initiated via the graphic user interface (GUI).
 
 	// circuit.history.createEntry$()
-
 
 	//  Now let’s work our way through each of the dragged operations.
 	//  If some of these are components of a multi-register operation
@@ -1570,11 +1566,15 @@ QSim.Editor.onPointerRelease = function( event ){
 
 	//  DO IT DO IT DO IT
 	// console.log('setCommands',setCommands)
+	// 拖拽之后生成整个电路
 	setCommands.forEach( function( setCommand ){
 
 		circuit.set$.apply( circuit, setCommand )
 	})
+	// QSim.log(circuit.gates, setCommands)
 
+	// update code
+	// QSim.Editor.updateCode(setCommands)
 
 	//  Are we capable of making controls? Swaps?
 
@@ -1943,9 +1943,48 @@ QSim.Editor.createSwap = function( circuitEl ){
 }
 
 
+// update code in html by drag circuitEl
+// IMPORTANT!
+// must be called follow this.sort()	
+
+QSim.Editor.updateCode = function(circuit){
+	QSim.log('updateCode', circuit.gates)
+	const textarea = document.getElementById('playground-input')
+	let source_code = 'quantum '+circuit.bandwidth+'\n'
+	let codeCont = []
+
+	// genarate codeCont
+
+	circuit.gates.forEach( obj => {
+		codeCont.push(obj)
+		if(obj.isControlled){
+			for(let i = 0; i < codeCont.length; i++){
+				if(codeCont[i] !== null && codeCont[i].momentIndex == obj.momentIndex && QSim.includes(obj.registerIndices, codeCont[i].registerIndices)){
+					codeCont[i] = null
+				}
+			}
+		}
+	})
+
+	// genarate source_code
+
+	codeCont.forEach( obj => {
+		if (obj === null)	return
+		if (obj.gate.symbol == '*')	return
+		clone_obj = JSON.parse(JSON.stringify(obj))
+		clone_obj.registerIndices[0] --
+		if(clone_obj.registerIndices.length == 2)	clone_obj.registerIndices[1] --
+		source_code += clone_obj.gate.symbol + ' '
+		source_code += clone_obj.registerIndices.join(' ') + '\n'
+	})
+
+	textarea.value = source_code
+	return source_code
+}
+
     ///////////////////
    //               //
-  //   Listener   //
+  //   Listener    //
  //               //
 ///////////////////
 

@@ -207,8 +207,8 @@ QSim.Circuit.checkScan = (scan) => {
 Object.assign(QSim.Circuit.prototype, {
     set$: function( gate, momentIndex, registerIndices ){
 
+        QSim.log('circuit set$')
 		const circuit = this
-
 
 		//  Is this a valid gate?
 
@@ -227,11 +227,8 @@ Object.assign(QSim.Circuit.prototype, {
 		if( registerIndices instanceof Array !== true ) return QSim.error( `Q.Circuit attempted to add a gate to circuit #${ this.index } at moment #${ momentIndex } with an invalid register indices array:`, registerIndices )
 		if( registerIndices.length === 0 ) return QSim.error( `Q.Circuit attempted to add a gate to circuit #${ this.index } at moment #${ momentIndex } with an empty register indices array:`, registerIndices )
 		if( registerIndices.reduce( function( accumulator, registerIndex ){
-
-			// console.log(accumulator && 
-			// 	registerIndex > 0 && 
-			// 	registerIndex <= circuit.bandwidth)
-			return (
+            
+            return (
 				accumulator && 
 				registerIndex > 0 && 
 				registerIndex <= circuit.bandwidth
@@ -296,7 +293,17 @@ Object.assign(QSim.Circuit.prototype, {
 			
 			this.sort$()
 
-			
+            // update code in html by drag circuitEl
+
+            QSim.Editor.updateCode(circuit)
+
+            const source_code = document.getElementById('playground-input').value.trim()
+            scan = QSim.Circuit.Scanner(source_code)
+            QSim.log('clear', source_code)
+            if( QSim.Circuit.checkScan(scan) ){
+                updatePlayground()
+            }
+
 			//  Emit an event that we have set an operation
 			//  on this circuit.
 
@@ -315,8 +322,8 @@ Object.assign(QSim.Circuit.prototype, {
     
 	clear$: function( momentIndex, registerIndices ){
 
+        QSim.log('circuit clear$')
 		const circuit = this
-
 
 		//  Validate our arguments.
 		
@@ -334,7 +341,7 @@ Object.assign(QSim.Circuit.prototype, {
 		//  and collect not only their content, but their index in the operations array.
 		// (We’ll need that index to splice the operations array later.)
 
-		const foundOperations = circuit.operations.reduce( function( filtered, operation, o ){
+		const foundOperations = circuit.gates.reduce( function( filtered, operation, o ){
 
 			if( operation.momentIndex === momentIndex && 
 				operation.registerIndices.some( function( registerIndex ){
@@ -359,7 +366,7 @@ Object.assign(QSim.Circuit.prototype, {
 
 		foundOperations.reduce( function( deletionsSoFar, operation ){
 
-			circuit.operations.splice( operation.index - deletionsSoFar, 1 )
+			circuit.gates.splice( operation.index - deletionsSoFar, 1 )
 			return deletionsSoFar + 1
 
 		}, 0 )
@@ -371,6 +378,18 @@ Object.assign(QSim.Circuit.prototype, {
 		//  multi-register operations!!
 				
 		this.sort$()
+
+        // update code in html by drag circuitEl
+        QSim.Editor.updateCode(circuit)
+        const source_code = document.getElementById('playground-input').value.trim()
+        scan = QSim.Circuit.Scanner(source_code)
+		QSim.log('clear', source_code)
+        if( QSim.Circuit.checkScan(scan) ){
+            updatePlayground()
+        }
+
+        
+        // QSim.log(source)
 
 		//  Enable that “fluent interface” method chaining :)
 

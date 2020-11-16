@@ -9,18 +9,18 @@ const QSim = {
 
 Object.assign(QSim, {
     log: function(){
-        console.log( ...arguments )
-		return '(log)' 
+      console.log( ...arguments )
+		  return '(log)' 
     },
 
     warn: function(){
-		console.warn( ...arguments )
-		return '(warn)'
+		  console.warn( ...arguments )
+		  return '(warn)'
     },
     
-	error: function(){
-		console.error( ...arguments )
-		return '(error)'
+	  error: function(){
+		  console.error( ...arguments )
+		  return '(error)'
     },
 
     isUsefulNumber: function( n ){
@@ -30,8 +30,15 @@ Object.assign(QSim, {
 			n !== -Infinity
     },
     
-	isUsefulInteger: function( n ){
-		return QSim.isUsefulNumber( n ) && Number.isInteger( n )
+	  isUsefulInteger: function( n ){
+		  return QSim.isUsefulNumber( n ) && Number.isInteger( n )
+    },
+
+    // if arr1 includes arr2, return true
+    // if arr1 == arr2, return false
+    // arr2 is a proper subset of arr1
+    includes: function (arr1, arr2) {
+      return arr2.every(val => arr1.includes(val)) && arr1.length != arr2.length
     },
 
     printInTerminal: function(){
