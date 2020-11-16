@@ -238,8 +238,10 @@ QSim.Editor = function( circuit, targetEl ){
 	 //               //
 	///////////////////
 	//	QSim.Editor.set( this.domElement, event.detail.operation )
-	circuit.gates.forEach(operation => {
-		QSim.Editor.set( circuitEl, operation )
+	QSim.log('绘制量子门', circuit.gates)
+
+	circuit.gates.forEach(gate => {
+		QSim.Editor.set( circuitEl, gate )
 	})
 
 	//  Add event listeners.
@@ -343,10 +345,12 @@ Object.assign( QSim.Editor, {
 
 
 QSim.Editor.prototype.onExternalSet = function( event ){
-	QSim.log('onExternalSet', this.domElement, event.detail.operation)
 	QSim.Editor.set( this.domElement, event.detail.operation )
 }
+// 尽量压缩门的展示
 QSim.Editor.set = function( circuitEl, operation ){
+
+	// QSim.log('set', operation)
 	const
 	backgroundEl = circuitEl.querySelector( '.Q-circuit-board-background' ),
 	foregroundEl = circuitEl.querySelector( '.Q-circuit-board-foreground' ),
@@ -432,14 +436,12 @@ QSim.Editor.set = function( circuitEl, operation ){
 
 
 QSim.Editor.prototype.onExternalClear = function( event ){
-	QSim.log('onExternalClear')
 	QSim.Editor.clear( this.domElement, {
 		momentIndex: event.detail.momentIndex,
 		registerIndices: event.detail.registerIndices
 	})
 }
 QSim.Editor.clear = function( circuitEl, operation ){
-	QSim.log('clear', operation)
 	const momentIndex = operation.momentIndex
 	operation.registerIndices.forEach( function( registerIndex ){
 
@@ -1107,7 +1109,6 @@ QSim.Editor.onPointerRelease = function( event ){
 
 	if( !boardContainerEl ){
 		
-		QSim.log('!boardContainerEl')
 		if( QSim.Editor.dragEl.circuitEl ){
 
 			const 
@@ -1575,7 +1576,7 @@ QSim.Editor.onPointerRelease = function( event ){
 	// console.log('setCommands',setCommands)
 	// 拖拽之后生成整个电路
 	setCommands.forEach( function( setCommand ){
-
+		QSim.log('拖拽之后生成整个电路', setCommand)
 		circuit.set$.apply( circuit, setCommand )
 	})
 	// QSim.log(circuit.gates, setCommands)
@@ -1950,11 +1951,13 @@ QSim.Editor.createSwap = function( circuitEl ){
 }
 
 
+// 将量子门转为代码
 // update code in html by drag circuitEl
 // IMPORTANT!
 // must be called follow this.sort()	
 
 QSim.Editor.updateCode = function(circuit){
+
 	QSim.log('updateCode', circuit.gates)
 	const textarea = document.getElementById('playground-input')
 	let source_code = 'quantum '+circuit.bandwidth+'\n'

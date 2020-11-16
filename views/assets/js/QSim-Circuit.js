@@ -176,6 +176,25 @@ QSim.Circuit.Scanner = (txt) => {
         item.momentIndex = momentIndex
         result.gates.push(JSON.parse(JSON.stringify(item)))
     }
+
+    // 将result的momentIndex尽可能压缩
+    let momentIndexCont = new Array(result.qubits_count).fill(1)
+    for(let i = 0; i < result.gates.length; i++){
+        if(result.gates[i].registerIndices.length == 1){
+            let index = result.gates[i].registerIndices[0] - 1
+            result.gates[i].momentIndex = momentIndexCont[index]
+            momentIndexCont[index] ++
+        }else{
+            const index_0 = result.gates[i].registerIndices[0] - 1,
+            index_1 = result.gates[i].registerIndices[1] - 1,
+            max = Math.max(momentIndexCont[index_0], momentIndexCont[index_1])
+
+            result.gates[i].momentIndex = max
+            momentIndexCont[index_0] = max + 1
+            momentIndexCont[index_1] = max + 1
+        }
+    }
+
     return result
 }
 
@@ -207,7 +226,6 @@ QSim.Circuit.checkScan = (scan) => {
 Object.assign(QSim.Circuit.prototype, {
     set$: function( gate, momentIndex, registerIndices ){
 
-        QSim.log('circuit set$')
 		const circuit = this
 
 		//  Is this a valid gate?
@@ -325,7 +343,6 @@ Object.assign(QSim.Circuit.prototype, {
     
 	clear$: function( momentIndex, registerIndices ){
 
-        QSim.log('circuit clear$')
 		const circuit = this
 
 		//  Validate our arguments.
@@ -419,7 +436,7 @@ Object.assign(QSim.Circuit.prototype, {
 		//  primarily by momentIndex,
 		//  then by the first registerIndex.
 
-		this.operations.sort( function( a, b ){
+		this.gates.sort( function( a, b ){
 
 			if( a.momentIndex === b.momentIndex ){
 

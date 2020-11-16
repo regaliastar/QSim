@@ -21,7 +21,7 @@
 			oninput="inputListener()"
 			class="Q-circuit-text-input" id="playground-input"></textarea>
 			<p class="right">
-				<button class="Q-button" id="playground-apply-button" type="button" onclick="updatePlayground()">
+				<button class="Q-button" id="playground-apply-button" type="button" onclick="inputListener()">
 					Debug
 				</button>
 				<br><br>
@@ -64,7 +64,7 @@
         const inputListener = () => {
 			const source_code = document.getElementById('playground-input').value.trim()
 			scan = QSim.Circuit.Scanner(source_code)
-			
+			QSim.log('inputListener', scan)
 			if( QSim.Circuit.checkScan(scan) ){
 				updatePlayground()
 			}
@@ -72,6 +72,6 @@
 	</script>
 	<script>
 		// 这个script用来测试使用
-		
+		updatePlayground()
 	</script>
 </html>
