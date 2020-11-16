@@ -54,7 +54,14 @@ QSim.Editor = function( circuit, targetEl ){
 	swapButton.classList.add( 'Q-circuit-button', 'Q-circuit-toggle-swap' )
 	swapButton.setAttribute( 'title', 'Create swap operation' )
 	swapButton.setAttribute( 'Q-disabled', 'Q-disabled' )
-	swapButton.innerText = 'S'
+	swapButton.innerText = 'Swap'
+
+	const saveButton = createDiv()
+	toolbarEl.appendChild( saveButton )
+	saveButton.classList.add( 'Q-circuit-button', 'Q-circuit-toggle-save' )
+	saveButton.setAttribute( 'title', 'Save operation' )
+	// saveButton.setAttribute( 'Q-disabled', 'Q-disabled' )
+	saveButton.innerText = 'Save'
 
 
 	//  Create a circuit board container
@@ -230,7 +237,7 @@ QSim.Editor = function( circuit, targetEl ){
 	  //   绘制量子门   //
 	 //               //
 	///////////////////
-
+	//	QSim.Editor.set( this.domElement, event.detail.operation )
 	circuit.gates.forEach(operation => {
 		QSim.Editor.set( circuitEl, operation )
 	})
@@ -249,6 +256,7 @@ QSim.Editor = function( circuit, targetEl ){
 		'QSim.Circuit.clear$',
 		QSim.Editor.prototype.onExternalClear.bind( this )
 	)
+	
 
 }
 
@@ -335,8 +343,7 @@ Object.assign( QSim.Editor, {
 
 
 QSim.Editor.prototype.onExternalSet = function( event ){
-	// console.log('onExternalSet')
-
+	QSim.log('onExternalSet', this.domElement, event.detail.operation)
 	QSim.Editor.set( this.domElement, event.detail.operation )
 }
 QSim.Editor.set = function( circuitEl, operation ){
@@ -1477,7 +1484,7 @@ QSim.Editor.onPointerRelease = function( event ){
 
 						+componentEl.getAttribute( 'register-indices-index' ) ? 
 							gatesymbol : 
-							Q.Gate.NOOP,
+							QSim.Gate.NOOP,
 						+componentEl.getAttribute( 'moment-index' ),
 						+componentEl.getAttribute( 'register-index' )
 					// )

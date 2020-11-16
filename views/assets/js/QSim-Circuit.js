@@ -297,24 +297,27 @@ Object.assign(QSim.Circuit.prototype, {
 
             QSim.Editor.updateCode(circuit)
 
-            const source_code = document.getElementById('playground-input').value.trim()
-            scan = QSim.Circuit.Scanner(source_code)
-            QSim.log('clear', source_code)
-            if( QSim.Circuit.checkScan(scan) ){
-                updatePlayground()
-            }
+            // const source_code = document.getElementById('playground-input').value.trim()
+            // scan = QSim.Circuit.Scanner(source_code)
+            // QSim.log('clear', source_code)
+            // if( QSim.Circuit.checkScan(scan) ){
+            //     updatePlayground()
+            // }
 
 			//  Emit an event that we have set an operation
 			//  on this circuit.
 
-			window.dispatchEvent( new CustomEvent( 
+            
+            window.dispatchEvent( new CustomEvent( 
 
-				'QSim.Circuit.set$', { detail: { 
+                'QSim.Circuit.set$', { detail: { 
 
-					circuit,
-					operation
-				}}
-			))
+                    circuit,
+                    operation
+                }}
+            ))
+            QSim.log('CustomEvent')
+			
 		}
 		return circuit
 	},
@@ -381,15 +384,27 @@ Object.assign(QSim.Circuit.prototype, {
 
         // update code in html by drag circuitEl
         QSim.Editor.updateCode(circuit)
-        const source_code = document.getElementById('playground-input').value.trim()
-        scan = QSim.Circuit.Scanner(source_code)
-		QSim.log('clear', source_code)
-        if( QSim.Circuit.checkScan(scan) ){
-            updatePlayground()
-        }
+        // const source_code = document.getElementById('playground-input').value.trim()
+        // scan = QSim.Circuit.Scanner(source_code)
+		// QSim.log('clear', source_code)
+        // if( QSim.Circuit.checkScan(scan) ){
+        //     updatePlayground()
+        // }
 
         
         // QSim.log(source)
+        foundOperations.forEach( function( operation ){
+
+            window.dispatchEvent( new CustomEvent( 
+
+                'QSim.Circuit.clear$', { detail: { 
+
+                    circuit,
+                    momentIndex,
+                    registerIndices: operation.registerIndices
+                }}
+            ))
+        })
 
 		//  Enable that “fluent interface” method chaining :)
 
