@@ -4,42 +4,126 @@
 		<title>QSim</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
 		<link rel="stylesheet" href="assets/css/QSim.css">
 		<link rel="stylesheet" href="assets/css/Editor.css">
 		<link rel="stylesheet" href="assets/css/documentation.css">
-
 		<script src="assets/js/QSim.js"></script>
 		<script src="assets/js/QSim-Gate.js"></script>
 		<script src="assets/js/QSim-Circuit.js"></script>
 		<script src="assets/js/QSim-Editor.js"></script>
-		
+		<style>
+			.left-container{
+				float: left;
+				top: 0;
+				left: 16rem;
+				min-height: 60vh;
+				padding: 7.6rem 2rem 12rem 1rem;
+				overflow: auto;
+				width: 48%;
+				font-size:   0.9rem;
+				line-height: 1.5rem;
+				padding-top: 20px;
+				padding-bottom: 20px;
+			}
+			.right-container{
+				float: right;
+				top: 0;
+				left: 16rem;
+				min-height: 60vh;
+				padding: 7.6rem 2rem 12rem 1rem;
+				overflow: auto;
+				width: 48%;
+				font-size:   0.9rem;
+				line-height: 1.5rem;
+				padding-top: 20px;
+				padding-bottom: 20px;
+			}
+			.bottom-container{
+				top: 0;
+				left: 16rem;
+				min-height: 30vh;
+				padding: 7.6rem 2rem 12rem 1rem;
+				overflow: auto;
+				width: 96%;
+				font-size:   0.9rem;
+				line-height: 1.5rem;
+				padding-top: 20px;
+				padding-bottom: 20px;
+				height: 100px;
+				overflow: scroll;
+				border:solid 1px rgb(7, 7, 7); 
+				margin: 0 auto;
+			}
+			textarea{
+				resize:none;
+				height: 300px;
+				border:solid 1px rgb(7, 7, 7); 
+			}
+			.Q-circuit-board-container {
+				position: relative;
+				margin: 0 0 2rem 0;
+				margin: 0;
+				width:  100%;
+				max-height: 50vh;
+				overflow: scroll;
+			}
+			::-webkit-scrollbar {
+            width: 4px;    
+            height: 4px;
+			}
+			::-webkit-scrollbar-thumb {
+				border-radius: 10px;
+				-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+				background: rgba(0,0,0,0.2);
+			}
+			::-webkit-scrollbar-track {
+				-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+				border-radius: 0;
+				background: rgba(0,0,0,0.1);
+
+			}
+
+		</style>
 	</head>
 	<body>
-		<main>
-			<textarea autofocus 
-			oninput="inputListener()"
-			class="Q-circuit-text-input" id="playground-input"></textarea>
+		<div class="left-container">
 			<p class="right">
 				<button class="Q-button" id="playground-apply-button" type="button" onclick="inputListener()">
 					Debug
 				</button>
 				<br><br>
 			</p>
+			<textarea autofocus 
+			oninput="inputListener()"
+			class="Q-circuit-text-input" id="playground-input"></textarea>
+		</div>
+		<div class="right-container">
 			<div id="playground"></div>
 			<div class='Q-circuit-palette'></div>
-
-		</main>
+		</div>
+		<div class="bottom-container">
+			<p>> 输出信息:</p>
+			<p>这是终端界面</p>
+			<p>这是终端界面</p>
+			<p>这是终端界面</p>
+			<p>这是终端界面</p>
+			<p>这是终端界面</p>
+			<p>这是终端界面</p>
+			<p>这是终端界面</p>
+			<p>这是终端界面</p>
+			<p>这是终端界面</p>
+			<p>这是终端界面</p>
+		</div>
 	</body>
 	<script>
-		// 创造量子门的图标
+		// 创建量子门的图标
 		Array
             .from( document.querySelectorAll( '.Q-circuit-palette' ))
-            .forEach( function( el ){
+            .forEach( el => {
                 QSim.Editor.createPalette(el)
             })
 
-		const updatePlayground = (source_code) => {
+		const updatePlayground = source_code => {
 			const circuit = QSim.init( 3, 4 )
 
 			if(!source_code){
@@ -47,14 +131,12 @@
 			}
 
 			circuit.set_source_code(source_code)
-			
-			if(circuit.gates.length) circuit.set_timewidth(circuit.gates.length+1)
+			if(circuit.maxMomentIndex) circuit.set_timewidth(circuit.maxMomentIndex + 2)
 			if(circuit.qubits_count) circuit.set_bandwidth(circuit.qubits_count)
 			
             const domEl = document.getElementById( 'playground' )
             if( domEl ){
                 while( domEl.lastChild ){
-                    
                     domEl.removeChild( domEl.lastChild )
                 }
                 circuit.toDom( domEl )	
@@ -64,7 +146,6 @@
         const inputListener = () => {
 			const source_code = document.getElementById('playground-input').value.trim()
 			scan = QSim.Circuit.Scanner(source_code)
-			QSim.log('inputListener', scan)
 			if( QSim.Circuit.checkScan(scan) ){
 				updatePlayground()
 			}

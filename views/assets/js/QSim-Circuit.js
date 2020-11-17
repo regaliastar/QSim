@@ -45,6 +45,7 @@ QSim.Circuit = function( bandwidth, timewidth ){
         scan = QSim.Circuit.Scanner(txt)
         this.gates = scan.gates
         this.qubits_count = scan.qubits_count
+        this.maxMomentIndex = scan.maxMomentIndex
     }
 }
 
@@ -121,7 +122,8 @@ QSim.Circuit.Scanner = (txt) => {
     let qubit_state = 0
     let result = {
         gates: [],
-        qubits_count: 0
+        qubits_count: 0,
+        maxMomentIndex: 0,
     }
     let item = {
         gate: null,
@@ -179,10 +181,12 @@ QSim.Circuit.Scanner = (txt) => {
 
     // 将result的momentIndex尽可能压缩
     let momentIndexCont = new Array(result.qubits_count).fill(1)
+    let maxMomentIndex = 0
     for(let i = 0; i < result.gates.length; i++){
         if(result.gates[i].registerIndices.length == 1){
             let index = result.gates[i].registerIndices[0] - 1
             result.gates[i].momentIndex = momentIndexCont[index]
+            maxMomentIndex < momentIndexCont[index] ? maxMomentIndex = momentIndexCont[index]: momentIndexCont[index]
             momentIndexCont[index] ++
         }else{
             const index_0 = result.gates[i].registerIndices[0] - 1,
@@ -190,10 +194,12 @@ QSim.Circuit.Scanner = (txt) => {
             max = Math.max(momentIndexCont[index_0], momentIndexCont[index_1])
 
             result.gates[i].momentIndex = max
+            maxMomentIndex < max ? maxMomentIndex = max: max
             momentIndexCont[index_0] = max + 1
             momentIndexCont[index_1] = max + 1
         }
     }
+    result.maxMomentIndex = maxMomentIndex
 
     return result
 }
@@ -334,7 +340,6 @@ Object.assign(QSim.Circuit.prototype, {
                     operation
                 }}
             ))
-            QSim.log('CustomEvent')
 			
 		}
 		return circuit

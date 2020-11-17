@@ -238,7 +238,6 @@ QSim.Editor = function( circuit, targetEl ){
 	 //               //
 	///////////////////
 	//	QSim.Editor.set( this.domElement, event.detail.operation )
-	QSim.log('绘制量子门', circuit.gates)
 
 	circuit.gates.forEach(gate => {
 		QSim.Editor.set( circuitEl, gate )
@@ -360,6 +359,7 @@ QSim.Editor.set = function( circuitEl, operation ){
 	operation.registerIndices.forEach( function( registerIndex, i ){
 		const operationEl = document.createElement( 'div' )
 		foregroundEl.appendChild( operationEl )
+		if(!operation.gate)	return
 		operationEl.classList.add( 'Q-circuit-operation', 'Q-circuit-operation-'+ operation.gate.nameCss )
 		// operationEl.setAttribute( 'operation-index', operationIndex )		
 		operationEl.setAttribute( 'gate-symbol', operation.gate.symbol )
@@ -1576,7 +1576,6 @@ QSim.Editor.onPointerRelease = function( event ){
 	// console.log('setCommands',setCommands)
 	// 拖拽之后生成整个电路
 	setCommands.forEach( function( setCommand ){
-		QSim.log('拖拽之后生成整个电路', setCommand)
 		circuit.set$.apply( circuit, setCommand )
 	})
 	// QSim.log(circuit.gates, setCommands)
@@ -1958,7 +1957,6 @@ QSim.Editor.createSwap = function( circuitEl ){
 
 QSim.Editor.updateCode = function(circuit){
 
-	QSim.log('updateCode', circuit.gates)
 	const textarea = document.getElementById('playground-input')
 	let source_code = 'quantum '+circuit.bandwidth+'\n'
 	let codeCont = []
@@ -1977,9 +1975,9 @@ QSim.Editor.updateCode = function(circuit){
 	})
 
 	// genarate source_code
-
 	codeCont.forEach( obj => {
 		if (obj === null)	return
+		if (!obj.gate)	return
 		if (obj.gate.symbol == '*')	return
 		clone_obj = JSON.parse(JSON.stringify(obj))
 		clone_obj.registerIndices[0] --
