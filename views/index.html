@@ -28,8 +28,13 @@
 			<div id="playground"></div>
 			<div class='Q-circuit-palette'></div>
 		</div>
-		<div class="bottom-container">
-			<p>> terminal:</p>
+		<div class="bottom-container terminal" id="terminal">
+			<div class="shell-msg" id="shell-msg">
+				<p>> Welcome to terminal, Type "-h" for more information.</p>
+			</div>
+			<div class="shell-view">
+				<span style="float: left;">$&nbsp;</span><input id="shell-input" class="shell-input">
+			</div>
 			
 		</div>
 		<div class="footer" >
@@ -71,9 +76,10 @@
 				updatePlayground()
 			}
 		}
-	</script>
-	<script>
-		// 这个script用来测试使用
+
 		updatePlayground()
+	</script>
+	<script type="text/javascript">
+		require('./render-process/render-async-msg')
 	</script>
 </html>

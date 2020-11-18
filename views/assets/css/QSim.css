@@ -170,27 +170,7 @@ svg, :root {
 
 
 
-.Q-circuit-text-input {
 
-	/*min-width:  18rem;*/
-	width: 100%;
-	min-height: 8rem;
-	
-    height: 360px;
-
-	/*margin:  1rem 0 2rem 0;*/
-	margin:  1rem 0 0 0;
-	border: 1px solid var( --Q-color-blue );
-	border-radius: 0.5rem;	
-	background-color: var( --Q-color-chalk );
-	padding: 1rem 0 0 2rem;
-	color: var( --Q-color-blue );
-	font-family: var( --Q-font-family-mono );
-	font-size:   1.0rem;
-	line-height: 1.2rem;
-	white-space: pre;
-	word-wrap: normal;/*  OMFG, iOS you make me sad.  */
-}
 
 
 
