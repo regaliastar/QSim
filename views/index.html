@@ -6,84 +6,11 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1.0">
 		<link rel="stylesheet" href="assets/css/QSim.css">
 		<link rel="stylesheet" href="assets/css/Editor.css">
-		<link rel="stylesheet" href="assets/css/documentation.css">
+		<link rel="stylesheet" href="assets/css/edit.css">
 		<script src="assets/js/QSim.js"></script>
 		<script src="assets/js/QSim-Gate.js"></script>
 		<script src="assets/js/QSim-Circuit.js"></script>
 		<script src="assets/js/QSim-Editor.js"></script>
-		<style>
-			.left-container{
-				float: left;
-				top: 0;
-				left: 16rem;
-				min-height: 60vh;
-				padding: 7.6rem 2rem 12rem 1rem;
-				overflow: auto;
-				width: 48%;
-				font-size:   0.9rem;
-				line-height: 1.5rem;
-				padding-top: 20px;
-				padding-bottom: 20px;
-			}
-			.right-container{
-				float: right;
-				top: 0;
-				left: 16rem;
-				min-height: 60vh;
-				padding: 7.6rem 2rem 12rem 1rem;
-				overflow: auto;
-				width: 48%;
-				font-size:   0.9rem;
-				line-height: 1.5rem;
-				padding-top: 20px;
-				padding-bottom: 20px;
-			}
-			.bottom-container{
-				top: 0;
-				left: 16rem;
-				min-height: 30vh;
-				padding: 7.6rem 2rem 12rem 1rem;
-				overflow: auto;
-				width: 96%;
-				font-size:   0.9rem;
-				line-height: 1.5rem;
-				padding-top: 20px;
-				padding-bottom: 20px;
-				height: 100px;
-				overflow: scroll;
-				border:solid 1px rgb(7, 7, 7); 
-				margin: 0 auto;
-			}
-			textarea{
-				resize:none;
-				height: 300px;
-				border:solid 1px rgb(7, 7, 7); 
-			}
-			.Q-circuit-board-container {
-				position: relative;
-				margin: 0 0 2rem 0;
-				margin: 0;
-				width:  100%;
-				max-height: 50vh;
-				overflow: scroll;
-			}
-			::-webkit-scrollbar {
-            width: 4px;    
-            height: 4px;
-			}
-			::-webkit-scrollbar-thumb {
-				border-radius: 10px;
-				-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-				background: rgba(0,0,0,0.2);
-			}
-			::-webkit-scrollbar-track {
-				-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-				border-radius: 0;
-				background: rgba(0,0,0,0.1);
-
-			}
-
-		</style>
 	</head>
 	<body>
 		<div class="left-container">
@@ -102,17 +29,11 @@
 			<div class='Q-circuit-palette'></div>
 		</div>
 		<div class="bottom-container">
-			<p>> 输出信息:</p>
-			<p>这是终端界面</p>
-			<p>这是终端界面</p>
-			<p>这是终端界面</p>
-			<p>这是终端界面</p>
-			<p>这是终端界面</p>
-			<p>这是终端界面</p>
-			<p>这是终端界面</p>
-			<p>这是终端界面</p>
-			<p>这是终端界面</p>
-			<p>这是终端界面</p>
+			<p>> terminal:</p>
+			
+		</div>
+		<div class="footer" >
+			<div style="font-size: 90%;text-align:center; line-height:4vh; color: rgba(192, 122, 17, 0.8);">QSim v1.0 @regaliastar </div> 
 		</div>
 	</body>
 	<script>
@@ -124,7 +45,7 @@
             })
 
 		const updatePlayground = source_code => {
-			const circuit = QSim.init( 3, 4 )
+			const circuit = QSim.init( 4, 4 )
 
 			if(!source_code){
 				source_code = document.getElementById('playground-input').value.trim()

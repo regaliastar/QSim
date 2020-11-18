@@ -175,6 +175,9 @@ svg, :root {
 	/*min-width:  18rem;*/
 	width: 100%;
 	min-height: 8rem;
+	
+    height: 360px;
+
 	/*margin:  1rem 0 2rem 0;*/
 	margin:  1rem 0 0 0;
 	border: 1px solid var( --Q-color-blue );

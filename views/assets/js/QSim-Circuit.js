@@ -195,6 +195,7 @@ QSim.Circuit.Scanner = (txt) => {
 
             result.gates[i].momentIndex = max
             maxMomentIndex < max ? maxMomentIndex = max: max
+            
             momentIndexCont[index_0] = max + 1
             momentIndexCont[index_1] = max + 1
         }
