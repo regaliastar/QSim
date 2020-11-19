@@ -78,7 +78,7 @@ height: 4px;
     min-height: 8rem;
     height: 360px;
     margin:  1rem 0 0 0;
-    border: 1px solid var( --Q-color-blue );
+    /* border: 1px solid var( --Q-color-blue ); */
     border-radius: 0.5rem;	
     background-color: var( --Q-color-chalk );
     padding: 1rem 0 0 2rem;
@@ -88,6 +88,8 @@ height: 4px;
     line-height: 1.2rem;
     white-space: pre;
     word-wrap: normal;
+    background: rgba(17, 16, 14, 0.5);
+    
 }
 
 .right {

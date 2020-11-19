@@ -1,72 +1,72 @@
 const QSim_Gate = {
-    'H':'',
-    'X':'',
-    'Y':'',
-    'Z':'',
-    'P':'',
-    'T':'',
-    '*':''
+    'H': '',
+    'X': '',
+    'Y': '',
+    'Z': '',
+    'P': '',
+    'T': '',
+    '*': ''
 }
 
 QSim.Gate.totalGate = ['H', 'P', 'X', 'Y', 'Z', 'T', 'I']
 
 QSim.Gate.findBySymbol = symbol => {
     const contain = {
-        'H':{
-            symbol:    'H',
+        'H': {
+            symbol: 'H',
             nameCss: 'hadamard',
-            name:    'Hadamard'
+            name: 'Hadamard'
         },
-        'P':{
-            symbol:    'P',
-		    name:      'Phase',
-		    nameCss:   'phase',
+        'P': {
+            symbol: 'P',
+            name: 'Phase',
+            nameCss: 'phase',
         },
-        'X':{
-            symbol:    'X',
-            name:      'Pauli X',
-            nameCss:   'pauli-x',
+        'X': {
+            symbol: 'X',
+            name: 'Pauli X',
+            nameCss: 'pauli-x',
         },
-        'Y':{
-            symbol:    'Y',
-            name:      'Pauli Y',
-            nameCss:   'pauli-y',
+        'Y': {
+            symbol: 'Y',
+            name: 'Pauli Y',
+            nameCss: 'pauli-y',
         },
-        'Z':{
-            symbol:    'Z',
-		    name:      'Pauli Z',
-		    nameCss:   'pauli-z',
+        'Z': {
+            symbol: 'Z',
+            name: 'Pauli Z',
+            nameCss: 'pauli-z',
         },
-        'T':{
-            symbol:    'T',
-		    name:      'π ÷ 8',
-		    nameCss:   'pi8',
+        'T': {
+            symbol: 'T',
+            name: 'π ÷ 8',
+            nameCss: 'pi8',
         },
-        'I':{
-            symbol:    'I',
-            name:      'Identity',
-            nameCss:   'identity',
+        'I': {
+            symbol: 'I',
+            name: 'Identity',
+            nameCss: 'identity',
         },
-        'CURSOR':{
-            symbol:    '*',
-		    name:      'Identity',
-		    nameCss:   'identity',
+        'CURSOR': {
+            symbol: '*',
+            name: 'Identity',
+            nameCss: 'identity',
         },
-        'SWAP':{
-            symbol:    'S',
-		    name:      'Swap',
-		    nameCss:   'swap',
+        'SWAP': {
+            symbol: 'S',
+            name: 'Swap',
+            nameCss: 'swap',
         }
     }
     return (
         Object
-        .values( contain )
-        .find( function( item ){
-            if( typeof symbol === 'string' && 
-                typeof item[ 'symbol' ] === 'string' ){
-                return symbol.toLowerCase() === item[ 'symbol' ].toLowerCase()
-            }
-            return symbol === item[ 'symbol' ]
-        })
+            .values(contain)
+            .find(function (item) {
+                if (typeof symbol === 'string' &&
+                    typeof item['symbol'] === 'string') {
+                    return symbol.toLowerCase() === item['symbol'].toLowerCase()
+                }
+                return symbol === item['symbol']
+            })
     )
 }

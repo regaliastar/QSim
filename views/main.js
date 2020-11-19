@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron')
 const path = require('path')
 const glob = require('glob')
 
-function createWindow () {
+function createWindow() {
   const win = new BrowserWindow({
     width: 1000,
     height: 600,
@@ -12,10 +12,10 @@ function createWindow () {
   })
 
   win.loadFile('index.html')
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 }
 
-function initialize(){
+function initialize() {
   loadDemos()
 
   app.whenReady().then(createWindow)
@@ -25,7 +25,7 @@ function initialize(){
       app.quit()
     }
   })
-  
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow()
@@ -34,7 +34,7 @@ function initialize(){
 }
 
 // Require each JS file in the main-process dir
-function loadDemos () {
+function loadDemos() {
   const files = glob.sync(path.join(__dirname, 'main-process/*.js'))
   files.forEach((file) => { require(file) })
 }

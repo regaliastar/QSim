@@ -148,22 +148,22 @@ svg, :root {
 	outline: none !important;
 	/* border:  none !important; */
 	/* border-radius: 1.2rem !important; */
-	box-shadow: 
+	/* box-shadow: 
 		 0.2rem  0.2rem 0.2rem rgba( 0, 0, 0, 0.15 ) inset,
-		-0.2rem -0.2rem 0.2rem rgba( 255, 255, 255, 1 ) inset;
-
+		-0.2rem -0.2rem 0.2rem rgba( 255, 255, 255, 1 ) inset; */
+/* 
 	background: linear-gradient( 
 
 		0.375turn,
 		rgba( 255, 255, 255, 1.0 ),
 		rgba( 255, 255, 255, 0.2 )
-	) !important;
+	) !important; */
 }
 .Q-input, 
 .Q-circuit-text-input {
 	
 	padding: 1.5rem !important;
-	color: #555 !important;
+	color:white !important;
 	font-size: 0.9rem !important;
 	line-height: 1.2rem !important;
 }
