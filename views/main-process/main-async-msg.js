@@ -1,7 +1,5 @@
 const { ipcMain } = require('electron')
-// const { program } = require('commander')
-const { Command } = require('commander') // include commander in git clone of commander repo
-const program = new Command()
+const { Sheller } = require('./Sheller')
 const { exec } = require('child_process')
 const package = require('../package.json')
 
@@ -12,52 +10,43 @@ ipcMain.on('asynchronous-message', (event, arg) => {
 ipcMain.on('shell-input', (event, arg) => {
   const argv = arg.split(' ')
   if (argv[0] === 'qsim') {
-    argv.shift()
     try {
-      program.exitOverride()
+      const sheller = new Sheller()
+      sheller
+        .version(package.version)
+        .name('QSim')
+        .usage('[options]')
+        .setCmdHeader('qsim')
+        .option('-v', 'version info', () => {
+          event.sender.send('shell-reply', sheller.v)
+        })
+        .option('-h', 'help information', () => {
+          event.sender.send('shell-reply', sheller.helpInformation())
+        })
+        .option('-d', 'debug source code', () => {
+          event.sender.send('shell-reply', 'debug source code')
+        })
+        .option('-q', 'quit program', () => {
+          event.sender.send('shell-reply', 'quit program')
+        })
+        .option('-s', 'save code from textarea', () => {
+          event.sender.send('shell-reply', 'save code from textarea')
+        })
+        .option('-l', 'generate lexer token', () => {
+          event.sender.send('shell-reply', 'generate lexer token')
+        })
+        .option('-p', 'generate AST(Abstract syntax tree)', () => {
+          event.sender.send('shell-reply', 'generate AST(Abstract syntax tree)')
+        })
+        .option('-tpy', 'translate QLight to python', () => {
+          event.sender.send('shell-reply', 'translate QLight to python')
+        })
 
-      program
-        .version(package.version, '-v', '-V', '--version')
-        .option('-h, --help', 'help information')
-        .option('-d, --debug', 'debug source code')
-        .option('-q, --quit', 'quit program')
-        .option('-s, --save', 'save code from textarea')
-        .option('-l, --lexer', 'generate lexer token')
-        .option('-p, --parser', 'generate AST(Abstract syntax tree)')
-        .option('-tpy, --transpy', 'translate QLight to python')
-
-      program.parseAsync(argv, { from: 'user' })
-
-      if(program.help){
-        event.sender.send('shell-reply', program.helpInformation())
-        console.log('program.help!')
-      }
-
-      if (program.quit) {
-        event.sender.send('shell-reply', 'quit')
-        console.log('quit!')
-      }
-      if (program.save) {
-        event.sender.send('shell-reply', 'save')
-        console.log('save!')
-      }
-      if (program.lexer) {
-        event.sender.send('shell-reply', 'lexer')
-        console.log('lexer!')
-      }
-      if (program.parser) {
-        event.sender.send('shell-reply', 'parser')
-        console.log('parser!')
-      }
-      if (program.transpy) {
-        event.sender.send('shell-reply', 'transpy')
-        console.log('transpy')
-      }
-      event.sender.send('shell-reply', '')
+        sheller.parse(argv.join(' '), { from: 'user' })
 
     } catch (e) {
       console.log('Catch', e)
-      event.sender.send('shell-reply', 'Catch:' + e.name)
+      event.sender.send('shell-reply', 'Catch:' + e)
     }
   } else {
 

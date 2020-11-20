@@ -10,7 +10,6 @@
   "author": "mumu",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^10.1.5",
-    "commander": "^6.10.2"
+    "electron": "^10.1.5"
   }
 }

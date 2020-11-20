@@ -36,6 +36,7 @@ shellInput.addEventListener('keydown', e => {
     ipcRenderer.send('shell-input', msg)
   } else if (e.keyCode == '38') {
     shellInput.value = inputHistory[inputHistoryPtr]    
+    shellInput.focus()
     if (inputHistoryPtr > 0) {
       inputHistoryPtr--
     }
@@ -44,6 +45,7 @@ shellInput.addEventListener('keydown', e => {
       inputHistoryPtr++
     }
     shellInput.value = inputHistory[inputHistoryPtr]
+    shellInput.focus()
   }
 })
 
@@ -53,5 +55,6 @@ ipcRenderer.on('shell-reply', (event, arg) => {
     node = document.createElement("P"),
     textnode = document.createTextNode(message);
   node.appendChild(textnode)
+  node.style['white-space'] = 'pre-line'
   document.getElementById('shell-msg').appendChild(node)
 })
