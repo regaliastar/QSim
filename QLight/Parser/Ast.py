@@ -35,7 +35,9 @@ class SyntaxTree(object):
         else:
             return []
 
-    def show(self):
+    def log(self):
+        output = open('log/parser.txt', 'a', encoding = 'utf-8')
+        output.truncate(0)
         self.show_core(self.root)
 
     def show_core(self, node):

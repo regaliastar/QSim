@@ -169,32 +169,14 @@ svg, :root {
 }
 
 
-
-
-
-
-
-
-
-
 .Q-button {
 
 	position: relative;
 	text-align: right;
 	margin: 0.5rem 1rem 0 0;
 	border-radius: 3rem;
-	box-shadow: 
-		-0.1rem -0.1rem 0 rgba( 255, 255, 255, 1 ),
-		 0.1rem  0.1rem 0.2rem rgba( 0, 0, 0, 0.3 );
 	height: 3rem;
-	background: 
-		var( --Q-color-blue )
-		linear-gradient(
-
-			0.4turn,
-			rgba( 255, 255, 255, 0.2 ),
-			rgba( 0, 0, 0, 0.08 )
-		);
+	background: rgb(17, 14, 14);
 	padding: 0.8rem 1.8rem;
 	color: var( --Q-color-white );
 	font-family: var( --Q-font-family-sans );
@@ -207,19 +189,7 @@ svg, :root {
 }
 .Q-button:hover {
 
-	background: 
-		hsl(
-
-			var( --Q-color-blue-hue ),
-			var( --Q-color-blue-saturation ),
-			calc( var( --Q-color-blue-lightness ) * 1.2 )
-		)
-		linear-gradient(
-
-			0.4turn,
-			rgba( 255, 255, 255, 0.2 ),
-			rgba( 0, 0, 0, 0.08 )
-		);
+	background: rgb(17, 14, 14, 0.5);
 }
 .Q-button:focus {
 
@@ -230,14 +200,6 @@ svg, :root {
 	box-shadow: 
 		-0.1rem -0.1rem 0 rgba( 255, 255, 255, 1 ) inset,
 		 0.1rem  0.1rem 0.2rem rgba( 0, 0, 0, 0.3 ) inset;
-	background: 
-		var( --Q-color-blue )
-		linear-gradient(
-
-			0.4turn,
-			rgba( 0, 0, 0, 0.08 ),
-			rgba( 255, 255, 255, 0.2 )
-		);
 }
 .Q-button[disabled] {
 

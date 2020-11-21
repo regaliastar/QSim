@@ -66,6 +66,9 @@ class Parser:
             return self.EOF
         return self.TOKEN[self.current_token]
 
+    def log(self):
+        self.tree.log()
+
     @log_func_call
     def FuncStatement(self, token, father=None):
         if not father:
@@ -257,7 +260,10 @@ class Parser:
         if not father:
             father = self.tree.root
         func_call_tree = SyntaxTree()
-        func_call_tree.current = func_call_tree.root = SyntaxTreeNode('FuncCall')
+        if token[0] == 211:
+            func_call_tree.current = func_call_tree.root = SyntaxTreeNode('Declare_quantum')
+        else:
+            func_call_tree.current = func_call_tree.root = SyntaxTreeNode('FuncCall')
         self.tree.add_child_node(func_call_tree.root, father)
         if token[0] != 500 and token[0] != 210 and token[0] != 211 and token[0] != 212:
             raise ValueError('Failed to FuncCall arguments: {}'.format(token))
@@ -303,12 +309,14 @@ class Parser:
                 # Identify
                 self.match(self.lookahead)
             else:
-                raise ValueError('Failed to GateOp arguments: {}'.format(self.lookahead))
+                # raise ValueError('Failed to GateOp arguments: {}'.format(self.lookahead))
+                pass
             if self.lookahead[0] == 302:
                 # [
                 self.match(self.lookahead)
             else:
-                raise ValueError('Failed to GateOp arguments: {}'.format(self.lookahead))
+                # raise ValueError('Failed to GateOp arguments: {}'.format(self.lookahead))
+                pass
             if self.lookahead[0] == 600:
                 # INT
                 GateOp_tree.add_child_node(
@@ -320,7 +328,8 @@ class Parser:
                 # ]
                 self.match(self.lookahead)
             else:
-                raise ValueError('Failed to GateOp arguments: {}'.format(self.lookahead))
+                # raise ValueError('Failed to GateOp arguments: {}'.format(self.lookahead))
+                pass
         if self.lookahead[0] == 308:
             # 匹配 \n
             self.match(self.lookahead)
@@ -378,7 +387,7 @@ class Parser:
                 raise ValueError('Failed to Statement arguments: {}'.format(self.lookahead))
 
     @log_func_call
-    def main(self):
+    def parse(self):
         self.tree.current = self.tree.root = SyntaxTreeNode('Program')
         while self.lookahead[0] != 0:
             if self.lookahead[0] >= 100 and self.lookahead[0] < 200:
@@ -430,5 +439,5 @@ if __name__ == '__main__':
     lexer.scanner()
     log.debug(lexer.getTOKEN())
     parser = Parser(lexer.getTOKEN())
-    parser.main()
-    parser.tree.show()
+    parser.parse()
+    parser.tree.log()

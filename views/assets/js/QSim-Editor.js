@@ -1958,7 +1958,7 @@ QSim.Editor.createSwap = function (circuitEl) {
 QSim.Editor.updateCode = function (circuit) {
 
 	const textarea = document.getElementById('playground-input')
-	let source_code = 'quantum ' + circuit.bandwidth + '\n'
+	let source_code = 'q = quantum(' + circuit.bandwidth + ')\n'
 	let codeCont = []
 
 	// genarate codeCont

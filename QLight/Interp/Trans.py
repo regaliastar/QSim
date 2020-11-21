@@ -1,5 +1,7 @@
 '''
 根据QSim将Parser生成的语法树翻译成Pyhton代码
+if __name__ == '__main__':
+    将生成的py文件保存在 log/auto.py
 date: 2020-11-10
 '''
 import os
@@ -79,6 +81,9 @@ class Translate:
     def __init__(self, tree):
         self.tree = tree
         self.fileHandler = pyFileHandler()
+
+    def log(self):
+        self.fileHandler.generate_file()
 
     def process_statement(self, node):
         '''处理大括号内的情况，如if,while,func'''
@@ -285,6 +290,10 @@ class Translate:
                     elif n.value == 'ParameterList' and n.type == None:
                         pl = self.tree.find_all_child(n)
                         numQubits = pl[0].value
+            elif child.type == None and child.value == 'ParameterList':
+                # 函数式声明quantumRegister
+                list = self.tree.find_all_child(child)
+                numQubits = list[0].value
             else:
                 raise ValueError('Failed to analyze child: {}'.format(child.format()))
             child = child.right
@@ -367,15 +376,15 @@ class Translate:
                 else:
                     dict = self.FuncCall(child)
                     self.fileHandler.insert(dict, 'FuncCall')
-        self.fileHandler.generate_file()
 
 if __name__ == '__main__':
     print('translate')
-    lexer = Lexer('QLight/code_1.txt')
+    lexer = Lexer('QLight/code_2.txt')
     lexer.scanner()
-    # log.debug(lexer.getTOKEN())
+    lexer.log()
     parser = Parser(lexer.getTOKEN())
-    parser.main()
-    # parser.tree.show()
+    parser.parse()
+    parser.log()
     translate = Translate(parser.tree)
     translate.main()
+    translate.log()
