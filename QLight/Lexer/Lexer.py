@@ -2,17 +2,34 @@
 读取源文件生成TOKEN串，根据DAG来编写读取程序
 date: 2020-11-2
 '''
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
+sys.path.append(BASE_DIR) #添加环境变量
 from Lexer.Token import Token
 import logging
+def mkdir(path): 
+    path=path.strip()
+    path=path.rstrip("\\")
+    isExists=os.path.exists(path)
+    if not isExists:
+        os.makedirs(path) 
+        return True
+    else:
+        return False
+mkdir('log')
 logging.basicConfig(filename='log/Lexer.log', level=logging.DEBUG)
 log = logging.getLogger('Lexer')
 
 class Lexer:
-    def __init__(self, file_path):
+    def __init__(self, file_path='', code = ''):
         self.current_raw = 0
         self.current_column = -1
         self.EOF = '\0'
-        self.source_code = self.read_source_code(file_path)
+        if file_path != '':
+            self.source_code = self.read_source_code(file_path)
+        elif code != '':
+            self.source_code = code
         self.TOKEN = []
 
     def getTOKEN(self):

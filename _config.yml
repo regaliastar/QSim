@@ -1,0 +1,12 @@
+# 生成py文件路径
+_filepath: "gene.py"
+
+# 模拟算法 默认DAG
+_algo: "DAG"
+
+# 网络连接配置，建议当端口被占用时修改
+_connect:
+  ip: '127.0.0.1'
+  port: 8000
+  connect_timeout: 100  # 连接超时时间 ms
+  max_attempts: 2       # 重连最大次数

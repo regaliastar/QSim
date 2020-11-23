@@ -10,6 +10,16 @@ from Lexer.Lexer import Lexer
 from Parser.Ast import SyntaxTree
 from Parser.Ast import SyntaxTreeNode
 import logging
+def mkdir(path): 
+    path=path.strip()
+    path=path.rstrip("\\")
+    isExists=os.path.exists(path)
+    if not isExists:
+        os.makedirs(path) 
+        return True
+    else:
+        return False
+mkdir('log')
 logging.basicConfig(filename='log/Parser.log', level=logging.DEBUG)
 log = logging.getLogger('Parser')
 
@@ -304,7 +314,7 @@ class Parser:
         params_list = SyntaxTreeNode('ParameterList')
         GateOp_tree.add_child_node(params_list, GateOp_tree.root)
         self.tree.add_child_node(GateOp_tree.root, father)
-        while self.lookahead[0] != 308:
+        while self.lookahead[0] != 308 and self.lookahead[0] != 0:
             if self.lookahead[0] == 500:
                 # Identify
                 self.match(self.lookahead)
@@ -435,7 +445,7 @@ class Parser:
 
 if __name__ == '__main__':
     print('parser')
-    lexer = Lexer('QLight/code_0.txt')
+    lexer = Lexer(file_path='QLight/code_0.txt')
     lexer.scanner()
     log.debug(lexer.getTOKEN())
     parser = Parser(lexer.getTOKEN())

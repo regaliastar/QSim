@@ -12,6 +12,16 @@ from string import Template
 from Lexer.Lexer import Lexer
 from Parser.Parser import Parser
 import logging
+def mkdir(path): 
+    path=path.strip()
+    path=path.rstrip("\\")
+    isExists=os.path.exists(path)
+    if not isExists:
+        os.makedirs(path) 
+        return True
+    else:
+        return False
+mkdir('log')
 logging.basicConfig(filename='log/translate.log', level=logging.DEBUG)
 log = logging.getLogger('translate')
 
@@ -69,8 +79,8 @@ class pyFileHandler():
         s = py_template[_type].substitute(_value)
         self.result.append(s)
 
-    def generate_file(self, file_name=None):
-        if not file_name:
+    def generate_file(self, file_name=''):
+        if file_name == '':
             file_name = 'log/auto'
         self.result.append(py_template['footer'])
         self.file = open(file_name + '.py', 'w+', encoding = 'utf-8')
@@ -82,8 +92,12 @@ class Translate:
         self.tree = tree
         self.fileHandler = pyFileHandler()
 
-    def log(self):
-        self.fileHandler.generate_file()
+    def log(self, file_name=''):
+        self.fileHandler.generate_file(file_name)
+    
+    def getResult(self):
+        result = self.fileHandler.result.append(py_template['footer'])
+        return '\n'.join(result) + '\n'
 
     def process_statement(self, node):
         '''处理大括号内的情况，如if,while,func'''
@@ -379,7 +393,7 @@ class Translate:
 
 if __name__ == '__main__':
     print('translate')
-    lexer = Lexer('QLight/code_2.txt')
+    lexer = Lexer(file_path='QLight/code_2.txt')
     lexer.scanner()
     lexer.log()
     parser = Parser(lexer.getTOKEN())

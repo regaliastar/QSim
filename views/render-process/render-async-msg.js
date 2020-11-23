@@ -1,18 +1,29 @@
+const path = require('path')
+const YAML = require('yamljs')
+const fs = require('fs')
+
+ /**
+  * 读取配置文件 _config.yml
+  */
+ const { 
+  _filepath,
+  _algo,
+  _connect
+} = YAML.parse(fs.readFileSync(path.join(__dirname,'..','..','_config.yml')).toString())
+
 const { ipcRenderer } = require('electron')
 const package = require('../package.json')
-const thrift = require('thrift');
-// 调用win10下thrift命令自动生成的依赖包
+const thrift = require('thrift')
 const userService = require('../gen-nodejs/userService.js')
 const ttypes = require('../gen-nodejs/interface_types.js')
-const thriftConnection = thrift.createConnection('127.0.0.1', 8000, {
-  connect_timeout: 100,
-  max_attempts: 2
+const thriftConnection = thrift.createConnection(_connect.ip, _connect.port, {
+  connect_timeout: _connect.connect_timeout,
+  max_attempts: _connect.max_attempts
 })
 const thriftClient = thrift.createClient(userService,thriftConnection)
-
-thriftConnection.on("error",function(e)
-{
+thriftConnection.on("error", e =>{
     console.error(e)
+    alert(e)
 })
 
 document.getElementById('version').innerHTML = 'v'+package.version
@@ -24,14 +35,17 @@ document.getElementById('version').innerHTML = 'v'+package.version
 const debugBtn = document.getElementById('playground-apply-button')
 
 debugBtn.addEventListener('click', () => {
+  const source_code = document.getElementById('playground-input').value.trim()
   const json = {
-    'name': 'tt'
+    _filepath,
+    _algo,
+    source_code
   }
   thriftClient.load(JSON.stringify(json), (error, res) => {
     if(error) {
       console.error(error)
     } else {
-      console.log('thriftClient.test1', res)
+      console.log('thriftClient.interface', res)
     }
   })
 })

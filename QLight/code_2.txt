@@ -1,3 +1,2 @@
-quantum(9)
-H 0
-X 0 1
+quantum(4)
+X 1
