@@ -62,10 +62,17 @@ Options:
   -h, --help       display help for command
 ```
 
-## Options
+## Install
 ```
-// env
+// python env
 pip install -r requirements.txt
+
+// nodejs env
+cd views
+npm install
+
+// open interface
+npm start
 
 // test
 pytest --disable-warnings  
