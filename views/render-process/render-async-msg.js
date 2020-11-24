@@ -41,11 +41,14 @@ debugBtn.addEventListener('click', () => {
     _algo,
     source_code
   }
+
   thriftClient.load(JSON.stringify(json), (error, res) => {
     if(error) {
       console.error(error)
+      printInShell(error, {type: 'error'})
     } else {
       console.log('thriftClient.interface', res)
+      printInShell(res, {type: 'error'})
     }
   })
 })
@@ -55,13 +58,15 @@ debugBtn.addEventListener('click', () => {
  * shell处理部分
  */
 
- function printInShell(msg){
+ function printInShell(msg, opt){
   // 将信息打印到terminal
   const message = `shell: ${msg}`,
     node = document.createElement("P"),
     textnode = document.createTextNode(msg);
   node.appendChild(textnode)
   node.style['white-space'] = 'pre-line'
+  if(opt && opt.type == 'error')
+    node.style['color'] = 'red'
   document.getElementById('shell-msg').appendChild(node)
  }
 

@@ -1,2 +1,2 @@
 quantum(4)
-X 1
+Z 0

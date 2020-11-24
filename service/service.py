@@ -1,9 +1,9 @@
-import json
-import yaml
 import os
 import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
 sys.path.append(BASE_DIR) #添加环境变量
+import json
+import yaml
 from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
@@ -21,6 +21,9 @@ file_data = yaml_file.read()
 yaml_file.close()
 yaml_data = yaml.load(file_data)
 
+# 全局变量
+namespace = {}
+
 class QS:
     def load(self, dic):
         print('in load')
@@ -34,15 +37,14 @@ class QS:
             parser = Parser(lexer.getTOKEN())
             parser.parse()
             parser.log()
-            
             translate = Translate(parser.tree)
             translate.main()
-            translate.log()
-            # translate.log(file_name=yaml_data['_filepath'])
+            translate.log(file_name=yaml_data['_filepath'])
             result = translate.getResult()
-            return json.dumps(result)
-        except Exception:
-            return json.dumps(Exception)
+            exec(compile(result, '<string>', 'exec'), globals())
+            return _wf
+        except Exception as e:
+            return str(e)
 
 if __name__ == "__main__":
     print('call main')

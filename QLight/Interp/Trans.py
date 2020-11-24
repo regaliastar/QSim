@@ -28,7 +28,6 @@ log = logging.getLogger('translate')
 py_template = {
     'header':
     '''
-import pytest
 import os
 import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
@@ -41,7 +40,7 @@ import numpy as np
     'footer':
     '''
 _wf = tools.print_wf(qubit.a2wf())
-print(_wf)
+# print(_wf)
     ''',
     'FuncStatement':
 Template('''
@@ -81,9 +80,9 @@ class pyFileHandler():
 
     def generate_file(self, file_name=''):
         if file_name == '':
-            file_name = 'log/auto'
+            file_name = 'log/auto.py'
         self.result.append(py_template['footer'])
-        self.file = open(file_name + '.py', 'w+', encoding = 'utf-8')
+        self.file = open(file_name, 'w+', encoding = 'utf-8')
         self.file.write('\n'.join(self.result) + '\n')
         self.file.close()
 
@@ -96,7 +95,8 @@ class Translate:
         self.fileHandler.generate_file(file_name)
     
     def getResult(self):
-        result = self.fileHandler.result.append(py_template['footer'])
+        result = self.fileHandler.result
+        result.append(py_template['footer'])
         return '\n'.join(result) + '\n'
 
     def process_statement(self, node):

@@ -29,7 +29,7 @@ class Lexer:
         if file_path != '':
             self.source_code = self.read_source_code(file_path)
         elif code != '':
-            self.source_code = code
+            self.source_code = self.code2readlines(code)
         self.TOKEN = []
 
     def getTOKEN(self):
@@ -43,6 +43,13 @@ class Lexer:
         source_code = f.readlines()
         f.close()
         return source_code
+
+    def code2readlines(self, code):
+        arr = code.split('\n')
+        for i in range(len(arr)):
+            arr[i] += '\n'
+            arr[i].strip()
+        return arr
 
     def getNextChar(self):
         self.current_column += 1

@@ -8,6 +8,7 @@ log = logging.getLogger('main')
 if __name__ == '__main__':
     print('main')
     lexer = Lexer(file_path='QLight/code_2.txt')
+    print(lexer.source_code)
     lexer.scanner()
     lexer.log()
     parser = Parser(lexer.getTOKEN())

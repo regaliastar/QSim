@@ -102,7 +102,7 @@ class Parser:
         '''匹配输入参数'''
         params_list = SyntaxTreeNode('ParameterList')
         FuncStatement_tree.add_child_node(params_list, FuncStatement_tree.root)
-        while self.lookahead[0] != 301:
+        while self.lookahead[0] != 301 and self.lookahead[0] != 0:
             FuncStatement_tree.add_child_node(
                 SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), params_list)
             self.match(self.lookahead)
@@ -130,7 +130,7 @@ class Parser:
         Expression_tree = SyntaxTree()
         Expression_tree.current = Expression_tree.root = SyntaxTreeNode('Expression')
         self.tree.add_child_node(Expression_tree.root, father)
-        while self.lookahead[0] != 308:
+        while self.lookahead[0] != 308 and self.lookahead[0] != 0:
             Expression_tree.add_child_node(
                 SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), Expression_tree.root)
             self.match(self.lookahead)
@@ -174,7 +174,7 @@ class Parser:
         Bool_call_tree = SyntaxTree()
         Bool_call_tree.current = Bool_call_tree.root = SyntaxTreeNode('Bool')
         self.tree.add_child_node(Bool_call_tree.root, father)
-        while self.lookahead[0] != 301:
+        while self.lookahead[0] != 301  and self.lookahead[0] != 0:
             Bool_call_tree.add_child_node(
                 SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), Bool_call_tree.root)
             self.match(self.lookahead)
@@ -288,7 +288,7 @@ class Parser:
             raise ValueError('Failed to FuncCall arguments: {}'.format(token))
         params_list = SyntaxTreeNode('ParameterList')
         func_call_tree.add_child_node(params_list, func_call_tree.root)
-        while self.lookahead[0] != 301:
+        while self.lookahead[0] != 301  and self.lookahead[0] != 0:
             func_call_tree.add_child_node(
                 SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), params_list)
             self.match(self.lookahead)
@@ -436,7 +436,8 @@ class Parser:
                 elif self.TOKEN[self.current_token+1][1] == '(':
                     '''函数调用'''
                     self.FuncCall(self.lookahead)
-                pass
+                else:
+                    raise ValueError('Failed to Main arguments: {}, nextToken: {}'.format(self.lookahead, self.TOKEN[self.current_token+1]))
             elif self.lookahead[0] == 600:
                 '''整数'''
                 self.match(self.lookahead)
