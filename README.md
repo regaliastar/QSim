@@ -51,15 +51,17 @@ print(result)
 ## Terminal
 *QSim*集成了命令行界面，你可以通过命令行方便的进行操控量子操作
 ```
-Usage: qsim [options] <action>
+Usage: qsim [options]
 
 Options:
-  -d, --debug      debug source code
-  -q, --quit       quit program
-  -s, --save       save code from textarea
-  -p, --parser     generate AST(Abstract syntax tree)
-  -tpy, --transpy  translate QLight to python
-  -h, --help       display help for command
+-v, version info
+-h, help information
+-d, debug source code
+-q, quit program
+-s, save code from textarea
+-l, generate lexer token
+-p, generate AST(Abstract syntax tree)
+-tpy, translate QLight to python
 ```
 
 ## Install

@@ -1,2 +1,10 @@
 quantum(4)
 Z 0
+Y 0
+X 0
+a = 1
+m1 = measure(0)
+show(m1)
+show(1)
+show(a)
+show()

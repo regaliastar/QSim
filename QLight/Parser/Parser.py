@@ -31,6 +31,7 @@ First = {
     'Argument': ['Identifier', 'Array'],
     'Measurement': ['measure'],
     'QuantumRegister': ['quantum'],
+    'Show': ['show'],
     'GateOp': ['I', 'X', 'Y', 'Z', 'H', 'S', 'T', 'V', 'V_H', 'SWAP'],
     'Factor': ['INT'],
     'Expression': ['INT'],
@@ -288,7 +289,7 @@ class Parser:
             raise ValueError('Failed to FuncCall arguments: {}'.format(token))
         params_list = SyntaxTreeNode('ParameterList')
         func_call_tree.add_child_node(params_list, func_call_tree.root)
-        while self.lookahead[0] != 301  and self.lookahead[0] != 0:
+        while self.lookahead[0] != 301 and self.lookahead[0] != 0:
             func_call_tree.add_child_node(
                 SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), params_list)
             self.match(self.lookahead)
@@ -372,6 +373,8 @@ class Parser:
                     self.FuncCall(self.lookahead, Statement_tree.root)
                 elif self.lookahead[1] in First['QuantumRegister']:
                     self.FuncCall(self.lookahead, Statement_tree.root)
+                elif self.lookahead[1] in First['Show']:
+                    self.FuncCall(self.lookahead, Statement_tree.root)
                 else:
                     raise ValueError('Failed to Statement arguments: {}'.format(self.lookahead))
                 pass
@@ -417,7 +420,10 @@ class Parser:
                     self.FuncCall(self.lookahead)
                 elif self.lookahead[1] in First['QuantumRegister']:
                     self.FuncCall(self.lookahead)
-                pass
+                elif self.lookahead[1] in First['Show']:
+                    self.FuncCall(self.lookahead)
+                else:
+                    raise ValueError('Failed to Main arguments: {}, nextToken: {}'.format(self.lookahead, self.TOKEN[self.current_token+1]))
             elif self.lookahead[0] >= 300 and self.lookahead[0] < 400:
                 '''分隔符'''
                 if self.lookahead[0] == 308:    # \n

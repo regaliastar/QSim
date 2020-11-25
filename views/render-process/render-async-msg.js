@@ -43,12 +43,25 @@ debugBtn.addEventListener('click', () => {
   }
 
   thriftClient.load(JSON.stringify(json), (error, res) => {
-    if(error) {
+    if (error) {
       console.error(error)
       printInShell(error, {type: 'error'})
     } else {
-      console.log('thriftClient.interface', res)
-      printInShell(res, {type: 'error'})
+      console.log('thriftClient.load', res)
+      message = JSON.parse(res)
+      let output = ''
+      if (message.show.length > 0) {
+        for(let i = 0; i < message.show.length; i++){
+          output += message.show[i] + '\n'
+        }
+      } else {
+        output += '波函数：'+message.wave_func
+      }
+      printMsg = {
+        info: output,
+        costTime: message.t_cost
+      }
+      printInShell(printMsg, {type: message.MessageType})
     }
   })
 })
@@ -60,6 +73,7 @@ debugBtn.addEventListener('click', () => {
 
  function printInShell(msg, opt){
   // 将信息打印到terminal
+  Object.prototype.toString.call(msg) === '[object Object]' ? msg = JSON.stringify(msg): msg
   const message = `shell: ${msg}`,
     node = document.createElement("P"),
     textnode = document.createTextNode(msg);

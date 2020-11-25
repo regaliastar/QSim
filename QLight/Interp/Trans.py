@@ -30,15 +30,18 @@ py_template = {
     '''
 import os
 import sys
+import time
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
 sys.path.append(BASE_DIR)
 from lib.QSim import QuantumRegister
 from lib.QSim import Tools
 tools = Tools()
 import numpy as np
+start_time = time.process_time()
     ''',
     'footer':
     '''
+t_cost = time.process_time() - start_time
 _wf = tools.print_wf(qubit.a2wf())
 # print(_wf)
     ''',
@@ -66,6 +69,8 @@ Template('''qubit.measure(place=$place, count=$count)'''),
 Template('''qubit = QuantumRegister($numQubits)'''),
     'Declare_measure':
 Template('''$Iden = qubit.measure(place=$place, count=$count)'''),
+    'show':
+Template('''# show( $Iden )''')
 }
 
 class pyFileHandler():
@@ -86,6 +91,42 @@ class pyFileHandler():
         self.file.write('\n'.join(self.result) + '\n')
         self.file.close()
 
+class SymbalTable:
+    '''
+    符号表
+    负责维护程序中的变量信息，以便调用
+    '''
+    def __init__(self):
+        self.table = {
+            'qubit': 'qubit',
+            '_wf': '_wf',
+            't_cost': 't_cost',
+            'measure' : [],
+            'show' : [],
+            'FuncStatement': [],
+            'Identify': []
+        }
+        self.showCount = 0
+    
+    def add(self, name=None, value=None, type=None):
+        if type == 'measure':
+            self.table['measure'].append({name: value})
+        elif type == 'show':
+            name = str(self.showCount)
+            self.showCount += 1
+            self.table['show'].append({name: value})
+        elif type == 'FuncStatement':
+            self.table['FuncStatement'].append({name: value})
+        elif type == 'Identify':
+            self.table['Identify'].append({name: value})
+        else:
+            raise ValueError('type {} is not defined!'.format(type))
+
+    def check(self, name, type):
+        pass
+
+symbalTable = SymbalTable()
+
 class Translate:
     def __init__(self, tree):
         self.tree = tree
@@ -98,6 +139,9 @@ class Translate:
         result = self.fileHandler.result
         result.append(py_template['footer'])
         return '\n'.join(result) + '\n'
+    
+    def getSymbalTable(self):
+        return symbalTable.table
 
     def process_statement(self, node):
         '''处理大括号内的情况，如if,while,func'''
@@ -134,6 +178,10 @@ class Translate:
                     dict = self.measure(child)
                     s = py_template['measure'].substitute(dict)
                     statement_list.append(s)
+                elif child.first_son.value == 'show':
+                    dict = self.show(child)
+                    s = py_template['show'].substitute(dict)
+                    statement_list.append(s)
                 else:
                     dict = self.FuncCall(child)
                     s = py_template['FuncCall'].substitute(dict)
@@ -141,8 +189,11 @@ class Translate:
             child = child.right
         statement_str = ''.join(statement_list) + '\n'
         return statement_str
-
+    
     def FuncStatement(self, node):
+        '''
+        func f(){}
+        '''
         if not node:
             return
         child = node.first_son
@@ -162,9 +213,13 @@ class Translate:
             else:
                 raise ValueError('Failed to analyze child: {}'.format(child.format())) 
             child = child.right
+        symbalTable.add(name=FuncStatement_Name, value='FuncStatement', type='FuncStatement')
         return dict(FuncStatement_Name=FuncStatement_Name,ParameterList=ParameterList,Statement=Statement_str)
 
     def IFStatement(self, node):
+        '''
+        if(2>1){}
+        '''
         if not node:
             return
         child = node.first_son
@@ -195,6 +250,9 @@ class Translate:
         return Expression_str
 
     def Declare_func(self, node):
+        '''
+        a = f()
+        '''
         if not node:
             return
         child = node.first_son
@@ -261,6 +319,7 @@ class Translate:
             child = child.right  
         return dict(FuncCall_Name=FuncCall_Name, ParameterList=ParameterList)
 
+    '''qubit.measure(place=$place, count=$count)'''
     def measure(self, node):
         if not node:
             return
@@ -272,7 +331,8 @@ class Translate:
                 pass
             elif child.value == 'ParameterList' and child.type == None:
                 pl = self.tree.find_all_child(child)
-                '''这里需要分别处理measure(q), measure(q[0])的情况'''
+                '''这里需要分别处理measure(q) === measure(), 
+                    measure(q[0]) === measure(0)的情况'''
                 for p in pl:
                     if p.type == 500:
                         pass
@@ -283,6 +343,28 @@ class Translate:
             child = child.right
         return dict(place=place, count=count)
     
+    def show(self, node):
+        if not node:
+            return
+        child = node.first_son
+        iden = None
+        while child:
+            if child.value == 'show':
+                pass
+            elif child.value == 'ParameterList' and child.type == None:
+                pl = self.tree.find_all_child(child)
+                '''show(m1), show(1)'''
+                for p in pl:
+                    if p.type == 500:
+                        iden = p.value
+                    elif p.type == 600:
+                        iden = p.value
+            else:
+                raise ValueError('Failed to analyze child: {}'.format(child.format()))
+            child = child.right
+        symbalTable.add(value=iden, type='show')
+        return dict(Iden=iden)
+
     def Declare_quantum(self, node):
         if not node:
             return
@@ -341,6 +423,7 @@ class Translate:
             else:
                 raise ValueError('Failed to analyze child: {}'.format(child.format()))
             child = child.right
+        symbalTable.add(name=Iden, value='measure', type='measure')
         return dict(Iden=Iden, place=place, count=count)
 
     def Declare_INT(self, node):
@@ -359,6 +442,7 @@ class Translate:
             else:
                 raise ValueError('Failed to analyze child: {}'.format(child.format()))
             child = child.right
+        symbalTable.add(name=Iden, value=INT, type='Identify')
         return dict(Iden=Iden, INT=INT)
 
     def main(self):
@@ -384,9 +468,13 @@ class Translate:
                 dict = self.FuncStatement(child)
                 self.fileHandler.insert(dict, 'FuncStatement')
             elif child.value == 'FuncCall':
-                if child.first_son == 'measure':
+                if child.first_son.value == 'measure':
                     dict = self.measure(child)
                     self.fileHandler.insert(dict, 'measure')
+                elif child.first_son.value == 'show':
+                    # show函数不需要生成代码
+                    dict = self.show(child)
+                    self.fileHandler.insert(dict, 'show')
                 else:
                     dict = self.FuncCall(child)
                     self.fileHandler.insert(dict, 'FuncCall')

@@ -3,6 +3,7 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
 sys.path.append(BASE_DIR) #添加环境变量
 import json
+import traceback
 import yaml
 from thrift.transport import TSocket
 from thrift.transport import TTransport
@@ -21,8 +22,6 @@ file_data = yaml_file.read()
 yaml_file.close()
 yaml_data = yaml.load(file_data)
 
-# 全局变量
-namespace = {}
 
 class QS:
     def load(self, dic):
@@ -39,12 +38,34 @@ class QS:
             parser.log()
             translate = Translate(parser.tree)
             translate.main()
+            symbalTable = translate.getSymbalTable()
             translate.log(file_name=yaml_data['_filepath'])
             result = translate.getResult()
-            exec(compile(result, '<string>', 'exec'), globals())
-            return _wf
+            exec(result, globals())
+            message = {
+                'info': globals()[symbalTable['_wf']],
+                'wave_func': globals()[symbalTable['_wf']],
+                't_cost': globals()[symbalTable['t_cost']],
+                'show': [],
+                'MessageType': 'info'
+            }
+            for index, dic in enumerate(symbalTable['show']): 
+                value = dic[str(index)]
+                print('{}, {}'.format(dic ,value)) 
+                if value == None:
+                    message['show'].append(globals()[symbalTable['_wf']])
+                elif not value.isdigit():
+                    print('value : {}'.format(globals()[value]))
+                    message['show'].append(str(globals()[value]))
+            
+            return json.dumps(message)
         except Exception as e:
-            return str(e)
+            trace_info = traceback.format_exc()
+            message = {
+                'info': str(e)+'\n'+str(trace_info),
+                'MessageType': 'error'
+            }
+            return json.dumps(message)
 
 if __name__ == "__main__":
     print('call main')
@@ -59,6 +80,5 @@ if __name__ == "__main__":
     pfactory = TBinaryProtocol.TBinaryProtocolFactory()
     # create server
     server = TServer.TThreadedServer(processor, transport, tfactory, pfactory)
-    print("start server in python")
+    print("start server")
     server.serve()
-    print("Done")

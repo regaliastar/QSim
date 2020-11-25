@@ -243,14 +243,14 @@ Object.assign(QSim.Circuit.prototype, {
             Number.isInteger(momentIndex) !== true ||
             momentIndex < 1 || momentIndex > this.timewidth) {
 
-            return Q.error(`Q.Circuit attempted to add a gate to circuit #${this.index} at a moment index that is not valid:`, momentIndex)
+            return Qsim.error(`Qsim.Circuit attempted to add a gate to circuit #${this.index} at a moment index that is not valid:`, momentIndex)
         }
 
         //  Are these valid register indices?
 
         if (typeof registerIndices === 'number') registerIndices = [registerIndices]
-        if (registerIndices instanceof Array !== true) return QSim.error(`Q.Circuit attempted to add a gate to circuit #${this.index} at moment #${momentIndex} with an invalid register indices array:`, registerIndices)
-        if (registerIndices.length === 0) return QSim.error(`Q.Circuit attempted to add a gate to circuit #${this.index} at moment #${momentIndex} with an empty register indices array:`, registerIndices)
+        if (registerIndices instanceof Array !== true) return QSim.error(`Qsim.Circuit attempted to add a gate to circuit #${this.index} at moment #${momentIndex} with an invalid register indices array:`, registerIndices)
+        if (registerIndices.length === 0) return QSim.error(`Qsim.Circuit attempted to add a gate to circuit #${this.index} at moment #${momentIndex} with an empty register indices array:`, registerIndices)
         if (registerIndices.reduce(function (accumulator, registerIndex) {
 
             return (
@@ -356,12 +356,12 @@ Object.assign(QSim.Circuit.prototype, {
         //  Validate our arguments.
 
         if (arguments.length !== 2)
-            QSim.warn(`Q.Circuit.clear$ expected 2 arguments but received ${arguments.length}.`)
+            QSim.warn(`Qsim.Circuit.clear$ expected 2 arguments but received ${arguments.length}.`)
         if (QSim.isUsefulInteger(momentIndex) !== true)
-            return QSim.error(`Q.Circuit attempted to clear an input on Circuit #${circuit.index} using an invalid moment index:`, momentIndex)
+            return QSim.error(`Qsim.Circuit attempted to clear an input on Circuit #${circuit.index} using an invalid moment index:`, momentIndex)
         if (QSim.isUsefulInteger(registerIndices)) registerIndices = [registerIndices]
         if (registerIndices instanceof Array !== true)
-            return QSim.error(`Q.Circuit attempted to clear an input on Circuit #${circuit.index} using an invalid register indices array:`, registerIndices)
+            return QSim.error(`Qsim.Circuit attempted to clear an input on Circuit #${circuit.index} using an invalid register indices array:`, registerIndices)
 
 
         //  Let’s find any operations 

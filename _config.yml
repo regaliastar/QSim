@@ -9,4 +9,4 @@ _connect:
   ip: '127.0.0.1'
   port: 8000
   connect_timeout: 100  # 连接超时时间 ms
-  max_attempts: 2       # 重连最大次数
+  max_attempts: 2       # 最大重连次数

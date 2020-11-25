@@ -16,4 +16,6 @@ if __name__ == '__main__':
     parser.log()
     translate = Translate(parser.tree)
     translate.main()
+    symbalTable = translate.getSymbalTable()
+    print(symbalTable)
     translate.log()
