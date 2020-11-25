@@ -41,24 +41,32 @@ class QS:
             symbalTable = translate.getSymbalTable()
             translate.log(file_name=yaml_data['_filepath'])
             result = translate.getResult()
-            exec(result, globals())
+            namespace = {}
+            exec(result, namespace)
             message = {
-                'info': globals()[symbalTable['_wf']],
-                'wave_func': globals()[symbalTable['_wf']],
-                't_cost': globals()[symbalTable['t_cost']],
+                'info': namespace['_wf'],
+                'wave_func': '波函数'+namespace['_wf'],
+                't_cost': namespace['t_cost'],
                 'show': [],
-                'MessageType': 'info'
+                'MessageType': 'info',
+                'symbalTable': symbalTable
             }
             for index, dic in enumerate(symbalTable['show']): 
-                value = dic[str(index)]
-                print('{}, {}'.format(dic ,value)) 
+                value = ''
+                for k in dic:
+                    value = dic[k]
                 if value == None:
-                    message['show'].append(globals()[symbalTable['_wf']])
+                    message['show'].append(namespace['_wf'],)
                 elif not value.isdigit():
-                    print('value : {}'.format(globals()[value]))
-                    message['show'].append(str(globals()[value]))
-            
-            return json.dumps(message)
+                    message['show'].append(str(namespace[value]))
+            msg_str = json.dumps(message)
+
+            # 初始化变量 !important
+            del message['show']
+            message['show'] = []
+            translate.initSymbalTable()
+
+            return msg_str
         except Exception as e:
             trace_info = traceback.format_exc()
             message = {

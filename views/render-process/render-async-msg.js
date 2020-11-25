@@ -49,19 +49,28 @@ debugBtn.addEventListener('click', () => {
     } else {
       console.log('thriftClient.load', res)
       message = JSON.parse(res)
+      if(message.MessageType == 'error'){
+        printInShell(message.info, {type: message.MessageType})
+        return
+      }
+      console.log('symbalTable', message.symbalTable)
+
+      /**
+       * output 由 show 字段与 wave_func 字段构成
+       * 当存在 show 时候，只输出 show
+       */
       let output = ''
       if (message.show.length > 0) {
+        output += 'show: \n'
         for(let i = 0; i < message.show.length; i++){
           output += message.show[i] + '\n'
         }
       } else {
-        output += '波函数：'+message.wave_func
+        output += message.wave_func
+
       }
-      printMsg = {
-        info: output,
-        costTime: message.t_cost
-      }
-      printInShell(printMsg, {type: message.MessageType})
+      output += '\n执行时间: '+ message.t_cost
+      printInShell(output, {type: message.MessageType})
     }
   })
 })
@@ -73,11 +82,22 @@ debugBtn.addEventListener('click', () => {
 
  function printInShell(msg, opt){
   // 将信息打印到terminal
-  Object.prototype.toString.call(msg) === '[object Object]' ? msg = JSON.stringify(msg): msg
   const message = `shell: ${msg}`,
-    node = document.createElement("P"),
-    textnode = document.createTextNode(msg);
-  node.appendChild(textnode)
+    node = document.createElement("P");
+  if(Object.prototype.toString.call(msg) === '[object Object]'){
+    let seliMsg = ''
+    for(let key in msg){
+      seliMsg += key + ': \n'
+      seliMsg += msg[key] + '\n'
+    }
+    const textnode = document.createTextNode(seliMsg);
+    node.appendChild(textnode)
+  }else{
+    const textnode = document.createTextNode(msg);
+    node.appendChild(textnode)
+  }
+  
+  node.appendChild(document.createTextNode('\n----------------------------------------------'))
   node.style['white-space'] = 'pre-line'
   if(opt && opt.type == 'error')
     node.style['color'] = 'red'

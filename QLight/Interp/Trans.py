@@ -31,8 +31,8 @@ py_template = {
 import os
 import sys
 import time
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
-sys.path.append(BASE_DIR)
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
+# sys.path.append(BASE_DIR)
 from lib.QSim import QuantumRegister
 from lib.QSim import Tools
 tools = Tools()
@@ -122,6 +122,16 @@ class SymbalTable:
         else:
             raise ValueError('type {} is not defined!'.format(type))
 
+    def initial(self):
+        del self.table['measure']
+        self.table['measure'] = []
+        del self.table['show']
+        self.table['show'] = []
+        del self.table['FuncStatement']
+        self.table['FuncStatement'] = []
+        del self.table['Identify']
+        self.table['Identify'] = []
+
     def check(self, name, type):
         pass
 
@@ -142,6 +152,9 @@ class Translate:
     
     def getSymbalTable(self):
         return symbalTable.table
+
+    def initSymbalTable(self):
+        symbalTable.initial()
 
     def process_statement(self, node):
         '''处理大括号内的情况，如if,while,func'''

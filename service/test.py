@@ -47,21 +47,20 @@ if __name__ == "__main__":
     result = translate.getResult()
     print(symbalTable)
     namespace = {}
-    exec(result, globals())
+    exec(result, namespace)
+    # print('namespace: {}'.format(namespace))
     message = {
-        'info': globals()[symbalTable['_wf']],
-        'wave_func': globals()[symbalTable['_wf']],
-        't_cost': globals()[symbalTable['t_cost']],
+        'info': namespace['_wf'],
+        'wave_func': namespace['_wf'],
+        't_cost': namespace['t_cost'],
         'show': [],
         'MessageType': 'info'
     }
     for index, dic in enumerate(symbalTable['show']): 
         value = dic[str(index)]
-        print('{}, {}'.format(dic ,value)) 
         if value == None:
-            message['show'].append(globals()[symbalTable['_wf']])
+            message['show'].append(namespace['_wf'],)
         elif not value.isdigit():
-            print('value : {}'.format(globals()[value]))
-            message['show'].append(str(globals()[value]))
+            message['show'].append(str(namespace[value]))
         
     print(json.dumps(message))
