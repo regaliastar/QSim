@@ -9,7 +9,7 @@ const fs = require('fs')
   _filepath,
   _algo,
   _connect
-} = YAML.parse(fs.readFileSync(path.join(__dirname,'..','..','_config.yml')).toString())
+} = YAML.parse(fs.readFileSync(path.join(__dirname,'..','_config.yml')).toString())
 
 const { ipcRenderer } = require('electron')
 const package = require('../package.json')

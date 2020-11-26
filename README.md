@@ -78,6 +78,9 @@ npm start
 
 // test
 pytest --disable-warnings  
+
+// bulid package
+npm run build-server
 ```
 ## Bits and pieces
 *To be written...*

@@ -1,7 +1,5 @@
 import os
 import sys
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
-sys.path.append(BASE_DIR) #添加环境变量
 import json
 import traceback
 import yaml
@@ -9,18 +7,36 @@ from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
-from genpy.interface import userService
 
-from QLight.Lexer.Lexer import Lexer
-from QLight.Parser.Parser import Parser
-from QLight.Interp.Trans import Translate
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
+sys.path.append(BASE_DIR) #添加环境变量
 
 # 读取配置文件
-yaml_path = os.path.join(os.path.abspath("."),"..", "_config.yml")
+def guessPackaged():
+    return os.path.basename(os.getcwd()) != 'QSim'
+yaml_path = ''
+print('guessPackaged: {}'.format(guessPackaged()))
+if guessPackaged():
+    # 已经打包
+    yaml_path = os.path.join(os.path.abspath("."), "..", "..", "_config.yml")
+else:
+    # 没有打包
+    yaml_path = os.path.join(os.path.abspath("."), "_config.yml")
 yaml_file = open(yaml_path, 'r', encoding="utf-8")
 file_data = yaml_file.read()
 yaml_file.close()
 yaml_data = yaml.load(file_data)
+
+
+from Interface.genpy.interface import userService
+from QLight.Lexer.Lexer import Lexer
+from QLight.Parser.Parser import Parser
+from QLight.Interp.Trans import Translate
+from lib.QSim import QuantumRegister
+from lib.QSim import Tools
+# import numpy as np
+# from scipy.linalg import kron
+# from sklearn.preprocessing import normalize
 
 
 class QS:
@@ -32,7 +48,7 @@ class QS:
         try:
             lexer = Lexer(code=dic['source_code'])
             lexer.scanner()
-            lexer.log() # views/log 
+            lexer.log()
             parser = Parser(lexer.getTOKEN())
             parser.parse()
             parser.log()
@@ -41,7 +57,10 @@ class QS:
             symbalTable = translate.getSymbalTable()
             translate.log(file_name=yaml_data['_filepath'])
             result = translate.getResult()
+
+            # 定义命名空间
             namespace = {}
+            # 执行脚本
             exec(result, namespace)
             message = {
                 'info': namespace['_wf'],
@@ -51,6 +70,7 @@ class QS:
                 'MessageType': 'info',
                 'symbalTable': symbalTable
             }
+            # 解析符号表中的show字段
             for index, dic in enumerate(symbalTable['show']): 
                 value = ''
                 for k in dic:

@@ -6,10 +6,38 @@ let pyProc = null
 let pyPort = null
 
 // create python process
+const PY_DIST_FOLDER = 'dist'
+const PY_FOLDER = 'src'
+const PY_MODULE = 'server' // without .py suffix
+
+// have package：return True
+const guessPackaged = () => {
+  const fullPath = path.join(__dirname, PY_DIST_FOLDER)
+  return require('fs').existsSync(fullPath)
+}
+
+const getScriptPath = () => {
+  if (!guessPackaged()) {
+    return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
+  }
+  if (process.platform === 'win32') {
+    return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE + '.exe')
+  }
+  return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE)
+}
+
 const createPyProc = () => {
-  let port = '4242'
-  let script = path.join(__dirname,'..', 'service', 'service.py')
-  pyProc = require('child_process').spawn('python', [script, port])
+  const port = '4242'
+  const script = getScriptPath()
+
+  // const script = path.join(__dirname,'src', 'server.py')
+  // pyProc = require('child_process').spawn('python', [script, port])
+  if(guessPackaged()){
+    pyProc = require('child_process').execFile(script, [port])
+  } else {
+    console.log('spawn: '+script)
+    pyProc = require('child_process').spawn('python', [script, port])
+  }
   if (pyProc != null) {
     console.log('child process success')
   }
@@ -37,6 +65,8 @@ function createWindow() {
 }
 
 function initialize() {
+
+  console.log(`initialize main.js`)
   loadDemos()
 
   app.whenReady().then(createWindow)

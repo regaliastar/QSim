@@ -1,11 +1,10 @@
 import os
 import sys
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录，这里为QSim
-sys.path.append(BASE_DIR) #添加环境变量
 import json
+import traceback
 import yaml
-import time
-from enum import Enum
+
+from Interface.genpy.interface import userService
 
 from QLight.Lexer.Lexer import Lexer
 from QLight.Parser.Parser import Parser
@@ -18,6 +17,7 @@ file_data = yaml_file.read()
 yaml_file.close()
 yaml_data = yaml.load(file_data)
 
+print('basename: {}'.format(os.path.basename(os.getcwd()) == 'QSim'))
 '''
 测试 service.py的内容
 

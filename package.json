@@ -1,11 +1,12 @@
 {
-  "name": "views",
+  "name": "QSim",
   "version": "1.0.0",
   "description": "Qsim that The implementation of the quantum computer simulator is based on python&Node.js. Numpy is used for kernel computing and electron framework is used for interface",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ./main.js"
+    "test": "pytest --disable-warnings",
+    "start": "electron ./main.js",
+    "build-server":"pyinstaller server.spec"
   },
   "author": "regaliastar",
   "license": "ISC",

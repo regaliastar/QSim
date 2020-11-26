@@ -1,5 +1,5 @@
 # 生成py文件路径
-_filepath: "gene.py"
+_filepath: "log/gene.py"
 
 # 模拟算法 默认DAG
 _algo: "DAG"
