@@ -80,10 +80,11 @@ pytest --disable-warnings
 
 // bulid package
 npm run build-server
+npm run pack-app
 ```
 
 ## Bits and pieces
-* 若服务器自动开启失败，可以手动开启，方法是双击dist/server.exe
+* 若服务器自动开启失败，可以手动开启，方法是双击resources\app\dist\server.exe
 
 ## API docs
 *To be written...*
