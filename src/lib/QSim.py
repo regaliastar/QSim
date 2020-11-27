@@ -4,7 +4,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前�
 sys.path.append(BASE_DIR) #添加环境变量
 from lib.GateManager import GateManager
 import numpy as np
-from scipy.linalg import kron
 from sklearn.preprocessing import normalize
 
 class Tools:
@@ -17,7 +16,7 @@ class Tools:
         res = np.array([[1]])
         # 从最后一位开始往前数，做克罗内克积
         for idx in string[::-1]:
-            res = kron(bit[int(idx)], res)
+            res = np.kron(bit[int(idx)], res)
         return np.matrix(res)
 
     def hilbert_space(self, nbit=5):
@@ -180,9 +179,9 @@ class QuantumRegister:
             index_1 = self.getCurrentIndex(q1, q2)
             for i in range(self.numQubits):
                 if i == index_1:
-                    res = kron(res, GateManager.Gates[gate])
+                    res = np.kron(res, GateManager.Gates[gate])
                 else:
-                    res = kron(res, GateManager.Gates['I'])
+                    res = np.kron(res, GateManager.Gates['I'])
         else:           # 双比特门
             [index_1, index_2] = self.getCurrentIndex(q1, q2)
             length = index_1-index_2 if index_1>index_2 else index_2-index_1
@@ -190,9 +189,9 @@ class QuantumRegister:
             matrix = GateManager.gate2Matrix(gate, index_1, index_2)
             for i in range(self.numQubits-length):
                 if i == min:
-                    res = kron(res, matrix)
+                    res = np.kron(res, matrix)
                 else:
-                    res = kron(res, GateManager.Gates['I'])
+                    res = np.kron(res, GateManager.Gates['I'])
         return res
 
     def applyGate(self, gate, q1, q2=-1):

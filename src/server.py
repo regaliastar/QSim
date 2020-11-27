@@ -18,7 +18,7 @@ yaml_path = ''
 print('guessPackaged: {}'.format(guessPackaged()))
 if guessPackaged():
     # 已经打包
-    yaml_path = os.path.join(os.path.abspath("."), "..", "..", "_config.yml")
+    yaml_path = os.path.join(os.path.abspath("."), "..", "_config.yml")
 else:
     # 没有打包
     yaml_path = os.path.join(os.path.abspath("."), "_config.yml")
@@ -34,9 +34,6 @@ from QLight.Parser.Parser import Parser
 from QLight.Interp.Trans import Translate
 from lib.QSim import QuantumRegister
 from lib.QSim import Tools
-# import numpy as np
-# from scipy.linalg import kron
-# from sklearn.preprocessing import normalize
 
 
 class QS:

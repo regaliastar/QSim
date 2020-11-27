@@ -21,23 +21,22 @@ const getScriptPath = () => {
     return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
   }
   if (process.platform === 'win32') {
-    return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE + '.exe')
+    return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE + '.exe')
   }
-  return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE)
+  return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE)
 }
 
 const createPyProc = () => {
   const port = '4242'
   const script = getScriptPath()
+  console.log('guessPackaged: '+guessPackaged()+'  script: '+script)
 
-  // const script = path.join(__dirname,'src', 'server.py')
-  // pyProc = require('child_process').spawn('python', [script, port])
   if(guessPackaged()){
     pyProc = require('child_process').execFile(script, [port])
   } else {
-    console.log('spawn: '+script)
     pyProc = require('child_process').spawn('python', [script, port])
   }
+
   if (pyProc != null) {
     console.log('child process success')
   }

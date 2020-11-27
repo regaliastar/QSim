@@ -70,7 +70,6 @@ Options:
 pip install -r requirements.txt
 
 // nodejs env
-cd views
 npm install
 
 // open interface
@@ -82,8 +81,9 @@ pytest --disable-warnings
 // bulid package
 npm run build-server
 ```
+
 ## Bits and pieces
-*To be written...*
+* 若服务器自动开启失败，可以手动开启，方法是双击dist/server.exe
 
 ## API docs
 *To be written...*
