@@ -1,40 +1,48 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Menu, shell } = require('electron')
 const path = require('path')
 const glob = require('glob')
+const YAML = require('yamljs')
+const fs = require('fs')
+const { electron } = require('process')
+
+/**
+* 读取配置文件 _config.yml
+*/
+const { 
+  _windowSize,
+  _server
+} = YAML.parse(fs.readFileSync(path.join(__dirname, '_config.yml')).toString())
 
 let pyProc = null
-let pyPort = null
-
-// create python process
-const PY_DIST_FOLDER = 'dist'
-const PY_FOLDER = 'src'
-const PY_MODULE = 'server' // without .py suffix
-
-// have package：return True
-const guessPackaged = () => {
-  const fullPath = path.join(__dirname, PY_DIST_FOLDER)
-  return require('fs').existsSync(fullPath)
-}
-
-const getScriptPath = () => {
-  if (!guessPackaged()) {
-    return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
-  }
-  if (process.platform === 'win32') {
-    return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE + '.exe')
-  }
-  return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE)
-}
 
 const createPyProc = () => {
-  const port = '4242'
+  // create python process
+  const PY_DIST_FOLDER = 'dist'
+  const PY_FOLDER = 'src'
+  const PY_MODULE = 'server' // without .py suffix
+
+  // have package：return True
+  const guessPackaged = () => {
+    const fullPath = path.join(__dirname, PY_DIST_FOLDER)
+    return require('fs').existsSync(fullPath)
+  }
+
+  const getScriptPath = () => {
+    if (!guessPackaged()) {
+      return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
+    }
+    if (process.platform === 'win32') {
+      return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE + '.exe')
+    }
+    return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE)
+  }
   const script = getScriptPath()
   console.log('guessPackaged: '+guessPackaged()+'  script: '+script)
 
   if(guessPackaged()){
-    pyProc = require('child_process').execFile(script, [port])
+    pyProc = require('child_process').execFile(script, [_server.port])
   } else {
-    pyProc = require('child_process').spawn('python', [script, port])
+    pyProc = require('child_process').spawn('python', [script, _server.port])
   }
 
   if (pyProc != null) {
@@ -46,21 +54,121 @@ const createPyProc = () => {
 const exitPyProc = () => {
   pyProc.kill()
   pyProc = null
-  pyPort = null
 }
-
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1000,
-    height: 600,
+    width: _windowSize.width,
+    height: _windowSize.height,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule: true
     }
   })
 
   win.loadFile('index.html')
   // win.webContents.openDevTools()
+}
+
+function initMenu() {
+  const menuTemplate = [
+    {
+      label: 'File',
+      submenu: [
+          {
+            label: 'Exit',
+            role: 'quit'
+          }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+          {
+            label: 'Undo'
+          },
+          {
+            label: 'Redo'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            label: 'Cut',
+            role: 'cut',
+            accelerator: 'CmdOrCtrl+X'
+          },
+          {
+            label: 'Copy',
+            role: 'copy',
+            accelerator: 'CmdOrCtrl+C'
+          },
+          {
+            label: 'Paste',
+            role: 'paste',
+            accelerator: 'CmdOrCtrl+V'
+          },
+          {
+            label: 'Delete',
+            role: 'delete'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            label: 'select All',
+            role: 'selectAll'
+          }
+        ]
+    },
+    {
+      label: 'View',
+      submenu: [
+          {
+            label: 'Reload',
+            role: 'reload'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            label: 'Zoom in',
+            role: 'zoomin'
+          },
+          {
+            label: 'Zoom out',
+            role: 'zoomout'
+          },
+          {
+            label: 'Toggle Full Screen',
+            role: 'togglefullscreen'
+          }
+      ]
+    },
+    {
+      label: 'Window',
+      submenu: [
+          {
+            label: 'Minimize',
+            role: 'minimize'
+          }
+      ]
+    },
+    {
+      label: 'Help',
+      submenu: [
+          {
+            label: 'Document',
+            click: function(){
+              shell.openExternal('https://github.com/regaliastar/QSim')
+            }
+          }
+      ]
+    }
+  ]
+
+  const appMenu = Menu.buildFromTemplate(menuTemplate)
+  // Menu.setApplicationMenu(appMenu)
 }
 
 function initialize() {
@@ -82,7 +190,10 @@ function initialize() {
     }
   })
 
-  app.on('ready', createPyProc)
+  app.on('ready', () => {
+    createPyProc()
+    initMenu()
+  })
   app.on('will-quit', exitPyProc)
 }
 

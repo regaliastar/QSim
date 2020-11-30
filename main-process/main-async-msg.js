@@ -3,10 +3,6 @@ const { Sheller } = require('./Sheller')
 const { exec } = require('child_process')
 const package = require('../package.json')
 
-ipcMain.on('asynchronous-message', (event, arg) => {
-  event.sender.send('asynchronous-reply', 'pong')
-})
-
 ipcMain.on('shell-input', (event, arg) => {
   const argv = arg.split(' ')
   if (argv[0] === 'qsim') {
@@ -33,9 +29,10 @@ ipcMain.on('shell-input', (event, arg) => {
           event.sender.send('shell-reply', 'save code from textarea')
         })
         .option('-l', 'generate lexer token', () => {
+          
           event.sender.send('shell-reply', 'generate lexer token')
         })
-        .option('-p', 'generate AST(Abstract syntax tree)', () => {
+        .option('-a', 'generate AST(Abstract syntax tree)', () => {
           event.sender.send('shell-reply', 'generate AST(Abstract syntax tree)')
         })
         .option('-tpy', 'translate QLight to python', () => {

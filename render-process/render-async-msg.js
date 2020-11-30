@@ -2,20 +2,22 @@ const path = require('path')
 const YAML = require('yamljs')
 const fs = require('fs')
 
- /**
-  * 读取配置文件 _config.yml
-  */
- const { 
+/**
+* 读取配置文件 _config.yml
+*/
+const { 
   _filepath,
   _algo,
   _connect
 } = YAML.parse(fs.readFileSync(path.join(__dirname,'..','_config.yml')).toString())
 
-const { ipcRenderer } = require('electron')
+const { ipcRenderer, remote } = require('electron')
+const { dialog, Menu } = remote
 const package = require('../package.json')
 const thrift = require('thrift')
 const userService = require('../gen-nodejs/userService.js')
 const ttypes = require('../gen-nodejs/interface_types.js')
+
 const thriftConnection = thrift.createConnection(_connect.ip, _connect.port, {
   connect_timeout: _connect.connect_timeout,
   max_attempts: _connect.max_attempts
@@ -32,14 +34,14 @@ document.getElementById('version').innerHTML = 'v'+package.version
  * debug处理部分
  */
 
-const debugBtn = document.getElementById('playground-apply-button')
-
-debugBtn.addEventListener('click', () => {
+document.getElementById('playground-apply-button').addEventListener('click', () => {
   const source_code = document.getElementById('playground-input').value.trim()
+  const route = 'debug'
   const json = {
     _filepath,
     _algo,
-    source_code
+    source_code,
+    route
   }
 
   thriftClient.load(JSON.stringify(json), (error, res) => {
@@ -53,7 +55,6 @@ debugBtn.addEventListener('click', () => {
         printInShell(message.info, {type: message.MessageType})
         return
       }
-      console.log('symbalTable', message.symbalTable)
 
       /**
        * output 由 show 字段与 wave_func 字段构成
@@ -80,7 +81,7 @@ debugBtn.addEventListener('click', () => {
  * shell处理部分
  */
 
- function printInShell(msg, opt){
+  function printInShell(msg, opt){
   // 将信息打印到terminal
   const message = `shell: ${msg}`,
     node = document.createElement("P");
@@ -102,7 +103,7 @@ debugBtn.addEventListener('click', () => {
   if(opt && opt.type == 'error')
     node.style['color'] = 'red'
   document.getElementById('shell-msg').appendChild(node)
- }
+  }
 
 const shellInput = document.getElementById('shell-input')
 const inputHistory = []
@@ -139,3 +140,66 @@ shellInput.addEventListener('keydown', e => {
 ipcRenderer.on('shell-reply', (event, arg) => {
   printInShell(arg)
 })
+
+/**
+ * save-button
+ */
+document.getElementById('save-button').addEventListener('click', e => {
+  console.log('save')
+  const source_code = document.getElementById('playground-input').value.trim()
+  let filename = dialog.showSaveDialog({
+    title: 'save code',
+    filters: [
+      { name: 'log', extensions: ['log', 'txt', '*'] }
+    ]
+  }).then(result => {
+      filename = result.filePath
+      if (filename === undefined) {
+        alert('the user clicked the btn but didn\'t created a file')
+        return;
+      }
+      fs.writeFile(filename, source_code, (err) => {
+        if (err) {
+          alert('an error ocurred with file creation ' + err.message)
+          return
+        }
+      })
+    }).catch(err => {
+      alert(err)
+    })
+  console.log(filename)
+})
+
+/**
+ * 右键创建菜单
+ */
+const createContextMenu = () => {
+  const contextTemplate = [
+      {
+        label: 'Reload',
+        role: 'reload'
+      },
+      {
+          label: 'Cut',
+          role: 'cut'
+      },
+      {
+          label: 'Copy',
+          role: 'copy'
+      },
+      {
+        label: 'Paste',
+        role: 'paste'
+      }
+  ]
+  const contextMenu = Menu.buildFromTemplate(contextTemplate)
+  return contextMenu
+}
+
+window.addEventListener('contextmenu', (event) => {
+  event.preventDefault()
+  const contextMenu = createContextMenu();
+  contextMenu.popup({
+      window: remote.getCurrentWindow()
+  })
+}, false)

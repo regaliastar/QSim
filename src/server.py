@@ -27,63 +27,40 @@ file_data = yaml_file.read()
 yaml_file.close()
 yaml_data = yaml.load(file_data)
 
-
 from Interface.genpy.interface import userService
 from QLight.Lexer.Lexer import Lexer
 from QLight.Parser.Parser import Parser
 from QLight.Interp.Trans import Translate
 from lib.QSim import QuantumRegister
 from lib.QSim import Tools
-
+from route import Route
 
 class QS:
     def load(self, dic):
-        print('in load')
-        dic = json.loads(dic)
-        if dic['source_code'] == '':
-            return 'source_code is empty!'
         try:
-            lexer = Lexer(code=dic['source_code'])
-            lexer.scanner()
-            lexer.log()
-            parser = Parser(lexer.getTOKEN())
-            parser.parse()
-            parser.log()
-            translate = Translate(parser.tree)
-            translate.main()
-            symbalTable = translate.getSymbalTable()
-            translate.log(file_name=yaml_data['_filepath'])
-            result = translate.getResult()
+            print('in load')
+            dic = json.loads(dic)
+            if dic['route'] == 'debug':
+                if dic['source_code'] == '':
+                    return 'source_code is empty!'
+                result = Route.debug(dic)
+                return result
+            if dic['route'] == 'le':
+                if dic['source_code'] == '':
+                    return 'source_code is empty!'
+                result = Route.le(dic['source_code'])
+                return result
+            if dic['route'] == 'ast':
+                if dic['source_code'] == '':
+                    return 'source_code is empty!'
+                result = Route.ast(dic['source_code'])
+                return result
+            if dic['route'] == 'tpy':
+                if dic['source_code'] == '':
+                    return 'source_code is empty!'
+                result = Route.tpy(dic['source_code'])
+                return result
 
-            # 定义命名空间
-            namespace = {}
-            # 执行脚本
-            exec(result, namespace)
-            message = {
-                'info': namespace['_wf'],
-                'wave_func': '波函数'+namespace['_wf'],
-                't_cost': namespace['t_cost'],
-                'show': [],
-                'MessageType': 'info',
-                'symbalTable': symbalTable
-            }
-            # 解析符号表中的show字段
-            for index, dic in enumerate(symbalTable['show']): 
-                value = ''
-                for k in dic:
-                    value = dic[k]
-                if value == None:
-                    message['show'].append(namespace['_wf'],)
-                elif not value.isdigit():
-                    message['show'].append(str(namespace[value]))
-            msg_str = json.dumps(message)
-
-            # 初始化变量 !important
-            del message['show']
-            message['show'] = []
-            translate.initSymbalTable()
-
-            return msg_str
         except Exception as e:
             trace_info = traceback.format_exc()
             message = {

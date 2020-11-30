@@ -1,3 +1,12 @@
+# 窗口大小
+_windowSize:
+  width: 1000
+  height: 600
+
+# server
+_server:
+  port: 4242
+
 # 生成py文件路径
 _filepath: "log/gene.py"
 
@@ -9,4 +18,4 @@ _connect:
   ip: '127.0.0.1'
   port: 8000
   connect_timeout: 1000  # 连接超时时间 ms
-  max_attempts: 2       # 最大重连次数
+  max_attempts: 5        # 最大重连次数

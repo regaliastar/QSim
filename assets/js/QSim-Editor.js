@@ -60,6 +60,7 @@ QSim.Editor = function (circuit, targetEl) {
 	toolbarEl.appendChild(saveButton)
 	saveButton.classList.add('Q-circuit-button', 'Q-circuit-toggle-save')
 	saveButton.setAttribute('title', 'Save operation')
+	saveButton.setAttribute('id', 'save-button')
 	// saveButton.setAttribute( 'Q-disabled', 'Q-disabled' )
 	saveButton.innerText = 'Save'
 
