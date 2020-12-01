@@ -16,7 +16,7 @@ const { dialog, Menu } = remote
 const package = require('../package.json')
 const thrift = require('thrift')
 const userService = require('../gen-nodejs/userService.js')
-const ttypes = require('../gen-nodejs/interface_types.js')
+const { Sheller } = require('./Sheller')
 
 const thriftConnection = thrift.createConnection(_connect.ip, _connect.port, {
   connect_timeout: _connect.connect_timeout,
@@ -30,11 +30,75 @@ thriftConnection.on("error", e =>{
 
 document.getElementById('version').innerHTML = 'v'+package.version
 
+
+/**
+ * Sheller
+ */
+function parseShell(arg){
+  console.log('parseShell', arg)
+  const argv = arg.split(' ')
+  if (argv[0] === 'qsim') {
+    try {
+      const sheller = new Sheller()
+      sheller
+        .version(package.version)
+        .name('QSim')
+        .usage('[options]')
+        .setCmdHeader('qsim')
+        .option('-v', 'version info', () => {
+          printInShell(sheller.v)
+        })
+        .option('-h', 'help information', () => {
+          printInShell(sheller.helpInformation())
+        })
+        .option('-d', 'debug source code', () => {
+          debug()   
+        })
+        .option('-q', 'quit program', () => {
+          console.log('quit')
+        })
+        .option('-s', 'save code from textarea', () => {
+          save_code()  
+        })
+        .option('-l', 'generate lexer token', () => {
+          const route = 'le'
+          const source_code = document.getElementById('playground-input').value.trim()
+          const json = {
+            source_code,
+            route
+          }
+          thriftClient.load(JSON.stringify(json), (error, res) => {
+            console.log('lexer-reply', res)
+            if (error) {
+              console.error(error)
+              printInShell(error, {type: 'error'})
+            } else {
+              printInShell(res)
+            }
+          })
+        })
+        .option('-a', 'generate AST(Abstract syntax tree)', () => {
+          console.log(1)    
+        })
+        .option('-tpy', 'translate QLight to python', () => {
+          console.log(1)    
+        })
+      
+      sheller.parse(argv.join(' '), { from: 'user' })
+    } catch (e) {
+      console.log('Catch', e)
+      printInShell(e)
+    }
+  }else{
+    ipcRenderer.send('shell-input', arg)
+  }
+}
+
+
 /**
  * debug处理部分
  */
-
-document.getElementById('playground-apply-button').addEventListener('click', () => {
+function debug(){
   const source_code = document.getElementById('playground-input').value.trim()
   const route = 'debug'
   const json = {
@@ -43,7 +107,6 @@ document.getElementById('playground-apply-button').addEventListener('click', () 
     source_code,
     route
   }
-
   thriftClient.load(JSON.stringify(json), (error, res) => {
     if (error) {
       console.error(error)
@@ -74,7 +137,8 @@ document.getElementById('playground-apply-button').addEventListener('click', () 
       printInShell(output, {type: message.MessageType})
     }
   })
-})
+}
+document.getElementById('playground-apply-button').addEventListener('click', debug)
 
 
 /**
@@ -112,7 +176,7 @@ let inputHistoryPtr = 0
 shellInput.addEventListener('keydown', e => {
   if (e.keyCode == '13') {
     const msg = shellInput.value,
-      node = document.createElement("SPAN"),
+      node = document.createElement("P"),
       textnode = document.createTextNode('$ ' + msg);
     inputHistory.push(msg)
     inputHistoryPtr = inputHistory.length - 1
@@ -121,7 +185,7 @@ shellInput.addEventListener('keydown', e => {
     
     node.appendChild(textnode)
     document.getElementById('shell-msg').appendChild(node)
-    ipcRenderer.send('shell-input', msg)
+    parseShell(msg)
   } else if (e.keyCode == '38') {
     shellInput.value = inputHistory[inputHistoryPtr]    
     shellInput.focus()
@@ -144,8 +208,7 @@ ipcRenderer.on('shell-reply', (event, arg) => {
 /**
  * save-button
  */
-document.getElementById('save-button').addEventListener('click', e => {
-  console.log('save')
+function save_code(){
   const source_code = document.getElementById('playground-input').value.trim()
   let filename = dialog.showSaveDialog({
     title: 'save code',
@@ -168,7 +231,8 @@ document.getElementById('save-button').addEventListener('click', e => {
       alert(err)
     })
   console.log(filename)
-})
+}
+document.getElementById('save-button').addEventListener('click', save_code)
 
 /**
  * 右键创建菜单

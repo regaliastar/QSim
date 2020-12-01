@@ -83,4 +83,6 @@ dic1 = {
 if __name__ == "__main__":
     res = Route.debug(dic1)
     print(res)
+    le = Route.le(source_code1)
+    print(le)
     pass
