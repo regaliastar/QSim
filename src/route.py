@@ -79,14 +79,6 @@ class Route:
         lexer.scanner()
         return lexer.getTOKEN()
 
-    def ast(source_code):
-        print('ast')
-        lexer = Lexer(code=source_code)
-        lexer.scanner()
-        parser = Parser(lexer.getTOKEN())
-        parser.parse()
-        return parser.tree
-    
     def tpy(source_code):
         print('tpy')
         lexer = Lexer(code=source_code)

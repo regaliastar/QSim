@@ -13,7 +13,7 @@ const {
 
 const { ipcRenderer, remote } = require('electron')
 const { dialog, Menu } = remote
-const package = require('../package.json')
+const _package = require('../package.json')
 const thrift = require('thrift')
 const userService = require('../gen-nodejs/userService.js')
 const { Sheller } = require('./Sheller')
@@ -28,7 +28,7 @@ thriftConnection.on("error", e =>{
     alert(e)
 })
 
-document.getElementById('version').innerHTML = 'v'+package.version
+document.getElementById('version').innerHTML = 'v'+_package.version
 
 
 /**
@@ -41,7 +41,7 @@ function parseShell(arg){
     try {
       const sheller = new Sheller()
       sheller
-        .version(package.version)
+        .version(_package.version)
         .name('QSim')
         .usage('[options]')
         .setCmdHeader('qsim')
@@ -73,15 +73,36 @@ function parseShell(arg){
               console.error(error)
               printInShell(error, {type: 'error'})
             } else {
-              printInShell(res)
+              const message = JSON.parse(res)
+              if(message.MessageType == 'error'){
+                printInShell(message.info, {type: message.MessageType})
+                return
+              }
+              printInShell(message.info, {type: message.MessageType})
             }
           })
         })
-        .option('-a', 'generate AST(Abstract syntax tree)', () => {
-          console.log(1)    
-        })
         .option('-tpy', 'translate QLight to python', () => {
-          console.log(1)    
+          const route = 'tpy'
+          const source_code = document.getElementById('playground-input').value.trim()
+          const json = {
+            source_code,
+            route
+          }
+          thriftClient.load(JSON.stringify(json), (error, res) => {
+            console.log('tpy-reply', res)
+            if (error) {
+              console.error(error)
+              printInShell(error, {type: 'error'})
+            } else {
+              const message = JSON.parse(res)
+              if(message.MessageType == 'error'){
+                printInShell(message.info, {type: message.MessageType})
+                return
+              }
+              printInShell(message.info, {type: message.MessageType})
+            }
+          })   
         })
       
       sheller.parse(argv.join(' '), { from: 'user' })
@@ -89,7 +110,12 @@ function parseShell(arg){
       console.log('Catch', e)
       printInShell(e)
     }
-  }else{
+  } else if (arg == 'clear'){
+    const domEl = document.getElementById('shell-msg')
+    while(domEl.lastChild){
+      domEl.removeChild(domEl.lastChild)
+    }
+  } else {
     ipcRenderer.send('shell-input', arg)
   }
 }
@@ -112,8 +138,8 @@ function debug(){
       console.error(error)
       printInShell(error, {type: 'error'})
     } else {
-      console.log('thriftClient.load', res)
-      message = JSON.parse(res)
+      // console.log('thriftClient.load', res)
+      const message = JSON.parse(res)
       if(message.MessageType == 'error'){
         printInShell(message.info, {type: message.MessageType})
         return
@@ -145,10 +171,9 @@ document.getElementById('playground-apply-button').addEventListener('click', deb
  * shell处理部分
  */
 
-  function printInShell(msg, opt){
+function printInShell(msg, opt){
   // 将信息打印到terminal
-  const message = `shell: ${msg}`,
-    node = document.createElement("P");
+  const node = document.createElement("P")
   if(Object.prototype.toString.call(msg) === '[object Object]'){
     let seliMsg = ''
     for(let key in msg){
@@ -161,13 +186,13 @@ document.getElementById('playground-apply-button').addEventListener('click', deb
     const textnode = document.createTextNode(msg);
     node.appendChild(textnode)
   }
-  
+
   node.appendChild(document.createTextNode('\n----------------------------------------------'))
   node.style['white-space'] = 'pre-line'
   if(opt && opt.type == 'error')
     node.style['color'] = 'red'
   document.getElementById('shell-msg').appendChild(node)
-  }
+}
 
 const shellInput = document.getElementById('shell-input')
 const inputHistory = []
@@ -215,15 +240,15 @@ function save_code(){
     filters: [
       { name: 'log', extensions: ['log', 'txt', '*'] }
     ]
-  }).then(result => {
+    }).then(result => {
       filename = result.filePath
       if (filename === undefined) {
         alert('the user clicked the btn but didn\'t created a file')
-        return;
+        return
       }
       fs.writeFile(filename, source_code, (err) => {
         if (err) {
-          alert('an error ocurred with file creation ' + err.message)
+          console.error('an error ocurred with file creation ' + err.message)
           return
         }
       })

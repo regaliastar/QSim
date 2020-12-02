@@ -85,10 +85,10 @@ Sheller.prototype['parse'] = function(command, options) {
         const args = command.trim().split(' ')
         args.forEach((item, index) => {
 
-            if( item == '' )  return
+            if(item == '')  return
 
             // 验证 cmdHeader
-            if( index == 0 ){
+            if(index == 0){
                 if(_self.cmdHeader != '' && item != _self.cmdHeader){
                     const errInfo = new ErrInfo({
                         stateCode: 0,
@@ -101,7 +101,7 @@ Sheller.prototype['parse'] = function(command, options) {
             }
             
             // 若该options被注册
-            if( _self.options[item] ){
+            if(_self.options[item]){
                 // hook_func only exec once times!
                 if(!_self.options[item].call && _self.options[item].hook_func){
                     _self.options[item].hook_func.apply()
@@ -153,9 +153,6 @@ Sheller.prototype['command'] = function(cmd) {
             errInfo: 'No exist command'
         })
         this.quit(errInfo)
-    }
-    const command = {
-        call: false
     }
     
     return this

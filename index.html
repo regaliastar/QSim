@@ -35,7 +35,6 @@
 			<div class="shell-view">
 				<span style="float: left;">$&nbsp;</span><input id="shell-input" class="shell-input">
 			</div>
-			
 		</div>
 		<div class="footer" >
 			<div style="font-size: 90%;text-align:center; line-height:4vh; color: rgba(192, 122, 17, 0.8);">QSim <span id="version"></span> @regaliastar </div> 
@@ -60,7 +59,7 @@
 			if(circuit.maxMomentIndex) circuit.set_timewidth(circuit.maxMomentIndex + 2)
 			if(circuit.qubits_count) circuit.set_bandwidth(circuit.qubits_count)
 			
-            const domEl = document.getElementById( 'playground' )
+            const domEl = document.getElementById('playground')
             if( domEl ){
                 while( domEl.lastChild ){
                     domEl.removeChild( domEl.lastChild )
@@ -72,6 +71,7 @@
         const inputListener = () => {
 			const source_code = document.getElementById('playground-input').value.trim()
 			scan = QSim.Circuit.Scanner(source_code)
+			// console.log(scan)
 			if( QSim.Circuit.checkScan(scan) ){
 				updatePlayground()
 			}

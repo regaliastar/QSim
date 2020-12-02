@@ -202,37 +202,17 @@ QSim.Editor = function (circuit, targetEl) {
 
 	// 对量子门进行绘制
 	// 测试 定义量子门
-	test_arr = [{
-		gate: {
-			symbol: 'H',
-			nameCss: 'hadamard',
-			name: 'Hadamard'
-		},
-		isControlled: false,
-		momentIndex: 1,
-		registerIndices: [1],
-	},
-	{
-		gate: {
-			name: "Pauli X",
-			nameCss: "pauli-x",
-			symbol: "X"
-		},
-		isControlled: true,
-		momentIndex: 2,
-		registerIndices: [1, 2]
-	},
-	{
-		gate: {
-			name: "Pauli X",
-			nameCss: "pauli-x",
-			symbol: "X"
-		},
-		isControlled: true,
-		momentIndex: 3,
-		registerIndices: [1, 3]
-	}]
-
+	// {
+	// 	gate: {
+	// 		symbol: 'H',
+	// 		nameCss: 'hadamard',
+	// 		name: 'Hadamard'
+	// 	},
+	// 	isControlled: false,
+	// 	momentIndex: 1,
+	// 	registerIndices: [1],
+	// }
+	//
 	///////////////////
 	//               //
 	//   绘制量子门   //
@@ -304,8 +284,8 @@ Object.assign(QSim.Editor, {
 
 		paletteEl.classList.add('Q-circuit-palette')
 
-		'HXYZPT*'
-			.split('')
+		'*,H,X,Y,Z,P,T,V,V_H'
+			.split(',')
 			.forEach(function (symbol) {
 				const gate = QSim.Gate.findBySymbol(symbol)
 
@@ -327,6 +307,7 @@ Object.assign(QSim.Editor, {
 						tileEl.style.setProperty('--Q-' + layer + '-x', randomRangeAndSign(1, 4) + 'px')
 						tileEl.style.setProperty('--Q-' + layer + '-y', randomRangeAndSign(1, 3) + 'px')
 					})
+				if (symbol === 'V_H') tileEl.innerText = 'V+'
 			})
 
 		paletteEl.addEventListener('mousedown', QSim.Editor.onPointerPress)
@@ -353,9 +334,7 @@ QSim.Editor.set = function (circuitEl, operation) {
 	// QSim.log('set', operation)
 	const
 		backgroundEl = circuitEl.querySelector('.Q-circuit-board-background'),
-		foregroundEl = circuitEl.querySelector('.Q-circuit-board-foreground'),
-		circuit = circuitEl.circuit,
-		operationIndex = circuitEl.circuit.operations.indexOf(operation)
+		foregroundEl = circuitEl.querySelector('.Q-circuit-board-foreground');
 
 	operation.registerIndices.forEach(function (registerIndex, i) {
 		const operationEl = document.createElement('div')
@@ -377,7 +356,8 @@ QSim.Editor.set = function (circuitEl, operation) {
 		operationEl.appendChild(tileEl)
 		tileEl.classList.add('Q-circuit-operation-tile')
 		if (operation.gate.symbol !== '*') tileEl.innerText = operation.gate.symbol
-
+		if (operation.gate.symbol === 'V_H') tileEl.innerText = 'V+'
+		
 
 		//  Add operation link wires
 		//  for multi-qubit operations.
@@ -691,7 +671,7 @@ QSim.Editor.onPointerPress = function (event) {
 	//  because both branches of if( circuitEl ) and if( paletteEl )
 	//  below will have access to this scope.
 
-	dragEl = document.createElement('div')
+	const dragEl = document.createElement('div')
 	dragEl.classList.add('Q-circuit-clipboard')
 	const { x, y } = QSim.Editor.getInteractionCoordinates(event)
 
@@ -705,7 +685,6 @@ QSim.Editor.onPointerPress = function (event) {
 		//  Shall we toggle the circuit lock?
 
 		const
-			circuit = circuitEl.circuit,
 			circuitIsLocked = circuitEl.classList.contains('Q-circuit-locked'),
 			lockEl = targetEl.closest('.Q-circuit-toggle-lock')
 
@@ -846,7 +825,6 @@ QSim.Editor.onPointerPress = function (event) {
 		//  then UNSELECT them all.
 
 		function toggleSelection(query) {
-
 			const
 				operations = Array.from(circuitEl.querySelectorAll(query)),
 				operationsSelectedLength = operations.reduce(function (sum, element) {
@@ -1112,9 +1090,8 @@ QSim.Editor.onPointerRelease = function (event) {
 
 		if (QSim.Editor.dragEl.circuitEl) {
 
-			const
-				originCircuitEl = QSim.Editor.dragEl.circuitEl
-			originCircuit = originCircuitEl.circuit
+			const originCircuitEl = QSim.Editor.dragEl.circuitEl
+			const originCircuit = originCircuitEl.circuit
 			Array
 				.from(QSim.Editor.dragEl.children)
 				.forEach(function (child) {
@@ -1199,8 +1176,7 @@ QSim.Editor.onPointerRelease = function (event) {
 		droppedAtRegisterIndex = QSim.Editor.gridRowToRegisterIndex(
 
 			QSim.Editor.pointToGrid(droppedAtY)
-		),
-		foregroundEl = circuitEl.querySelector('.Q-circuit-board-foreground')
+		);
 
 
 	//  If this is a self-drop
@@ -1312,7 +1288,7 @@ QSim.Editor.onPointerRelease = function (event) {
 					`[moment-index="${childEl.origin.momentIndex}"]` +
 					`[register-indices="${registerIndicesString}"]`
 				)),
-				remainingComponents = allComponents.filter(function (componentEl, i) {
+				remainingComponents = allComponents.filter(function (componentEl) {
 
 					return !foundComponents.includes(componentEl)
 				}),
@@ -1429,10 +1405,7 @@ QSim.Editor.onPointerRelease = function (event) {
 
 				foundComponents.forEach(function (component) {
 
-					const
-						componentRegisterIndex = +component.getAttribute('register-index'),
-						registerGrabDelta = componentRegisterIndex - QSim.Editor.dragEl.registerIndex
-
+					const componentRegisterIndex = +component.getAttribute('register-index')
 
 					//  Now put it where it wants to go,
 					//  possibly overwriting a sibling component!
@@ -1449,7 +1422,7 @@ QSim.Editor.onPointerRelease = function (event) {
 				//  back into an array of register indices.
 
 				const fixedRegistersIndices = Object.entries(registerMap)
-					.reduce(function (registers, entry, i) {
+					.reduce(function (registers, entry) {
 
 						registers[+entry[1]] = +entry[0]
 						return registers
@@ -1462,7 +1435,7 @@ QSim.Editor.onPointerRelease = function (event) {
 
 					.filter(function (entry) {
 
-						return Q.isUsefulInteger(entry)
+						return QSim.isUsefulInteger(entry)
 					})
 
 
@@ -1479,7 +1452,7 @@ QSim.Editor.onPointerRelease = function (event) {
 			}
 			else {
 
-				remainingComponents.forEach(function (componentEl, i) {
+				remainingComponents.forEach(function (componentEl) {
 
 					//circuit.set$( 
 					setCommands.push([
@@ -1504,7 +1477,7 @@ QSim.Editor.onPointerRelease = function (event) {
 
 						+componentEl.getAttribute('register-indices-index') ?
 							gatesymbol :
-							Q.Gate.NOOP,
+							QSim.Gate.NOOP,
 						+componentEl.getAttribute('moment-index') + draggedMomentDelta,
 						+componentEl.getAttribute('register-index') + draggedRegisterDelta,
 						// )
@@ -1894,7 +1867,7 @@ QSim.Editor.isValidSwapCandidate = function (circuitEl) {
 	//  Both operations must be “identity cursors.”
 	//  If so, we are good to go.
 
-	areBothCursors = selectedOperations.every(function (operationEl) {
+	const areBothCursors = selectedOperations.every(function (operationEl) {
 
 		return operationEl.getAttribute('gate-symbol') === '*'
 	})
@@ -1913,7 +1886,7 @@ QSim.Editor.createSwap = function (circuitEl) {
 		selectedOperations = Array
 			.from(circuitEl.querySelectorAll('.Q-circuit-cell-selected')),
 		momentIndex = +selectedOperations[0].getAttribute('moment-index')
-	registerIndices = selectedOperations
+	const registerIndices = selectedOperations
 		.reduce(function (registerIndices, operationEl) {
 
 			registerIndices.push(+operationEl.getAttribute('register-index'))
@@ -1934,9 +1907,10 @@ QSim.Editor.createSwap = function (circuitEl) {
 			+operation.getAttribute('register-index')
 		)
 	})
+	const swap_gate = QSim.Gate.findBySymbol('SWAP')
 	circuit.set$(
 
-		Q.Gate.SWAP,
+		swap_gate,
 		momentIndex,
 		registerIndices
 	)
@@ -1980,7 +1954,7 @@ QSim.Editor.updateCode = function (circuit) {
 		if (obj === null) return
 		if (!obj.gate) return
 		if (obj.gate.symbol == '*') return
-		clone_obj = JSON.parse(JSON.stringify(obj))
+		const clone_obj = JSON.parse(JSON.stringify(obj))
 		clone_obj.registerIndices[0]--
 		if (clone_obj.registerIndices.length == 2) clone_obj.registerIndices[1]--
 		source_code += clone_obj.gate.symbol + ' '

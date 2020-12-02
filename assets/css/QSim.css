@@ -146,18 +146,7 @@ svg, :root {
 
 	margin: 1.5rem 0 0 0 !important;
 	outline: none !important;
-	/* border:  none !important; */
-	/* border-radius: 1.2rem !important; */
-	/* box-shadow: 
-		 0.2rem  0.2rem 0.2rem rgba( 0, 0, 0, 0.15 ) inset,
-		-0.2rem -0.2rem 0.2rem rgba( 255, 255, 255, 1 ) inset; */
-/* 
-	background: linear-gradient( 
 
-		0.375turn,
-		rgba( 255, 255, 255, 1.0 ),
-		rgba( 255, 255, 255, 0.2 )
-	) !important; */
 }
 .Q-input, 
 .Q-circuit-text-input {
@@ -220,20 +209,12 @@ svg, :root {
 }
 
 
-
-
-
-
 /*
 
 	The below still need to be prefaced with “Q-”
 	and for the HTML pages to be updated accordingly.
 
 */
-
-
-
-
 
 
     /*************/

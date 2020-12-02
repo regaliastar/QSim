@@ -32,7 +32,7 @@ First = {
     'Measurement': ['measure'],
     'QuantumRegister': ['quantum'],
     'Show': ['show'],
-    'GateOp': ['I', 'X', 'Y', 'Z', 'H', 'S', 'T', 'V', 'V_H', 'SWAP'],
+    'GateOp': ['I', 'X', 'Y', 'Z', 'H', 'S', 'T', 'V', 'V_H', 'SWAP', 'P'],
     'Factor': ['INT'],
     'Expression': ['INT'],
     'Bool': ['!', 'INT'],

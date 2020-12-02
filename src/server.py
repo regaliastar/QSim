@@ -42,24 +42,38 @@ class QS:
             dic = json.loads(dic)
             if dic['route'] == 'debug':
                 if dic['source_code'] == '':
-                    return 'source_code is empty!'
+                    return json.dumps({
+                        'info': 'source_code is empty!',
+                        'MessageType': 'error'
+                    })
                 result = Route.debug(dic)
                 return result
             if dic['route'] == 'le':
                 if dic['source_code'] == '':
-                    return 'source_code is empty!'
+                    return json.dumps({
+                        'info': 'source_code is empty!',
+                        'MessageType': 'error'
+                    })
                 result = Route.le(dic['source_code'])
-                return result
-            if dic['route'] == 'ast':
-                if dic['source_code'] == '':
-                    return 'source_code is empty!'
-                result = Route.ast(dic['source_code'])
-                return result
+                message = {
+                    'info': result,
+                    'MessageType': 'info'
+                }
+                msg_str = json.dumps(message)
+                return msg_str
             if dic['route'] == 'tpy':
                 if dic['source_code'] == '':
-                    return 'source_code is empty!'
+                    return json.dumps({
+                        'info': 'source_code is empty!',
+                        'MessageType': 'error'
+                    })
                 result = Route.tpy(dic['source_code'])
-                return result
+                message = {
+                    'info': result,
+                    'MessageType': 'info'
+                }
+                msg_str = json.dumps(message)
+                return msg_str
 
         except Exception as e:
             trace_info = traceback.format_exc()

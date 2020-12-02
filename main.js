@@ -3,7 +3,6 @@ const path = require('path')
 const glob = require('glob')
 const YAML = require('yamljs')
 const fs = require('fs')
-const { electron } = require('process')
 
 /**
 * 读取配置文件 _config.yml
@@ -168,7 +167,7 @@ function initMenu() {
   ]
 
   const appMenu = Menu.buildFromTemplate(menuTemplate)
-  // Menu.setApplicationMenu(appMenu)
+  Menu.setApplicationMenu(appMenu)
 }
 
 function initialize() {

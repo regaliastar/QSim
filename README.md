@@ -60,7 +60,6 @@ Options:
 -q, quit program
 -s, save code from textarea
 -l, generate lexer token
--p, generate AST(Abstract syntax tree)
 -tpy, translate QLight to python
 ```
 
@@ -80,7 +79,7 @@ pytest --disable-warnings
 
 // bulid package
 npm run build-server
-npm run pack-app
+npm run pack-app-win
 ```
 
 ## Bits and pieces

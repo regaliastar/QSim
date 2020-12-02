@@ -1,6 +1,5 @@
 const { ipcMain } = require('electron')
 const { exec } = require('child_process')
-const package = require('../package.json')
 
 ipcMain.on('shell-input', (event, arg) => {
   exec(arg, { timeout: 3000, encoding: 'utf8' }, (err, stdout, stderr) => {

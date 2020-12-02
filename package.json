@@ -1,13 +1,16 @@
 {
   "name": "QSim",
   "version": "1.0.0",
-  "description": "Qsim is the implementation of the quantum computer simulator which is based on python&Node.js. Numpy is used for kernel computing and electron framework is used for interface",
+  "description": "QSim is the implementation of the quantum computer simulator which is based on python&Node.js. Numpy is used for kernel computing and electron framework is used for interface",
   "main": "main.js",
   "scripts": {
+    "lint-create": "./node_modules/.bin/eslint --init",
+    "lint": "./node_modules/.bin/eslint . --ext .js",
+    "fix": "./node_modules/.bin/eslint . --ext .js --fix",
     "test": "pytest --disable-warnings",
     "start": "electron ./main.js --inspect=5858",
     "build-server": "pyinstaller server.spec",
-    "pack-app": "electron-builder --win --x64"
+    "pack-app-win": "electron-builder --win --x64"
   },
   "build": {
     "productName": "QSim",
@@ -43,14 +46,12 @@
       "allowToChangeInstallationDirectory": true
     }
   },
-  "author": "regaliastar",
+  "author": "mumu",
   "license": "ISC",
   "devDependencies": {
     "electron": "^10.1.6",
     "electron-builder": "^22.9.1",
-    "glob": "^7.1.6",
-    "thrift": "^0.13.0-hotfix.1",
-    "yamljs": "^0.3.0"
+    "eslint": "^7.14.0"
   },
   "dependencies": {
     "glob": "^7.1.6",

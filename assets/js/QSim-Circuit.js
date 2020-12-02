@@ -42,7 +42,7 @@ QSim.Circuit = function (bandwidth, timewidth) {
      * `
      */
     this.set_source_code = txt => {
-        scan = QSim.Circuit.Scanner(txt)
+        const scan = QSim.Circuit.Scanner(txt)
         this.gates = scan.gates
         this.qubits_count = scan.qubits_count
         this.maxMomentIndex = scan.maxMomentIndex
@@ -134,7 +134,7 @@ QSim.Circuit.Scanner = (txt) => {
     let momentIndex = 1
     while (ptr < cont.length) {
         if (state == 0 && (/^[A-Za-z]+$/.test(cont.charAt(ptr)) || cont.charAt(ptr) == '_')) {
-            iden = recognizeId(cont.charAt(ptr))
+            const iden = recognizeId(cont.charAt(ptr))
             if (QSim.Gate.totalGate.indexOf(iden) != -1) {
                 state = 1
                 // console.log(1, iden)
@@ -243,7 +243,7 @@ Object.assign(QSim.Circuit.prototype, {
             Number.isInteger(momentIndex) !== true ||
             momentIndex < 1 || momentIndex > this.timewidth) {
 
-            return Qsim.error(`Qsim.Circuit attempted to add a gate to circuit #${this.index} at a moment index that is not valid:`, momentIndex)
+            return QSim.error(`Qsim.Circuit attempted to add a gate to circuit #${this.index} at a moment index that is not valid:`, momentIndex)
         }
 
         //  Are these valid register indices?
@@ -264,10 +264,6 @@ Object.assign(QSim.Circuit.prototype, {
             return QSim.warn(`QSim.Circuit attempted to add a gate to circuit #${this.index} at moment #${momentIndex} with some out of range qubit indices:`, registerIndices)
         }
 
-        // console.log('registerIndices', registerIndices)
-        //  Ok, now we can check if this set$ command
-        //  is redundant.
-
         const
             isRedundant = !!circuit.operations.find(function (operation) {
 
@@ -286,19 +282,9 @@ Object.assign(QSim.Circuit.prototype, {
 
         if (isRedundant !== true) {
 
-
-            //  If there’s already an operation here,
-            //  we’d better get rid of it!
-            //  This will also entirely remove any multi-register operations
-            //  that happen to have a component at this moment / register.
-
             this.clear$(momentIndex, registerIndices)
 
-
-            //  Finally. 
-            //  Finally we can actually set this operation.
-            //  Aren’t you glad we handle all this for you?
-            swap_gate = QSim.Gate.findBySymbol('S')
+            const swap_gate = QSim.Gate.findBySymbol('S')
             const
                 isControlled = registerIndices.length > 1 && gate !== swap_gate,
                 operation = {
@@ -310,34 +296,15 @@ Object.assign(QSim.Circuit.prototype, {
                 }
             this.gates.push(operation)
 
-
-            //  IMPORTANT!
-            //  Operations must be sorted properly
-            //  for toTable to work reliably with
-            //  multi-register operations!!
-
             this.sort$()
 
             // update code in html by drag circuitEl
 
             QSim.Editor.updateCode(circuit)
 
-            // const source_code = document.getElementById('playground-input').value.trim()
-            // scan = QSim.Circuit.Scanner(source_code)
-            // QSim.log('clear', source_code)
-            // if( QSim.Circuit.checkScan(scan) ){
-            //     updatePlayground()
-            // }
-
-            //  Emit an event that we have set an operation
-            //  on this circuit.
-
-
             window.dispatchEvent(new CustomEvent(
-
                 'QSim.Circuit.set$', {
                     detail: {
-
                         circuit,
                         operation
                     }
@@ -363,12 +330,6 @@ Object.assign(QSim.Circuit.prototype, {
         if (registerIndices instanceof Array !== true)
             return QSim.error(`Qsim.Circuit attempted to clear an input on Circuit #${circuit.index} using an invalid register indices array:`, registerIndices)
 
-
-        //  Let’s find any operations 
-        //  with a footprint at this moment index and one of these register indices
-        //  and collect not only their content, but their index in the operations array.
-        // (We’ll need that index to splice the operations array later.)
-
         const foundOperations = circuit.gates.reduce(function (filtered, operation, o) {
 
             if (operation.momentIndex === momentIndex &&
@@ -387,11 +348,6 @@ Object.assign(QSim.Circuit.prototype, {
 
         }, [])
 
-
-        //  Because we held on to each found operation’s index
-        //  within the circuit’s operations array
-        //  we can now easily splice them out of the array.
-
         foundOperations.reduce(function (deletionsSoFar, operation) {
 
             circuit.gates.splice(operation.index - deletionsSoFar, 1)
@@ -399,25 +355,11 @@ Object.assign(QSim.Circuit.prototype, {
 
         }, 0)
 
-
-        //  IMPORTANT!
-        //  Operations must be sorted properly
-        //  for toTable to work reliably with
-        //  multi-register operations!!
-
         this.sort$()
 
         // update code in html by drag circuitEl
         QSim.Editor.updateCode(circuit)
-        // const source_code = document.getElementById('playground-input').value.trim()
-        // scan = QSim.Circuit.Scanner(source_code)
-        // QSim.log('clear', source_code)
-        // if( QSim.Circuit.checkScan(scan) ){
-        //     updatePlayground()
-        // }
 
-
-        // QSim.log(source)
         foundOperations.forEach(function (operation) {
 
             window.dispatchEvent(new CustomEvent(
@@ -433,35 +375,16 @@ Object.assign(QSim.Circuit.prototype, {
             ))
         })
 
-        //  Enable that “fluent interface” method chaining :)
-
         return circuit
     },
 
 
     sort$: function () {
-
-
-        //  Sort this circuit’s operations
-        //  primarily by momentIndex,
-        //  then by the first registerIndex.
-
         this.gates.sort(function (a, b) {
-
             if (a.momentIndex === b.momentIndex) {
-
-
-                //  Note that we are NOT sorting registerIndices here!
-                //  We are merely asking which set of indices contain
-                //  the lowest register index.
-                //  If we instead sorted the registerIndices 
-                //  we could confuse which qubit is the controller
-                //  and which is the controlled!
-
                 return Math.min(...a.registerIndices) - Math.min(b.registerIndices)
             }
             else {
-
                 return a.momentIndex - b.momentIndex
             }
         })
