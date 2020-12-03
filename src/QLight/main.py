@@ -7,8 +7,7 @@ log = logging.getLogger('main')
 
 if __name__ == '__main__':
     print('main')
-    lexer = Lexer(file_path='src/QLight/code_2.txt')
-    print(lexer.source_code)
+    lexer = Lexer(file_path='src/QLight/code_trans.txt')
     lexer.scanner()
     lexer.log()
     parser = Parser(lexer.getTOKEN())
@@ -17,5 +16,4 @@ if __name__ == '__main__':
     translate = Translate(parser.tree)
     translate.main()
     symbalTable = translate.getSymbalTable()
-    print(symbalTable)
     translate.log()

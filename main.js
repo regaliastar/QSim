@@ -74,94 +74,94 @@ function initMenu() {
     {
       label: 'File',
       submenu: [
-          {
-            label: 'Exit',
-            role: 'quit'
-          }
+        {
+          label: 'Exit',
+          role: 'quit'
+        }
       ]
     },
     {
       label: 'Edit',
       submenu: [
-          {
-            label: 'Undo'
-          },
-          {
-            label: 'Redo'
-          },
-          {
-            type: 'separator'
-          },
-          {
-            label: 'Cut',
-            role: 'cut',
-            accelerator: 'CmdOrCtrl+X'
-          },
-          {
-            label: 'Copy',
-            role: 'copy',
-            accelerator: 'CmdOrCtrl+C'
-          },
-          {
-            label: 'Paste',
-            role: 'paste',
-            accelerator: 'CmdOrCtrl+V'
-          },
-          {
-            label: 'Delete',
-            role: 'delete'
-          },
-          {
-            type: 'separator'
-          },
-          {
-            label: 'select All',
-            role: 'selectAll'
-          }
-        ]
+        {
+          label: 'Undo'
+        },
+        {
+          label: 'Redo'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: 'Cut',
+          role: 'cut',
+          accelerator: 'CmdOrCtrl+X'
+        },
+        {
+          label: 'Copy',
+          role: 'copy',
+          accelerator: 'CmdOrCtrl+C'
+        },
+        {
+          label: 'Paste',
+          role: 'paste',
+          accelerator: 'CmdOrCtrl+V'
+        },
+        {
+          label: 'Delete',
+          role: 'delete'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: 'select All',
+          role: 'selectAll'
+        }
+      ]
     },
     {
       label: 'View',
       submenu: [
-          {
-            label: 'Reload',
-            role: 'reload'
-          },
-          {
-            type: 'separator'
-          },
-          {
-            label: 'Zoom in',
-            role: 'zoomin'
-          },
-          {
-            label: 'Zoom out',
-            role: 'zoomout'
-          },
-          {
-            label: 'Toggle Full Screen',
-            role: 'togglefullscreen'
-          }
+        {
+          label: 'Reload',
+          role: 'reload'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: 'Zoom in',
+          role: 'zoomin'
+        },
+        {
+          label: 'Zoom out',
+          role: 'zoomout'
+        },
+        {
+          label: 'Toggle Full Screen',
+          role: 'togglefullscreen'
+        }
       ]
     },
     {
       label: 'Window',
       submenu: [
-          {
-            label: 'Minimize',
-            role: 'minimize'
-          }
+        {
+          label: 'Minimize',
+          role: 'minimize'
+        }
       ]
     },
     {
       label: 'Help',
       submenu: [
-          {
-            label: 'Document',
-            click: function(){
-              shell.openExternal('https://github.com/regaliastar/QSim')
-            }
+        {
+          label: 'Document',
+          click: function(){
+            shell.openExternal('https://github.com/regaliastar/QSim')
           }
+        }
       ]
     }
   ]

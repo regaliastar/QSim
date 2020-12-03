@@ -51,10 +51,8 @@ def $FuncStatement_Name($ParameterList):
     $Statement
 '''),
     'IFStatement':
-Template('''
-if $bool_str:
-    $Statement
-'''),
+Template('''if $bool_str:
+    $Statement'''),
     'Declare_func':
 Template('''$name = $FuncCall_Name($ParameterList)'''),
     'Declare_INT':
@@ -199,6 +197,11 @@ class Translate:
                     dict = self.FuncCall(child)
                     s = py_template['FuncCall'].substitute(dict)
                     statement_list.append(s)
+            elif child.value == 'IFStatement':
+                dict = self.IFStatement(child)
+                s = py_template['IFStatement'].substitute(dict)
+                statement_list.append(s)
+                pass
             child = child.right
         statement_str = ''.join(statement_list) + '\n'
         return statement_str
@@ -248,7 +251,7 @@ class Translate:
             else:
                 raise ValueError('Failed to analyze child: {}'.format(child.format())) 
             child = child.right
-        return dict(bool_str=bool_str, statement=statement_str)
+        return dict(bool_str=bool_str, Statement=statement_str)
 
     def Return(self, node):
         pass
@@ -491,6 +494,10 @@ class Translate:
                 else:
                     dict = self.FuncCall(child)
                     self.fileHandler.insert(dict, 'FuncCall')
+            elif child.value == 'IFStatement':
+                dict = self.IFStatement(child)
+                self.fileHandler.insert(dict, 'IFStatement')
+                pass
 
 if __name__ == '__main__':
     print('translate')

@@ -24,8 +24,8 @@ const thriftConnection = thrift.createConnection(_connect.ip, _connect.port, {
 })
 const thriftClient = thrift.createClient(userService,thriftConnection)
 thriftConnection.on("error", e =>{
-    console.error(e)
-    alert(e)
+  console.error(e)
+  alert(e)
 })
 
 document.getElementById('version').innerHTML = 'v'+_package.version
@@ -104,7 +104,7 @@ function parseShell(arg){
             }
           })   
         })
-      
+        
       sheller.parse(argv.join(' '), { from: 'user' })
     } catch (e) {
       console.log('Catch', e)
@@ -240,21 +240,21 @@ function save_code(){
     filters: [
       { name: 'log', extensions: ['log', 'txt', '*'] }
     ]
-    }).then(result => {
-      filename = result.filePath
-      if (filename === undefined) {
-        alert('the user clicked the btn but didn\'t created a file')
+  }).then(result => {
+    filename = result.filePath
+    if (filename === undefined) {
+      alert('the user clicked the btn but didn\'t created a file')
+      return
+    }
+    fs.writeFile(filename, source_code, (err) => {
+      if (err) {
+        console.error('an error ocurred with file creation ' + err.message)
         return
       }
-      fs.writeFile(filename, source_code, (err) => {
-        if (err) {
-          console.error('an error ocurred with file creation ' + err.message)
-          return
-        }
-      })
-    }).catch(err => {
-      alert(err)
     })
+  }).catch(err => {
+    alert(err)
+  })
   console.log(filename)
 }
 document.getElementById('save-button').addEventListener('click', save_code)
@@ -264,22 +264,22 @@ document.getElementById('save-button').addEventListener('click', save_code)
  */
 const createContextMenu = () => {
   const contextTemplate = [
-      {
-        label: 'Reload',
-        role: 'reload'
-      },
-      {
-          label: 'Cut',
-          role: 'cut'
-      },
-      {
-          label: 'Copy',
-          role: 'copy'
-      },
-      {
-        label: 'Paste',
-        role: 'paste'
-      }
+    {
+      label: 'Reload',
+      role: 'reload'
+    },
+    {
+      label: 'Cut',
+      role: 'cut'
+    },
+    {
+      label: 'Copy',
+      role: 'copy'
+    },
+    {
+      label: 'Paste',
+      role: 'paste'
+    }
   ]
   const contextMenu = Menu.buildFromTemplate(contextTemplate)
   return contextMenu
@@ -289,6 +289,6 @@ window.addEventListener('contextmenu', (event) => {
   event.preventDefault()
   const contextMenu = createContextMenu();
   contextMenu.popup({
-      window: remote.getCurrentWindow()
+    window: remote.getCurrentWindow()
   })
 }, false)
