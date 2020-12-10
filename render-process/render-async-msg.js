@@ -104,6 +104,9 @@ function parseShell(arg){
             }
           })   
         })
+        .option('-tqasm', 'translate QLight to QASM', () => {
+
+        })
         
       sheller.parse(argv.join(' '), { from: 'user' })
     } catch (e) {

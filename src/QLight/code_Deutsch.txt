@@ -1,0 +1,12 @@
+// Deutsch算法，平衡函数测量为1，常数函数测量为0
+// NOT函数是平衡函数
+quantum(2)
+X 1
+H 0
+H 1
+X 0
+X 0 1
+X 0
+H 0
+m0 = measure(0)
+show(m0)

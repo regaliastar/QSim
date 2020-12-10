@@ -37,7 +37,7 @@ show()
 #                 Introduction              #
 #############################################
 # 这里是一些调用的例子
-# 介绍了Qsim.py模块是如何工作的
+# 介绍了QSim.py模块是如何工作的
 
 from QSim import QuantumRegister
 from QSim import Tools
@@ -49,6 +49,7 @@ qubit.applyGate('X', 0, 1)
 result = qubit.measure()
 print(result)
 ```
+
 ## Terminal
 *QSim*集成了命令行界面，你可以通过命令行方便的进行操控量子操作
 ```
@@ -62,6 +63,7 @@ Options:
 -s, save code from textarea
 -l, generate lexer token
 -tpy, translate QLight to python
+-tqasm, translate QLight to QASM
 ```
 
 ## Install

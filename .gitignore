@@ -107,7 +107,6 @@ public
 __pycache__
 docs
 .vscode
-.exe
 
 # build
 build
