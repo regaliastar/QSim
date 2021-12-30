@@ -66,7 +66,8 @@ function createWindow() {
   })
 
   win.loadFile('index.html')
-  // win.webContents.openDevTools()
+  // 打开控制台
+  win.webContents.openDevTools()
 }
 
 function initMenu() {

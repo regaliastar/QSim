@@ -144,7 +144,7 @@ svg, :root {
 .Q-input, 
 .Q-circuit-text-input {
 
-	margin: 1.5rem 0 0 0 !important;
+	margin: 0 0 0 0 !important;
 	outline: none !important;
 
 }
@@ -162,7 +162,7 @@ svg, :root {
 
 	position: relative;
 	text-align: right;
-	margin: 0.5rem 1rem 0 0;
+	margin: 1rem 1rem 0 0;
 	border-radius: 3rem;
 	height: 3rem;
 	background: rgb(17, 14, 14);
@@ -175,6 +175,7 @@ svg, :root {
 	letter-spacing: 0;
 	text-shadow: -1px -1px 0 rgba( 0, 0, 0, 0.1 );
 	cursor: pointer;
+
 }
 .Q-button:hover {
 

@@ -284,7 +284,7 @@ Object.assign(QSim.Editor, {
 
     paletteEl.classList.add('Q-circuit-palette')
 
-    '*,H,X,Y,Z,P,T,V,V_H'
+    '*,H,X,Y,Z,P,T,S,V,V_H,SWAP'
       .split(',')
       .forEach(function (symbol) {
         const gate = QSim.Gate.findBySymbol(symbol)
@@ -308,6 +308,7 @@ Object.assign(QSim.Editor, {
           tileEl.style.setProperty('--Q-' + layer + '-y', randomRangeAndSign(1, 3) + 'px')
         })
         if (symbol === 'V_H') tileEl.innerText = 'V+'
+        if (symbol === 'SWAP') tileEl.innerText = 'SP'
       })
 
     paletteEl.addEventListener('mousedown', QSim.Editor.onPointerPress)
@@ -1592,12 +1593,12 @@ QSim.Editor.onSelectionChanged = function (circuitEl) {
   }
   else controlButtonEl.setAttribute('Q-disabled', true)
 
-  const swapButtonEl = circuitEl.querySelector('.Q-circuit-toggle-swap')
-  if (QSim.Editor.isValidSwapCandidate(circuitEl)) {
+  // const swapButtonEl = circuitEl.querySelector('.Q-circuit-toggle-swap')
+  // if (QSim.Editor.isValidSwapCandidate(circuitEl)) {
 
-    swapButtonEl.removeAttribute('Q-disabled')
-  }
-  else swapButtonEl.setAttribute('Q-disabled', true)
+  //   swapButtonEl.removeAttribute('Q-disabled')
+  // }
+  // else swapButtonEl.setAttribute('Q-disabled', true)
 }
 QSim.Editor.onCircuitChanged = function (circuitEl) {
 

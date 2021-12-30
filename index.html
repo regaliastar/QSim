@@ -37,19 +37,19 @@
 			</div>
 		</div>
 		<div class="footer" >
-			<div style="font-size: 90%;text-align:center; line-height:4vh; color: rgba(192, 122, 17, 0.8);">QSim <span id="version"></span> @regaliastar </div> 
+			<div style="font-size: 90%;text-align:center; line-height:4vh; color: rgba(192, 122, 17, 0.8);">QSim <span id="version"></span></div> 
 		</div>
 	</body>
 	<script>
 		// 创建量子门的图标
 		Array
-            .from( document.querySelectorAll( '.Q-circuit-palette' ))
-            .forEach( el => {
-                QSim.Editor.createPalette(el)
-            })
+			.from( document.querySelectorAll( '.Q-circuit-palette' ))
+			.forEach( el => {
+					QSim.Editor.createPalette(el)
+			})
 
 		const updatePlayground = source_code => {
-			const circuit = QSim.init( 4, 4 )
+			const circuit = QSim.init(4, 8)
 
 			if(!source_code){
 				source_code = document.getElementById('playground-input').value.trim()
@@ -68,14 +68,14 @@
             }
         }
 		
-        const inputListener = () => {
-			const source_code = document.getElementById('playground-input').value.trim()
-			scan = QSim.Circuit.Scanner(source_code)
-			// console.log(scan)
-			if( QSim.Circuit.checkScan(scan) ){
-				updatePlayground()
+      const inputListener = () => {
+				const source_code = document.getElementById('playground-input').value.trim()
+				scan = QSim.Circuit.Scanner(source_code)
+				// console.log(scan)
+				if( QSim.Circuit.checkScan(scan) ){
+					updatePlayground()
+				}
 			}
-		}
 
 		updatePlayground()
 	</script>
