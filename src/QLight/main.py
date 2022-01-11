@@ -1,3 +1,5 @@
+# 保存到 log/auto.py
+
 from Lexer.Lexer import Lexer
 from Parser.Parser import Parser
 from Interp.Trans import Translate
@@ -7,7 +9,7 @@ log = logging.getLogger('main')
 
 if __name__ == '__main__':
     print('main')
-    lexer = Lexer(file_path='src/QLight/code_trans.txt')
+    lexer = Lexer(file_path='src/QLight/code_qft.txt')
     lexer.scanner()
     lexer.log()
     parser = Parser(lexer.getTOKEN())

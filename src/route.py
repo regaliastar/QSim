@@ -42,6 +42,7 @@ class Route:
 
         # 定义命名空间
         namespace = {}
+        
         # 执行脚本
         exec(result, namespace)
         message = {

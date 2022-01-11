@@ -64,6 +64,7 @@ Options:
 -l, generate lexer token
 -tpy, translate QLight to python
 -tqasm, translate QLight to QASM
+-env, get current env
 ```
 
 ## Install

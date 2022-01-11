@@ -179,9 +179,9 @@ class QuantumRegister:
             index_1 = self.getCurrentIndex(q1, q2)
             for i in range(self.numQubits):
                 if i == index_1:
-                    res = np.kron(res, GateManager.Gates[gate])
+                    res = np.kron(res, GateManager.getGate(gate))
                 else:
-                    res = np.kron(res, GateManager.Gates['I'])
+                    res = np.kron(res, GateManager.getGate('I'))
         else:           # 双比特门
             [index_1, index_2] = self.getCurrentIndex(q1, q2)
             length = index_1-index_2 if index_1>index_2 else index_2-index_1
@@ -197,7 +197,7 @@ class QuantumRegister:
     def applyGate(self, gate, q1, q2=-1):
         if self.value:
             raise ValueError('Cannot add Gate to Measured Register')
-        if gate not in GateManager.Gates:
+        if not GateManager.has(gate):
             raise ValueError('Gate {} is not defined in Gates'.format(gate))
         gateMatrix = self.generateMatrix(gate, q1, q2)
         self.amplitudes = np.dot(self.amplitudes, gateMatrix)

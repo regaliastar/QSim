@@ -9,7 +9,8 @@ const fs = require('fs')
 */
 const { 
   _windowSize,
-  _server
+  _server,
+  _env
 } = YAML.parse(fs.readFileSync(path.join(__dirname, '_config.yml')).toString())
 
 let pyProc = null
@@ -27,7 +28,7 @@ const createPyProc = () => {
   }
 
   const getScriptPath = () => {
-    if (!guessPackaged()) {
+    if (!guessPackaged() || _env === 'dev') {
       return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
     }
     if (process.platform === 'win32') {
@@ -38,9 +39,11 @@ const createPyProc = () => {
   const script = getScriptPath()
   console.log('guessPackaged: '+guessPackaged()+'  script: '+script)
 
-  if(guessPackaged()){
+  // 判断 python服务器 是否被打包
+  if (guessPackaged() && _env !== 'dev') {
     pyProc = require('child_process').execFile(script, [_server.port])
   } else {
+    console.log('dev')
     pyProc = require('child_process').spawn('python', [script, _server.port])
   }
 

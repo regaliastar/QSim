@@ -17,6 +17,21 @@ class GateManager:
         'SWAP': np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
     }
 
+    def getGate(gate):
+        if gate in GateManager.Gates:
+            return GateManager.Gates[gate]
+        if gate[0] == 'R':
+            k = int(gate[1:])
+            return np.array([[1, 0], [0, np.exp(2j * np.pi / 2**k)]])
+        raise ValueError('Failed to GateManager.getGate!')
+
+    def has(gate):
+        if gate in GateManager.Gates:
+            return True
+        if gate[0] == 'R':
+            return True
+        return False
+
     def getGates():
         return GateManager.Gates
 
@@ -35,10 +50,11 @@ class GateManager:
         CNOT, C-Z, C-U
         :return np.ndarray
         '''
-        if gate not in GateManager.Gates:
+        if not GateManager.has(gate):
             raise ValueError('Gate {} is not defined in Gates'.format(gate))
+        gate_matrix = GateManager.getGate(gate)
         if q2 == -1:
-            return GateManager.Gates[gate]
+            return gate_matrix
         if q2 > q1:
             m_size = 2 ** (q2 - q1 + 1)
             base = np.identity(m_size)
@@ -46,7 +62,7 @@ class GateManager:
                 # base[m_size/2+i*2][m_size/2+i*2]
                 for j in range(2):
                     for k in range(2):
-                        base[int(m_size / 2 + i * 2 + j)][int(m_size / 2 + i * 2 + k)] = GateManager.Gates[gate][j][k]
+                        base[int(m_size / 2 + i * 2 + j)][int(m_size / 2 + i * 2 + k)] = gate_matrix[j][k]
             return base
         elif q2 < q1:
             m_size = 2 ** (q1 - q2 + 1)
@@ -55,7 +71,7 @@ class GateManager:
                 # 1+2*i, 1+2*i+m_size/2
                 for j in range(2):
                     for k in range(2):
-                        base[int(1 + 2 * i + j * m_size / 2)][int(1 + 2 * i + k * m_size / 2)] = GateManager.Gates[gate][j][k]
+                        base[int(1 + 2 * i + j * m_size / 2)][int(1 + 2 * i + k * m_size / 2)] = gate_matrix[j][k]
             return base
         else:
             raise ValueError('Failed to input args!')

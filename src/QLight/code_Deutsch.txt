@@ -1,5 +1,6 @@
 // Deutsch算法，平衡函数测量为1，常数函数测量为0
 // NOT函数是平衡函数
+// pass
 quantum(2)
 X 1
 H 0

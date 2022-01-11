@@ -3,4 +3,4 @@ X q[0] q[1]
 func m(){
     measure(q)
 }
-m()
+measure()

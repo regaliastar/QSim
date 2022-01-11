@@ -66,6 +66,8 @@ QSim.Circuit.Scanner = (txt) => {
     }
     return cont[ptr]
   }
+
+  // 识别逻辑门
   function recognizeId(ch) {
     let state = 0
     let str = ''
@@ -156,14 +158,22 @@ QSim.Circuit.Scanner = (txt) => {
   let momentIndex = 1
   while (ptr < cont.length) {
     if (state == 0 && (/^[A-Za-z]+$/.test(cont.charAt(ptr)) || cont.charAt(ptr) == '_')) {
-      const iden = recognizeId(cont.charAt(ptr))
-      if (QSim.Gate.totalGate.indexOf(iden) != -1) {
+      // R(2) 1 0
+      if(cont.charAt(ptr) === 'R' && cont.charAt(ptr+1) === '(') {
         state = 1
-        // console.log(1, iden)
-        item.gate = QSim.Gate.findBySymbol(iden)
-      }
-      else if (iden == 'quantum') {
-        qubit_state = 1
+        item.gate = QSim.Gate.findBySymbol('R')
+        while(getNextChar() !== ')'){}
+        
+      } else {
+        const iden = recognizeId(cont.charAt(ptr))
+        if (QSim.Gate.totalGate.indexOf(iden) != -1) {
+          state = 1
+          // console.log(1, iden)
+          item.gate = QSim.Gate.findBySymbol(iden)
+        }
+        else if (iden == 'quantum') {
+          qubit_state = 1
+        }
       }
     }
     else if ((qubit_state == 1 || state == 1) && /^\d+$/.test(cont.charAt(ptr))) {
@@ -208,21 +218,25 @@ QSim.Circuit.Scanner = (txt) => {
   let momentIndexCont = new Array(result.qubits_count).fill(1)
   let maxMomentIndex = 0
   for (let i = 0; i < result.gates.length; i++) {
-    if (result.gates[i].registerIndices.length == 1) {
+    if (result.gates[i].registerIndices.length == 1) {  // 单量子门
       let index = result.gates[i].registerIndices[0] - 1
       result.gates[i].momentIndex = momentIndexCont[index]
       maxMomentIndex < momentIndexCont[index] ? maxMomentIndex = momentIndexCont[index] : momentIndexCont[index]
       momentIndexCont[index]++
-    } else {
+    } else {  // 双量子门
       const index_0 = result.gates[i].registerIndices[0] - 1,
         index_1 = result.gates[i].registerIndices[1] - 1,
         max = Math.max(momentIndexCont[index_0], momentIndexCont[index_1])
 
       result.gates[i].momentIndex = max
       maxMomentIndex < max ? maxMomentIndex = max : max
-
-      momentIndexCont[index_0] = max + 1
-      momentIndexCont[index_1] = max + 1
+      
+      // momentIndexCont[index_0] = max + 1
+      // momentIndexCont[index_1] = max + 1
+      max_index = Math.max(index_0, index_1)
+      for (let i = Math.min(index_0, index_1); i <= max_index; i++) {
+        momentIndexCont[i] = max + 1;
+      }
     }
   }
   result.maxMomentIndex = maxMomentIndex

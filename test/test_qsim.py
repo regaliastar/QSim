@@ -123,4 +123,3 @@ def test_print_wf():
     q3 = QuantumRegister(coef=coef, basis=basis)
     wf3 = tools.print_wf(q3.a2wf())
     assert answer == wf3
-

@@ -35,6 +35,7 @@ from lib.QSim import QuantumRegister
 from lib.QSim import Tools
 from route import Route
 
+
 class QS:
     def load(self, dic):
         try:

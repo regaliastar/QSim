@@ -19,3 +19,8 @@ _connect:
   port: 8000
   connect_timeout: 1000  # 连接超时时间 ms
   max_attempts: 5        # 最大重连次数
+
+# 开发环境dev，生产环境改为product
+_env: "dev"
+
+_simulation_env: true

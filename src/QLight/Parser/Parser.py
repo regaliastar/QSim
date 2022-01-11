@@ -43,7 +43,8 @@ First = {
     'Statement': ['I', 'X', 'Y', 'Z', 'H', 'S', 'T', 'V', 'V_H', 'SWAP', 'measure', 'if', 'while', 'func'],
     'Declare': ['Identifier'],
     'Program': ['Identifier'],
-    'FuncCall': ['Identifier']
+    'FuncCall': ['Identifier'],
+    'R': ['R']
 }
 
 def log_func_call(func):
@@ -276,10 +277,11 @@ class Parser:
         else:
             func_call_tree.current = func_call_tree.root = SyntaxTreeNode('FuncCall')
         self.tree.add_child_node(func_call_tree.root, father)
-        if token[0] != 500 and token[0] != 210 and token[0] != 211 and token[0] != 212:
+        if token[0] != 500 and token[0] != 210 and token[0] != 211 and token[0] != 212 and token[0] != 214:
             raise ValueError('Failed to FuncCall arguments: {}'.format(token))
         # 匹配 函数名
         self.match(token)
+        func_token = token[0]
         func_call_tree.add_child_node(
             SyntaxTreeNode(token[1], 'FuncCall_Name'))
         if self.lookahead[0] == 300:
@@ -295,6 +297,11 @@ class Parser:
             self.match(self.lookahead)
         if self.lookahead[0] == 301:
             # 匹配 )
+            self.match(self.lookahead)
+        # R(2) 1 0
+        while func_token == 214 and self.lookahead[0] != 308:
+            func_call_tree.add_child_node(
+                SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), params_list)
             self.match(self.lookahead)
         if self.lookahead[0] == 308:
             # 匹配 \n
@@ -375,6 +382,8 @@ class Parser:
                     self.FuncCall(self.lookahead, Statement_tree.root)
                 elif self.lookahead[1] in First['Show']:
                     self.FuncCall(self.lookahead, Statement_tree.root)
+                elif self.lookahead[1] in First['R']:
+                    self.FuncCall(self.lookahead, Statement_tree.root)
                 else:
                     raise ValueError('Failed to Statement arguments: {}'.format(self.lookahead))
                 pass
@@ -421,6 +430,8 @@ class Parser:
                 elif self.lookahead[1] in First['QuantumRegister']:
                     self.FuncCall(self.lookahead)
                 elif self.lookahead[1] in First['Show']:
+                    self.FuncCall(self.lookahead)
+                elif self.lookahead[1] in First['R']:
                     self.FuncCall(self.lookahead)
                 else:
                     raise ValueError('Failed to Main arguments: {}, nextToken: {}'.format(self.lookahead, self.TOKEN[self.current_token+1]))

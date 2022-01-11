@@ -1,4 +1,4 @@
-QSim.Gate.totalGate = ['H', 'P', 'X', 'Y', 'Z', 'T','S', 'I', 'V', 'V_H', 'SWAP']
+QSim.Gate.totalGate = ['H', 'P', 'X', 'Y', 'Z', 'T','S', 'I', 'V', 'V_H', 'SWAP', 'R']
 
 QSim.Gate.findBySymbol = symbol => {
   const contain = {
@@ -61,6 +61,11 @@ QSim.Gate.findBySymbol = symbol => {
       symbol: 'V_H',
       name: 'V_H',
       nameCss: 'V_H',
+    },
+    'R': {
+      symbol: 'R',
+      name: 'R',
+      nameCss: 'R',
     }
   }
   return (

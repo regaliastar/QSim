@@ -68,7 +68,9 @@ Template('''qubit = QuantumRegister($numQubits)'''),
     'Declare_measure':
 Template('''$Iden = qubit.measure(place=$place, count=$count)'''),
     'show':
-Template('''# show( $Iden )''')
+Template('''# show( $Iden )'''),
+    'R':
+Template('''qubit.applyGate('$GateOp_Name',$placeList)''')
 }
 
 class pyFileHandler():
@@ -193,6 +195,9 @@ class Translate:
                     dict = self.show(child)
                     s = py_template['show'].substitute(dict)
                     statement_list.append(s)
+                elif child.first_son.value == 'R':
+                    dict = self.R(child)
+                    s = py_template['R'].substitute(dict)
                 else:
                     dict = self.FuncCall(child)
                     s = py_template['FuncCall'].substitute(dict)
@@ -308,6 +313,27 @@ class Translate:
                 GateOp_Name = child.value
             elif child.value == 'ParameterList' and child.type == None:
                 list = self.tree.find_all_child(child)
+                for n in list:
+                    placeList += ',' + n.value
+                placeList = placeList[1:]   # 去除第一个,
+            else:
+                raise ValueError('Failed to analyze child: {}'.format(child.format())) 
+            child = child.right  
+        return dict(GateOp_Name=GateOp_Name, placeList=placeList)
+
+    def R(self, node):
+        if not node:
+            return
+        child = node.first_son
+        GateOp_Name = ''
+        placeList = ''
+        while child:
+            if child.value == 'R':
+                GateOp_Name = child.value
+            elif child.value == 'ParameterList' and child.type == None:
+                list = self.tree.find_all_child(child)
+                GateOp_Name = GateOp_Name + list[0].value
+                list = list[1:]
                 for n in list:
                     placeList += ',' + n.value
                 placeList = placeList[1:]   # 去除第一个,
@@ -491,6 +517,9 @@ class Translate:
                     # show函数不需要生成代码
                     dict = self.show(child)
                     self.fileHandler.insert(dict, 'show')
+                elif child.first_son.value == 'R':
+                    dict = self.R(child)
+                    self.fileHandler.insert(dict, 'R') 
                 else:
                     dict = self.FuncCall(child)
                     self.fileHandler.insert(dict, 'FuncCall')

@@ -284,7 +284,7 @@ Object.assign(QSim.Editor, {
 
     paletteEl.classList.add('Q-circuit-palette')
 
-    '*,H,X,Y,Z,P,T,S,V,V_H,SWAP'
+    '*,H,X,Y,Z,P,T,S,V,V_H,SWAP,R'
       .split(',')
       .forEach(function (symbol) {
         const gate = QSim.Gate.findBySymbol(symbol)

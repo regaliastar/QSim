@@ -372,13 +372,13 @@
 
 	background-color: transparent;
 }
+
 .Q-circuit-operation-link {
 
 	display: block;
 	position: absolute;
 	width:  calc( var( --Q-link-stroke ) * 2 );
 	height: calc( 100% - 4rem + var( --Q-link-stroke ));
-	/*border: var( --Q-link-stroke ) solid hsl( 0, 0%, 50% );*/
 	border: var( --Q-link-stroke ) solid hsl(
 
 		var( --Q-color-background-hue ),
@@ -386,17 +386,17 @@
 		30%
 	);
 	
-	/*border: var( --Q-link-stroke ) solid var( --Q-color-orange );*/
-
 	transform: translate( -50%, calc( 2rem - ( var( --Q-link-stroke ) / 2 )));
 	transform-origin: center;
 }
-.Q-circuit-operation-link.Q-circuit-operation-link-curved {
+
+/* 量子门之间的连线，注释掉改为直线 */
+/* .Q-circuit-operation-link.Q-circuit-operation-link-curved {
 
 	width: calc( var( --Q-link-radius ) - var( --Q-link-stroke ));
 	width: 200%;
 	border-radius: 100%;
-}
+} */
 
 
 
