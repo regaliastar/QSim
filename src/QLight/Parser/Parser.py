@@ -300,9 +300,20 @@ class Parser:
             self.match(self.lookahead)
         # R(2) 1 0
         while func_token == 214 and self.lookahead[0] != 308:
-            func_call_tree.add_child_node(
+            if self.lookahead[0] == 500:
+                # Identify
+                self.match(self.lookahead)
+            if self.lookahead[0] == 302:
+                # [
+                self.match(self.lookahead)
+            if self.lookahead[0] == 600:
+                # INT
+                func_call_tree.add_child_node(
                 SyntaxTreeNode(self.lookahead[1], self.lookahead[0]), params_list)
-            self.match(self.lookahead)
+                self.match(self.lookahead)
+            if self.lookahead[0] == 303:
+                # ]
+                self.match(self.lookahead)
         if self.lookahead[0] == 308:
             # 匹配 \n
             self.match(self.lookahead)

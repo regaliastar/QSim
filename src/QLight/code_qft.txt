@@ -1,10 +1,10 @@
 // 量子傅里叶变换
-quantum(3)
-H 0
-R(2) 1 0
-R(3) 2 0
-H 1
-R(2) 2 1
-H 2
+q = quantum(3)
+H q[0]
+R(2) q[1] q[0]
+R(3) q[2] q[0]
+H q[1]
+R(2) q[2] q[1]
+H q[2]
 measure()
 show()

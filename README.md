@@ -8,28 +8,25 @@
 
 *Qsim*的*API*库实现了量子线路最新论文的算法，使用时通过配置`_config.yml`文件加载
 
-## Demo
-*To be written...*
-
 ## Introduction
 ```
 #############################################
 #                 Quick start               #
 #############################################
 // 量子隐态传输
-quantum(3)
-H 1
-X 1 2     // bell state
-H 0       // phi = sqrt(1/2)|0> + sqrt(1/2)|1>
-X 0 1
-H 0
-m1 = measure(0)
-m2 = measure(1)
+q = quantum(3)
+H q[1]
+X q[1] q[2]     // bell state
+H q[0]          // phi = sqrt(1/2)|0> + sqrt(1/2)|1>
+X q[0] q[1]
+H q[0]
+m1 = measure(q[0])
+m2 = measure(q[1])
 if(m2 == 1){
-    X 2
+    X q[2]
 }
 if(m1 == 1){
-    Z 2
+    Z q[2]
 }
 show()
 
@@ -88,7 +85,3 @@ npm run pack-app-win
 
 ## Bits and pieces
 * 若服务器自动连接失败，可以右键`reload`界面
-
-## API docs
-*To be written...*
-

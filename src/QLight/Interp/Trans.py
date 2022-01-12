@@ -73,6 +73,23 @@ Template('''# show( $Iden )'''),
 Template('''qubit.applyGate('$GateOp_Name',$placeList)''')
 }
 
+# TODO
+qasm_template = {
+    'header':
+    '''
+OPENQASM 3;
+include "stdgates.inc";
+    ''',
+    'Declare_quantum':
+Template('''qubit[$numQubits] _q'''),
+    'GateOp':
+Template('''$GateOp_Name $placeList'''),
+    'R':
+Template('''cphase(pi / $k) $placeList'''),
+    'measure':
+Template('''_c = measure _q''')
+}
+
 class pyFileHandler():
     '''维护生成的代码'''
     def __init__(self):
@@ -87,6 +104,23 @@ class pyFileHandler():
         if file_name == '':
             file_name = 'log/auto.py'
         self.result.append(py_template['footer'])
+        self.file = open(file_name, 'w+', encoding = 'utf-8')
+        self.file.write('\n'.join(self.result) + '\n')
+        self.file.close()
+
+class qasmFileHandler():
+    '''维护生成的代码'''
+    def __init__(self):
+        self.result = []
+        self.result.append(py_template['header'])
+
+    def insert(self, _value, _type):
+        s = py_template[_type].substitute(_value)
+        self.result.append(s)
+
+    def generate_file(self, file_name=''):
+        if file_name == '':
+            file_name = 'log/qasm.txt'
         self.file = open(file_name, 'w+', encoding = 'utf-8')
         self.file.write('\n'.join(self.result) + '\n')
         self.file.close()
@@ -417,9 +451,11 @@ class Translate:
             if child.value == 'quantum':
                 pass
             elif child.type == 500:
-                qubit = child.value
+                pass
             elif child.value == '=':
                 pass
+            elif child.value == 'Declare_quantum' and child.father.value == 'Declare_quantum':
+                return Translate.Declare_quantum(self, child)
             elif child.value == 'FuncCall' and child.type == None:
                 list = self.tree.find_all_child(child)
                 for n in list:
