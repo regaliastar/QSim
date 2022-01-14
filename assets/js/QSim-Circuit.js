@@ -55,7 +55,52 @@ QSim.Circuit = function (bandwidth, timewidth) {
 //   文本分析，将代码转为量子门   //
 //                              //
 //////////////////////////////////
+const PreScanner = (txt) => {
+  const symbolTable = {
+    // 'Alice_1': 'q[0]'
+  }
+  let quantumNum = 0
+  let quantumDeclareNum = 0
+  const result = []
+  const codeBox = txt.split('\n')
 
+  // 建立符号表
+  codeBox.reduce((pre, cur, index, arr) => {
+    const prefix_2 = cur.substring(0, 2)
+    if (cur.indexOf('quantum(') !== -1 && prefix_2 !== '//') {
+      let alias = cur.trim().split(' ')[0]
+      symbolTable[alias] = `q[${quantumNum}]`
+      quantumNum++
+      quantumDeclareNum++
+      return cur
+    } else if (prefix_2 == 'if') {  // 根据符号表替换if语句
+      let alias = /\(\s*[A-Za-z_0-9]+\s+/.exec(cur)[0].substring(1).trim()
+      if (symbolTable[alias]) {
+        result.push(`m${alias} = measure(${symbolTable[alias]})`)
+        console.log('cur', cur, alias)
+        cur = cur.replace(alias, `m${alias}`)
+      }
+    } else {
+      for(let key in symbolTable) {
+        if (cur.indexOf(key) !== -1) {
+          cur = cur.replace(key, symbolTable[key])
+        }
+      }
+    }
+    result.push(cur)
+    return cur
+  }, [])
+  // 替换quantum
+  result.unshift(`q = quantum(${quantumNum})`)
+  // 判断是否需要预处理，针对code_tele_test.txt
+  if (quantumDeclareNum <= 1) {
+    return txt
+  } else {
+    return result.join('\n')
+  }
+}
+// console.log('PreScanner结果', PreScanner(txt))
+QSim.Circuit.PreScanner = PreScanner
 
 QSim.Circuit.Scanner = (txt) => {
 
@@ -138,8 +183,8 @@ QSim.Circuit.Scanner = (txt) => {
     return str
   }
 
-  const cont = txt.trim()
-  // console.log('Scanner source code: ',cont)
+  const cont = PreScanner(txt.trim())
+  console.log('Scanner source code: ',cont)
 
   let ptr = 0
   let state = 0   //state是必要的，为了能够将门和其他的语句区分开

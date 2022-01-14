@@ -106,6 +106,7 @@ svg, :root {
 		var( --Q-color-base-hue ),
 		 5%,
 		35%
+		/* var( --Q-color-white ) */
 	);
 	--Q-text-code-comment-color: rgba( 0, 0, 0, 0.4 );
 	--Q-text-code-output-color:  rgba( 0, 0, 0, 1 );

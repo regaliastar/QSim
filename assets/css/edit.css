@@ -82,7 +82,8 @@ height: 4px;
     border-radius: 0.5rem;	
     background-color: var( --Q-color-chalk );
     padding: 1rem 0 0 2rem;
-    color: var( --Q-color-blue );
+    /* color: var( --Q-color-blue ); */
+    color: #FFFFFF;
     font-family: var( --Q-font-family-mono );
     font-size:   1.0rem;
     line-height: 1.2rem;
@@ -110,7 +111,8 @@ body {
     background-color: var( --Q-color-background );
     background-color: white;
     padding: 0;
-    color: var( --Q-text-color );
+    /* color: var( --Q-text-color ); */
+    color: #FFFFFF;
     font-family: var( --Q-font-family-sans );
     font-weight: 400;
     hanging-punctuation: first;
@@ -141,6 +143,7 @@ body {
     outline:none;
     font-size:14px;
     width:95%;
+    
 }
 
 .Q-circuit-header {

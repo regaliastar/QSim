@@ -49,6 +49,7 @@ class Route:
             'info': namespace['_wf'],
             'wave_func': '波函数'+namespace['_wf'],
             't_cost': namespace['t_cost'],
+            'memory_cost': namespace['memory_cost'],
             'show': [],
             'MessageType': 'info',
             'symbalTable': symbalTable

@@ -37,12 +37,13 @@ from lib.QSim import QuantumRegister
 from lib.QSim import Tools
 tools = Tools()
 import numpy as np
-start_time = time.process_time()
+start_time = time.perf_counter ()
     ''',
     'footer':
     '''
-t_cost = time.process_time() - start_time
+t_cost = time.perf_counter () - start_time
 _wf = tools.print_wf(qubit.a2wf())
+memory_cost = sys.getsizeof(qubit) / 1024 / 1024
 # print(_wf)
     ''',
     'FuncStatement':

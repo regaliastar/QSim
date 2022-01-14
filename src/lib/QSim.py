@@ -61,12 +61,13 @@ class Tools:
     def print_wf(self, wf):
         '''
         :param wf: np.martix
-        :return: sr
+        :return: str
         '''
         coef, seqs = self.decompose(wf)
-        str = '|psi> = '
+        str = ''
         for i, seq in enumerate(seqs):
-            str += '{}|{}>'.format(coef[i], seq)
+            # str += '{}|{}>'.format(coef[i], seq)
+            str += '{}|{}>'.format(round(float(coef[i]), 2), seq)
             if i != len(seqs) - 1:
                 str += '+'
         return str

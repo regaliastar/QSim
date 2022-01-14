@@ -128,7 +128,8 @@ function parseShell(arg){
  * debug处理部分
  */
 function debug(){
-  const source_code = document.getElementById('playground-input').value.trim()
+  const txt_code = document.getElementById('playground-input').value.trim()
+  const source_code = PreScanner(txt_code.trim())
   const route = 'debug'
   const json = {
     _filepath,
@@ -143,6 +144,7 @@ function debug(){
     } else {
       // console.log('thriftClient.load', res)
       const message = JSON.parse(res)
+      console.log('message', typeof message, message)
       if(message.MessageType == 'error'){
         printInShell(message.info, {type: message.MessageType})
         return
@@ -152,17 +154,17 @@ function debug(){
        * output 由 show 字段与 wave_func 字段构成
        * 当存在 show 时候，只输出 show
        */
-      let output = ''
+      let output = `simulation_env: false\n`
       if (message.show.length > 0) {
-        output += 'show: \n'
+        output += 'result: \n'
         for(let i = 0; i < message.show.length; i++){
           output += message.show[i] + '\n'
         }
       } else {
         output += message.wave_func
-
       }
-      output += '\n执行时间: '+ message.t_cost
+      output += `\ncost time:  ${message.t_cost} S`
+      output += `\nmemory:  ${message.memory_cost} MB`
       printInShell(output, {type: message.MessageType})
     }
   })
