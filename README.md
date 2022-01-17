@@ -6,27 +6,29 @@
 
 在前端界面书写的*QLight*文本会被解释成Python语句执行，脚本文件和量子线路*mvvm*绑定，做到所见即所算。你也可以将线路保存为*LaTeX*语句或字符集合
 
-*Qsim*的*API*库实现了量子线路最新论文的算法，使用时通过配置`_config.yml`文件加载
+*Qsim*的*API*库实现了量子线路论文的算法，使用时通过配置`_config.yml`文件加载
 
 ## Introduction
 ```
 #############################################
 #                 Quick start               #
 #############################################
-// 量子隐态传输
-q = quantum(3)
-H q[1]
-X q[1] q[2]     // bell state
-H q[0]          // phi = sqrt(1/2)|0> + sqrt(1/2)|1>
-X q[0] q[1]
-H q[0]
-m1 = measure(q[0])
-m2 = measure(q[1])
-if(m2 == 1){
-    X q[2]
+// Quantum Teleportation
+// Declare quantum state, Alice transmits data to Bob
+Alice_1 = quantum(1)
+Alice_2 = quantum(1)
+Bob = quantum(1)
+H Alice_1
+X Alice_2 Bob
+H Alice_1  
+X Alice_1 Alice_2
+H Alice_1
+// Quantum version of the IF statement
+if(Alice_1 == 1){
+    X Bob
 }
-if(m1 == 1){
-    Z q[2]
+if(Alice_2 == 1){
+    Z Bob
 }
 show()
 

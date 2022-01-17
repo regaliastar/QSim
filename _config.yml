@@ -23,4 +23,10 @@ _connect:
 # 开发环境dev，生产环境改为product
 _env: "dev"
 
+# 噪声环境
 _simulation_env: true
+
+# 错误率
+_single_error_rate: 0.0012
+_double_error_rate: 0.011
+_measure_error_rate: 0.017

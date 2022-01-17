@@ -1,28 +1,33 @@
 import numpy as np
 from sklearn.preprocessing import normalize
 import sys
+from lib.Noisy import Noisy
+
+noisy = Noisy()
 
 class GateManager:
     Gates = {
-        'I': np.array([[1, 0], [0, 1]]),
-        'X': np.array([[0, 1], [1, 0]]),
-        'Y': np.array([[0, -1j], [1j, 0]]),
-        'Z': np.array([[1, 0], [0, -1]]),
-        'P': np.array([[1, 0], [0, 1j]]),
+        'I': np.array([[1.0, 0], [0, 1]]),
+        'X': np.array([[0.0, 1], [1, 0]]),
+        'Y': np.array([[0.0, -1j], [1j, 0]]),
+        'Z': np.array([[1.0, 0], [0, -1]]),
+        'P': np.array([[1.0, 0], [0, 1j]]),
         'H': np.array([[1 / np.sqrt(2), 1 / np.sqrt(2)], [1 / np.sqrt(2), -1 / np.sqrt(2)]]),
-        'S': np.array([[1, 0], [0, 1j]]),
-        'T': np.array([[1, 0], [0, np.exp(1j * np.pi / 4)]]),
+        'S': np.array([[1.0, 0], [0, 1j]]),
+        'T': np.array([[1.0, 0], [0, np.exp(1j * np.pi / 4)]]),
         'V': np.array([[(1 + 1j) / 2, -1j * (1 + 1j) / 2], [-1j * (1 + 1j) / 2, (1 + 1j) / 2]]),
         'V_H': np.array([[(1 - 1j) / 2, 1j * (1 - 1j) / 2], [1j * (1 - 1j) / 2, (1 - 1j) / 2]]),
-        'SWAP': np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
+        'SWAP': np.array([[1.0, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
     }
 
     def getGate(gate):
         if gate in GateManager.Gates:
-            return GateManager.Gates[gate]
+            result = noisy.getNoisyGate(GateManager.Gates[gate])
+            return result
         if gate[0] == 'R':
             k = int(gate[1:])
-            return np.array([[1, 0], [0, np.exp(2j * np.pi / 2**k)]])
+            result = noisy.getNoisyGate(np.array([[1, 0], [0, np.exp(2j * np.pi / 2**k)]]))
+            return result
         raise ValueError('Failed to GateManager.getGate!')
 
     def has(gate):

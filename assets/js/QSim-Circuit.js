@@ -77,7 +77,7 @@ const PreScanner = (txt) => {
       let alias = /\(\s*[A-Za-z_0-9]+\s+/.exec(cur)[0].substring(1).trim()
       if (symbolTable[alias]) {
         result.push(`m${alias} = measure(${symbolTable[alias]})`)
-        console.log('cur', cur, alias)
+        // console.log('cur', cur, alias)
         cur = cur.replace(alias, `m${alias}`)
       }
     } else {
@@ -184,7 +184,7 @@ QSim.Circuit.Scanner = (txt) => {
   }
 
   const cont = PreScanner(txt.trim())
-  console.log('Scanner source code: ',cont)
+  // console.log('Scanner source code: ',cont)
 
   let ptr = 0
   let state = 0   //state是必要的，为了能够将门和其他的语句区分开

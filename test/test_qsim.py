@@ -107,7 +107,7 @@ def test_wave_func():
 # test print_wf, a2wf
 def test_print_wf():
     tools = Tools()
-    answer = '|psi> = {}|{}>+{}|{}>'.format(1/np.sqrt(2),'00',1/np.sqrt(2),'11')
+    answer = '{}|{}>+{}|{}>'.format(1/np.sqrt(2),'00',1/np.sqrt(2),'11')
     q1 = QuantumRegister(2)
     q1.applyGate('H', 0)
     q1.applyGate('X', 0, 1)

@@ -52,7 +52,11 @@ class Route:
             'memory_cost': namespace['memory_cost'],
             'show': [],
             'MessageType': 'info',
-            'symbalTable': symbalTable
+            'symbalTable': symbalTable,
+            'simulation_env': yaml_data['_simulation_env'],
+            'single_error_rate': yaml_data['_single_error_rate'],
+            'double_error_rate': yaml_data['_double_error_rate'],
+            'measure_error_rate': yaml_data['_measure_error_rate']
         }
         # 解析符号表中的show字段
         for index, dic in enumerate(symbalTable['show']): 

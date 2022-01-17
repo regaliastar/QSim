@@ -58,7 +58,7 @@ def test_teleport():
     qubit.applyGate('X',1,2)
     # 假设 phi = sqrt(1/2)|0> + sqrt(1/2)|1>
     qubit.applyGate('H',0)
-    phi = '|psi> = {}|{}>+{}|{}>'.format(1/np.sqrt(2),'0',1/np.sqrt(2),'1')
+    phi = '{}|{}>+{}|{}>'.format(1/np.sqrt(2),'0',1/np.sqrt(2),'1')
     # 开始隐态传输
     qubit.applyGate('X',0,1)
     qubit.applyGate('H',0)

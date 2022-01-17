@@ -154,7 +154,15 @@ function debug(){
        * output 由 show 字段与 wave_func 字段构成
        * 当存在 show 时候，只输出 show
        */
-      let output = `simulation_env: false\n`
+      let output = ''
+      if (message.simulation_env) {
+        output = `simulation_env: true
+        single_error_rate: ${message.single_error_rate}
+        double_error_rate: ${message.double_error_rate}
+        measure_error_rate: ${message.measure_error_rate}\n`
+      } else {
+        output = `simulation_env: false\n`
+      }
       if (message.show.length > 0) {
         output += 'result: \n'
         for(let i = 0; i < message.show.length; i++){
