@@ -18,17 +18,16 @@
 Alice_1 = quantum(1)
 Alice_2 = quantum(1)
 Bob = quantum(1)
-H Alice_1
-X Alice_2 Bob
-H Alice_1  
+H Bob
+X Bob Alice_2
 X Alice_1 Alice_2
 H Alice_1
 // Quantum version of the IF statement
 if(Alice_1 == 1){
-    X Bob
+  X Bob
 }
 if(Alice_2 == 1){
-    Z Bob
+  Z Bob
 }
 show()
 
