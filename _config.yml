@@ -24,7 +24,7 @@ _connect:
 _env: "dev"
 
 # 噪声环境
-_simulation_env: true
+_simulation_env: false
 
 # 错误率
 _single_error_rate: 0.0012

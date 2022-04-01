@@ -202,6 +202,7 @@ class QuantumRegister:
             raise ValueError('Gate {} is not defined in Gates'.format(gate))
         gateMatrix = self.generateMatrix(gate, q1, q2)
         self.amplitudes = np.dot(self.amplitudes, gateMatrix)
+        return gateMatrix
 
     def measure(self, place=-1, count=1):
         '''

@@ -1,12 +1,12 @@
-# QSim
+# QSimor
 `QLight`：一种轻量级解释型编程语言  
-`QSim`：配套的量子模拟器  
+`QSimor`：配套的量子模拟器  
 
 *QSim*是基于*Python+Node.js*实现的量子计算机模拟器。内核计算使用`numpy`，界面使用`electron`框架
 
 在前端界面书写的*QLight*文本会被解释成Python语句执行，脚本文件和量子线路*mvvm*绑定，做到所见即所算。你也可以将线路保存为*LaTeX*语句或字符集合
 
-*Qsim*的*API*库实现了量子线路论文的算法，使用时通过配置`_config.yml`文件加载
+*Qsimor*的*API*库实现了量子线路论文的算法，使用时通过配置`_config.yml`文件加载
 
 ## Introduction
 ```
@@ -49,7 +49,7 @@ print(result)
 ```
 
 ## Terminal
-*QSim*集成了命令行界面，你可以通过命令行方便的进行操控量子操作
+*QSimor*集成了命令行界面，你可以通过命令行方便的进行操控量子操作
 ```
 Usage: qsim [options]
 
