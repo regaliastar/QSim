@@ -107,6 +107,7 @@ public
 __pycache__
 docs
 .vscode
+.VSCodeCounter
 
 # build
 build
